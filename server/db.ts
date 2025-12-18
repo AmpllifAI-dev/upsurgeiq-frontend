@@ -1,6 +1,15 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import {
+  InsertUser,
+  users,
+  subscriptions,
+  businesses,
+  Subscription,
+  InsertSubscription,
+  Business,
+  InsertBusiness,
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +98,97 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// Subscription helpers
+export async function getUserSubscription(userId: number): Promise<Subscription | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select()
+    .from(subscriptions)
+    .where(eq(subscriptions.userId, userId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createSubscription(subscription: InsertSubscription): Promise<Subscription> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(subscriptions).values(subscription);
+  const insertedId = Number(result[0].insertId);
+
+  const created = await db
+    .select()
+    .from(subscriptions)
+    .where(eq(subscriptions.id, insertedId))
+    .limit(1);
+
+  if (created.length === 0) throw new Error("Failed to create subscription");
+  return created[0]!;
+}
+
+export async function updateSubscription(
+  subscriptionId: number,
+  updates: Partial<InsertSubscription>
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(subscriptions).set(updates).where(eq(subscriptions.id, subscriptionId));
+}
+
+// Business helpers
+export async function getUserBusiness(userId: number): Promise<Business | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select()
+    .from(businesses)
+    .where(eq(businesses.userId, userId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createBusiness(business: InsertBusiness): Promise<Business> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(businesses).values(business);
+  const insertedId = Number(result[0].insertId);
+
+  const created = await db
+    .select()
+    .from(businesses)
+    .where(eq(businesses.id, insertedId))
+    .limit(1);
+
+  if (created.length === 0) throw new Error("Failed to create business");
+  return created[0]!;
+}
+
+export async function updateBusiness(
+  businessId: number,
+  updates: Partial<InsertBusiness>
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(businesses).set(updates).where(eq(businesses.id, businessId));
+}
+
+export async function getBusinessById(businessId: number): Promise<Business | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select()
+    .from(businesses)
+    .where(eq(businesses.id, businessId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
