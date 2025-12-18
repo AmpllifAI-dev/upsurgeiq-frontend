@@ -47,8 +47,13 @@ import { createCheckoutSession, createPortalSession } from "./stripe";
 import { getProductByTier } from "./products";
 import { invokeLLM } from "./_core/llm";
 import { getErrorLogs, getErrorStats } from "./errorLogs";
+import { createLogger } from "./_core/logger";
+import { sendPressReleaseNotificationEmail } from "./_core/email";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+
+const prLogger = createLogger("PressReleaseGeneration");
+const aiLogger = createLogger("AIAssistant");
 
 export const appRouter = router({
   system: systemRouter,
@@ -183,8 +188,18 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
+        prLogger.info("Starting press release generation", {
+          userId: ctx.user.id,
+          action: "generate",
+          metadata: { topic: input.topic },
+        });
+
         const business = await getUserBusiness(ctx.user.id);
         if (!business) {
+          prLogger.error("Business profile not found", undefined, {
+            userId: ctx.user.id,
+            action: "generate",
+          });
           throw new TRPCError({
             code: "NOT_FOUND",
             message: "Business profile not found",
@@ -218,16 +233,34 @@ ${input.keyPoints ? `Key Points to Cover:\n${input.keyPoints}` : ""}
 
 Generate a complete, publication-ready press release.`;
 
-        const response = await invokeLLM({
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-        });
+        try {
+          const response = await invokeLLM({
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          });
 
-        const content = response.choices[0]?.message?.content || "";
+          const content = response.choices[0]?.message?.content || "";
 
-        return { content };
+          prLogger.info("Press release generated successfully", {
+            userId: ctx.user.id,
+            action: "generate",
+            metadata: { 
+              topic: input.topic,
+              wordCount: content.length 
+            },
+          });
+
+          return { content };
+        } catch (error) {
+          prLogger.error("Press release generation failed", error as Error, {
+            userId: ctx.user.id,
+            action: "generate",
+            metadata: { topic: input.topic },
+          });
+          throw error;
+        }
       }),
 
     create: protectedProcedure
@@ -248,12 +281,28 @@ Generate a complete, publication-ready press release.`;
         }
 
         const pressRelease = await createPressRelease({
-          businessId: business.id,
           userId: ctx.user.id,
+          businessId: business.id,
           title: input.title,
           body: input.content,
           status: input.status,
         });
+
+        // Send notification email if published
+        if (input.status === "published" && ctx.user.email && ctx.user.name) {
+          const excerpt = input.content.substring(0, 200) + (input.content.length > 200 ? "..." : "");
+          await sendPressReleaseNotificationEmail({
+            to: ctx.user.email,
+            name: ctx.user.name,
+            title: input.title,
+            excerpt,
+          }).catch((error) => {
+            prLogger.error("Failed to send press release notification email", error as Error, {
+              userId: ctx.user.id,
+              action: "create",
+            });
+          });
+        }
 
         return pressRelease;
       }),
@@ -431,8 +480,18 @@ Generate a complete, publication-ready press release.`;
         })
       )
       .mutation(async ({ ctx, input }) => {
+        aiLogger.info("AI assistant chat request", {
+          userId: ctx.user.id,
+          action: "chat",
+          metadata: { messageLength: input.message.length },
+        });
+
         const business = await getUserBusiness(ctx.user.id);
         if (!business) {
+          aiLogger.error("Business profile not found", undefined, {
+            userId: ctx.user.id,
+            action: "chat",
+          });
           throw new TRPCError({
             code: "NOT_FOUND",
             message: "Business profile not found",
@@ -455,16 +514,33 @@ Your role is to:
 
 Be concise, actionable, and professional. Use markdown formatting for clarity.`;
 
-        const response = await invokeLLM({
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: input.message },
-          ],
-        });
+        try {
+          const response = await invokeLLM({
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: input.message },
+            ],
+          });
 
-        const message = response.choices[0]?.message?.content || "I apologize, but I couldn't generate a response. Please try again.";
+          const message = response.choices[0]?.message?.content || "I apologize, but I couldn't generate a response. Please try again.";
 
-        return { message: typeof message === 'string' ? message : '' };
+          aiLogger.info("AI assistant response generated", {
+            userId: ctx.user.id,
+            action: "chat",
+            metadata: { 
+              responseLength: typeof message === 'string' ? message.length : 0 
+            },
+          });
+
+          return { message: typeof message === 'string' ? message : '' };
+        } catch (error) {
+          aiLogger.error("AI assistant chat failed", error as Error, {
+            userId: ctx.user.id,
+            action: "chat",
+            metadata: { messageLength: input.message.length },
+          });
+          throw error;
+        }
       }),
   }),
 

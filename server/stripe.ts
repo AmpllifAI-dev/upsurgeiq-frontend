@@ -1,5 +1,8 @@
 import Stripe from "stripe";
 import { ENV } from "./_core/env";
+import { createLogger } from "./_core/logger";
+
+const logger = createLogger("StripePayment");
 
 if (!ENV.stripeSecretKey) {
   throw new Error("STRIPE_SECRET_KEY is not configured");
@@ -20,7 +23,14 @@ export async function createCheckoutSession(params: {
   tier: string;
   origin: string;
 }): Promise<Stripe.Checkout.Session> {
-  const session = await stripe.checkout.sessions.create({
+  logger.info("Creating Stripe checkout session", {
+    userId: params.userId,
+    action: "createCheckout",
+    metadata: { tier: params.tier, priceId: params.priceId },
+  });
+
+  try {
+    const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     payment_method_types: ["card"],
     line_items: [
@@ -40,9 +50,23 @@ export async function createCheckoutSession(params: {
     allow_promotion_codes: true,
     success_url: `${params.origin}/dashboard?payment=success`,
     cancel_url: `${params.origin}/subscribe?payment=canceled`,
-  });
+    });
 
-  return session;
+    logger.info("Checkout session created successfully", {
+      userId: params.userId,
+      action: "createCheckout",
+      metadata: { sessionId: session.id, tier: params.tier },
+    });
+
+    return session;
+  } catch (error) {
+    logger.error("Failed to create checkout session", error as Error, {
+      userId: params.userId,
+      action: "createCheckout",
+      metadata: { tier: params.tier, priceId: params.priceId },
+    });
+    throw error;
+  }
 }
 
 /**
@@ -52,10 +76,28 @@ export async function createPortalSession(params: {
   customerId: string;
   origin: string;
 }): Promise<Stripe.BillingPortal.Session> {
-  const session = await stripe.billingPortal.sessions.create({
-    customer: params.customerId,
-    return_url: `${params.origin}/dashboard`,
+  logger.info("Creating customer portal session", {
+    action: "createPortal",
+    metadata: { customerId: params.customerId },
   });
 
-  return session;
+  try {
+    const session = await stripe.billingPortal.sessions.create({
+      customer: params.customerId,
+      return_url: `${params.origin}/dashboard`,
+    });
+
+    logger.info("Portal session created successfully", {
+      action: "createPortal",
+      metadata: { sessionId: session.id },
+    });
+
+    return session;
+  } catch (error) {
+    logger.error("Failed to create portal session", error as Error, {
+      action: "createPortal",
+      metadata: { customerId: params.customerId },
+    });
+    throw error;
+  }
 }

@@ -10,4 +10,8 @@ export const ENV = {
   stripeSecretKey: process.env.STRIPE_SECRET_KEY ?? "",
   stripePublishableKey: process.env.VITE_STRIPE_PUBLISHABLE_KEY ?? "",
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? "",
+  sendGridApiKey: process.env.SENDGRID_API_KEY ?? "",
+  fromEmail: process.env.FROM_EMAIL ?? "noreply@upsurgeiq.com",
+  adminEmail: process.env.ADMIN_EMAIL ?? "christopher@upsurgeiq.com",
+  frontendUrl: process.env.FRONTEND_URL ?? "https://upsurgeiq.com",
 };

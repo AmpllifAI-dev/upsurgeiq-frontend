@@ -5,21 +5,29 @@ import { ENV } from "../_core/env";
 import { getDb } from "../db";
 import { subscriptions, users } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
+import { createLogger } from "../_core/logger";
+import { sendPaymentConfirmationEmail } from "../_core/email";
+
+const logger = createLogger("StripeWebhook");
 
 if (!ENV.stripeWebhookSecret) {
-  console.warn("[Stripe Webhook] STRIPE_WEBHOOK_SECRET not configured");
+  logger.warn("STRIPE_WEBHOOK_SECRET not configured");
 }
 
 export async function handleStripeWebhook(req: Request, res: Response) {
   const sig = req.headers["stripe-signature"];
 
   if (!sig) {
-    console.error("[Stripe Webhook] No signature header");
+    logger.error("No signature header in webhook request", undefined, {
+      action: "verifySignature",
+    });
     return res.status(400).send("No signature");
   }
 
   if (!ENV.stripeWebhookSecret) {
-    console.error("[Stripe Webhook] Webhook secret not configured");
+    logger.error("Webhook secret not configured", undefined, {
+      action: "verifySignature",
+    });
     return res.status(500).send("Webhook secret not configured");
   }
 
@@ -32,19 +40,27 @@ export async function handleStripeWebhook(req: Request, res: Response) {
       ENV.stripeWebhookSecret
     );
   } catch (err: any) {
-    console.error("[Stripe Webhook] Signature verification failed:", err.message);
+    logger.error("Signature verification failed", err, {
+      action: "verifySignature",
+    });
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
   // Handle test events
   if (event.id.startsWith("evt_test_")) {
-    console.log("[Stripe Webhook] Test event detected, returning verification response");
+    logger.info("Test event detected, returning verification response", {
+      action: "handleTestEvent",
+      metadata: { eventType: event.type },
+    });
     return res.json({
       verified: true,
     });
   }
 
-  console.log(`[Stripe Webhook] Received event: ${event.type}`);
+  logger.info("Received webhook event", {
+    action: "handleWebhook",
+    metadata: { eventType: event.type, eventId: event.id },
+  });
 
   try {
     switch (event.type) {
@@ -80,30 +96,50 @@ export async function handleStripeWebhook(req: Request, res: Response) {
       }
 
       default:
-        console.log(`[Stripe Webhook] Unhandled event type: ${event.type}`);
+        logger.info("Unhandled event type", {
+          action: "handleWebhook",
+          metadata: { eventType: event.type },
+        });
     }
+
+    logger.info("Webhook event processed successfully", {
+      action: "handleWebhook",
+      metadata: { eventType: event.type },
+    });
 
     res.json({ received: true });
   } catch (error) {
-    console.error("[Stripe Webhook] Error processing event:", error);
+    logger.error("Error processing webhook event", error as Error, {
+      action: "handleWebhook",
+      metadata: { eventType: event.type, eventId: event.id },
+    });
     res.status(500).json({ error: "Webhook processing failed" });
   }
 }
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-  console.log("[Stripe Webhook] Checkout completed:", session.id);
+  logger.info("Checkout completed", {
+    action: "handleCheckout",
+    metadata: { sessionId: session.id },
+  });
 
   const userId = session.metadata?.user_id;
   const tier = session.metadata?.tier;
 
   if (!userId) {
-    console.error("[Stripe Webhook] No user_id in metadata");
+    logger.error("No user_id in checkout session metadata", undefined, {
+      action: "handleCheckout",
+      metadata: { sessionId: session.id },
+    });
     return;
   }
 
   const db = await getDb();
   if (!db) {
-    console.error("[Stripe Webhook] Database not available");
+    logger.error("Database not available", undefined, {
+      action: "handleCheckout",
+      userId: parseInt(userId),
+    });
     return;
   }
 
@@ -112,7 +148,11 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const stripeCustomerId = session.customer as string;
 
   if (!stripeSubscriptionId) {
-    console.error("[Stripe Webhook] No subscription ID in session");
+    logger.error("No subscription ID in checkout session", undefined, {
+      action: "handleCheckout",
+      userId: parseInt(userId),
+      metadata: { sessionId: session.id },
+    });
     return;
   }
 
@@ -146,7 +186,35 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     });
   }
 
-  console.log(`[Stripe Webhook] Subscription created/updated for user ${userId}`);
+  logger.info("Subscription created/updated successfully", {
+    action: "handleCheckout",
+    userId: parseInt(userId),
+    metadata: { tier, subscriptionId: stripeSubscriptionId },
+  });
+
+  // Send payment confirmation email
+  const userEmail = session.metadata?.customer_email;
+  const userName = session.metadata?.customer_name;
+  if (userEmail && userName && tier) {
+    const tierMap: Record<string, { name: string; amount: number }> = {
+      starter: { name: "Starter", amount: 4900 },
+      pro: { name: "Pro", amount: 9900 },
+      scale: { name: "Scale", amount: 34900 },
+    };
+    const planInfo = tierMap[tier.toLowerCase()] || { name: tier, amount: 0 };
+    
+    await sendPaymentConfirmationEmail({
+      to: userEmail,
+      name: userName,
+      plan: planInfo.name,
+      amount: planInfo.amount,
+    }).catch((error) => {
+      logger.error("Failed to send payment confirmation email", error as Error, {
+        action: "handleCheckout",
+        userId: parseInt(userId),
+      });
+    });
+  }
 }
 
 async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
