@@ -298,3 +298,18 @@ export const aiChatHistory = mysqlTable("ai_chat_history", {
 
 export type AiChatHistory = typeof aiChatHistory.$inferSelect;
 export type InsertAiChatHistory = typeof aiChatHistory.$inferInsert;
+// Error Logs (for monitoring and debugging)
+export const errorLogs = mysqlTable("error_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  level: mysqlEnum("level", ["info", "warn", "error", "debug"]).notNull(),
+  message: text("message").notNull(),
+  userId: int("userId").references(() => users.id, { onDelete: "set null" }),
+  component: varchar("component", { length: 100 }),
+  action: varchar("action", { length: 100 }),
+  errorStack: text("errorStack"),
+  metadata: text("metadata"), // JSON string
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ErrorLog = typeof errorLogs.$inferSelect;
+export type InsertErrorLog = typeof errorLogs.$inferInsert;

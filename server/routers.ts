@@ -46,6 +46,7 @@ import {
 import { createCheckoutSession, createPortalSession } from "./stripe";
 import { getProductByTier } from "./products";
 import { invokeLLM } from "./_core/llm";
+import { getErrorLogs, getErrorStats } from "./errorLogs";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
@@ -694,6 +695,41 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
       });
 
       return { url: session.url };
+    }),
+  }),
+
+  errorLogs: router({
+    list: protectedProcedure
+      .input(
+        z.object({
+          limit: z.number().optional(),
+          level: z.enum(["info", "warn", "error", "debug"]).optional(),
+          userId: z.number().optional(),
+          component: z.string().optional(),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        // Only admins can view error logs
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only admins can view error logs",
+          });
+        }
+
+        return await getErrorLogs(input);
+      }),
+
+    stats: protectedProcedure.query(async ({ ctx }) => {
+      // Only admins can view error stats
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only admins can view error stats",
+        });
+      }
+
+      return await getErrorStats();
     }),
   }),
 });

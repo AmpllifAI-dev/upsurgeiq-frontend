@@ -14,7 +14,8 @@ import {
   Plus,
   TrendingUp,
   Calendar,
-  Target
+  Target,
+  AlertCircle
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -129,6 +130,11 @@ export default function Dashboard() {
             <a href="/campaigns" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Campaigns
             </a>
+            {user.role === "admin" && (
+              <a href="/error-logs" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Error Logs
+              </a>
+            )}
             <div className="flex items-center gap-3">
               <Badge variant="secondary">{planName} Plan</Badge>
               <Button variant="ghost" size="sm" onClick={() => setLocation("/settings")}>
