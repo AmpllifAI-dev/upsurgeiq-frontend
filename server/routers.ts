@@ -17,6 +17,16 @@ import {
   createSocialMediaPost,
   getSocialMediaPostsByBusiness,
 } from "./pressReleases";
+import {
+  createMediaList,
+  getMediaListsByBusiness,
+  getMediaListById,
+  updateMediaList,
+  deleteMediaList,
+  createMediaListContact,
+  getContactsByMediaList,
+  bulkCreateContacts,
+} from "./mediaLists";
 import { invokeLLM } from "./_core/llm";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
@@ -294,6 +304,148 @@ Generate a complete, publication-ready press release.`;
         );
 
         return { success: true, posts };
+      }),
+  }),
+
+  mediaList: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const business = await getUserBusiness(ctx.user.id);
+      if (!business) {
+        return [];
+      }
+      return await getMediaListsByBusiness(business.id);
+    }),
+
+    get: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return await getMediaListById(input.id);
+      }),
+
+    create: protectedProcedure
+      .input(
+        z.object({
+          name: z.string(),
+          description: z.string().optional(),
+          type: z.enum(["default", "custom", "purchased"]).optional(),
+          industry: z.string().optional(),
+          region: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const business = await getUserBusiness(ctx.user.id);
+        if (!business) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Business profile not found",
+          });
+        }
+
+        const mediaList = await createMediaList({
+          businessId: business.id,
+          name: input.name,
+          description: input.description,
+          type: input.type || "custom",
+          industry: input.industry,
+          region: input.region,
+        });
+
+        return mediaList;
+      }),
+
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          name: z.string().optional(),
+          description: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { id, ...updates } = input;
+        await updateMediaList(id, updates);
+        return { success: true };
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteMediaList(input.id);
+        return { success: true };
+      }),
+
+    getContacts: protectedProcedure
+      .input(z.object({ mediaListId: z.number() }))
+      .query(async ({ input }) => {
+        return await getContactsByMediaList(input.mediaListId);
+      }),
+
+    addContact: protectedProcedure
+      .input(
+        z.object({
+          mediaListId: z.number(),
+          name: z.string(),
+          email: z.string().email(),
+          publication: z.string().optional(),
+          role: z.string().optional(),
+          phone: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const contact = await createMediaListContact(input);
+        return contact;
+      }),
+  }),
+
+  ai: router({
+    chat: protectedProcedure
+      .input(
+        z.object({
+          message: z.string(),
+          context: z
+            .object({
+              businessName: z.string(),
+              industry: z.string(),
+              brandVoice: z.string(),
+            })
+            .optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const business = await getUserBusiness(ctx.user.id);
+        if (!business) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Business profile not found",
+          });
+        }
+
+        const systemPrompt = `You are an expert PR and marketing consultant for ${input.context?.businessName || "a business"}. 
+
+Business Context:
+- Name: ${input.context?.businessName || "Unknown"}
+- Industry: ${input.context?.industry || "General"}
+- Brand Voice: ${input.context?.brandVoice || "Professional"}
+
+Your role is to:
+- Provide strategic PR and marketing advice
+- Help with content creation and messaging
+- Offer insights on media outreach and journalist relations
+- Suggest campaign ideas and tactics
+- Answer questions about best practices
+
+Be concise, actionable, and professional. Use markdown formatting for clarity.`;
+
+        const response = await invokeLLM({
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: input.message },
+          ],
+        });
+
+        const message = response.choices[0]?.message?.content || "I apologize, but I couldn't generate a response. Please try again.";
+
+        return { message: typeof message === 'string' ? message : '' };
       }),
   }),
 });

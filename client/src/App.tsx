@@ -11,6 +11,8 @@ import Onboarding from "./pages/Onboarding";
 import PressReleaseNew from "./pages/PressReleaseNew";
 import PressReleases from "./pages/PressReleases";
 import SocialMediaNew from "./pages/SocialMediaNew";
+import MediaLists from "./pages/MediaLists";
+import AIAssistant from "./pages/AIAssistant";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -23,6 +25,8 @@ function Router() {
       <Route path="/press-releases/new" component={PressReleaseNew} />
       <Route path="/press-releases" component={PressReleases} />
       <Route path="/social-media/new" component={SocialMediaNew} />
+      <Route path="/media-lists" component={MediaLists} />
+      <Route path="/ai-assistant" component={AIAssistant} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
