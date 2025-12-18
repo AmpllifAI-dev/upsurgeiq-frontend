@@ -16,6 +16,7 @@ export interface ProductConfig {
   interval: "month";
   features: string[];
   stripePriceId?: string; // To be set after creating in Stripe Dashboard
+  stripeProductId?: string; // Stripe Product ID
 }
 
 export const PRODUCTS: Record<PricingTier, ProductConfig> = {
@@ -32,7 +33,8 @@ export const PRODUCTS: Record<PricingTier, ProductConfig> = {
       "Up to 10 press releases/month",
       "Email support",
     ],
-    // stripePriceId will be set after Stripe product creation
+    stripeProductId: "prod_Td2pC4hUddBbAH",
+    stripePriceId: "price_1SfmjyAGfyqPBnQ9JPZoNoWl",
   },
   pro: {
     name: "Pro",
@@ -49,7 +51,8 @@ export const PRODUCTS: Record<PricingTier, ProductConfig> = {
       "Campaign Lab access",
       "Priority support",
     ],
-    // stripePriceId will be set after Stripe product creation
+    stripeProductId: "prod_Td2sl51moqbe4C",
+    stripePriceId: "price_1SfmmWAGfyqPBnQ9LeAJ711i",
   },
   scale: {
     name: "Scale",
@@ -66,7 +69,26 @@ export const PRODUCTS: Record<PricingTier, ProductConfig> = {
       "API access",
       "Dedicated account manager",
     ],
-    // stripePriceId will be set after Stripe product creation
+    stripeProductId: "prod_Td2tuhKJPQ41d8",
+    stripePriceId: "price_1SfmnuAGfyqPBnQ9U5P7KfF4",
+  },
+};
+
+/**
+ * Additional Products Configuration
+ */
+export const ADDITIONAL_PRODUCTS = {
+  additionalMediaList: {
+    name: "Additional Media List",
+    stripeProductId: "prod_Td2wLpX1A6exs9",
+    stripePriceId: "price_1Sfmq8AGfyqPBnQ9JJ8tsFHt",
+    description: "Add extra media list to your subscription",
+  },
+  intelligentCampaignLab: {
+    name: "Intelligent Campaign Lab",
+    stripeProductId: "prod_Td2yyQ1pFJWNoo",
+    stripePriceId: "price_1SfmsDAGfyqPBnQ9DTkBb5vw",
+    description: "Advanced campaign optimization and A/B testing",
   },
 };
 

@@ -140,3 +140,13 @@
 - [x] Scheduled posting functionality
 - [x] Platform-specific tone customization
 - [x] Character limit validation per platform
+
+
+## Stripe Product Configuration (New Request)
+- [x] Update Stripe product IDs in server/products.ts
+- [x] Configure Starter tier product ID (prod_Td2pC4hUddBbAH) and price ID (price_1SfmjyAGfyqPBnQ9JPZoNoWl)
+- [x] Configure Pro tier product ID (prod_Td2sl51moqbe4C) and price ID (price_1SfmmWAGfyqPBnQ9LeAJ711i)
+- [x] Configure Scale tier product ID (prod_Td2tuhKJPQ41d8) and price ID (price_1SfmnuAGfyqPBnQ9U5P7KfF4)
+- [x] Configure Additional Media List product ID (prod_Td2wLpX1A6exs9) and price ID (price_1Sfmq8AGfyqPBnQ9JJ8tsFHt)
+- [x] Configure Intelligent Campaign Lab product ID (prod_Td2yyQ1pFJWNoo) and price ID (price_1SfmsDAGfyqPBnQ9DTkBb5vw)
+- [x] Test Stripe checkout integration
