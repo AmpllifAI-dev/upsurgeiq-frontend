@@ -2,13 +2,14 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Zap, FileText, Plus, Calendar, ArrowLeft, Eye, Edit, Trash2, Search } from "lucide-react";
+import { Zap, FileText, Plus, Calendar, ArrowLeft, Eye, Edit, Trash2, Search, Download } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
+import { exportPressReleaseToPDF } from "@/lib/pdfExport";
 
 export default function PressReleases() {
   const { user, loading } = useAuth();
@@ -50,6 +51,16 @@ export default function PressReleases() {
     if (confirm("Are you sure you want to delete this press release?")) {
       deleteMutation.mutate({ id });
     }
+  };
+
+  const handleExportPDF = (pr: any) => {
+    exportPressReleaseToPDF({
+      title: pr.title,
+      subtitle: pr.subtitle || undefined,
+      body: pr.body,
+      date: new Date(pr.createdAt),
+    });
+    toast.success("PDF exported successfully");
   };
 
   const getStatusBadge = (status: string) => {
@@ -201,6 +212,14 @@ export default function PressReleases() {
                     >
                       <Edit className="w-4 h-4 mr-2" />
                       Edit
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleExportPDF(pr)}
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Export PDF
                     </Button>
                     <Button
                       variant="outline"

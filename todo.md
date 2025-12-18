@@ -214,7 +214,7 @@
 - [x] Implement advanced filtering options
 
 ### Export Functionality
-- [ ] Add PDF export for press releases
+- [x] Add PDF export for press releases
 - [ ] Implement CSV export for media lists
 - [ ] Create campaign report PDF export
 - [ ] Add analytics data CSV export
