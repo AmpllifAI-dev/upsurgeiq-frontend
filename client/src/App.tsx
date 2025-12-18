@@ -8,6 +8,9 @@ import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Subscribe from "./pages/Subscribe";
 import Onboarding from "./pages/Onboarding";
+import PressReleaseNew from "./pages/PressReleaseNew";
+import PressReleases from "./pages/PressReleases";
+import SocialMediaNew from "./pages/SocialMediaNew";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -17,6 +20,9 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/subscribe" component={Subscribe} />
       <Route path="/onboarding" component={Onboarding} />
+      <Route path="/press-releases/new" component={PressReleaseNew} />
+      <Route path="/press-releases" component={PressReleases} />
+      <Route path="/social-media/new" component={SocialMediaNew} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
