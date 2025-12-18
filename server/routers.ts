@@ -43,6 +43,8 @@ import {
   updatePartner,
   deletePartner,
 } from "./partners";
+import { createCheckoutSession, createPortalSession } from "./stripe";
+import { getProductByTier } from "./products";
 import { invokeLLM } from "./_core/llm";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
@@ -641,6 +643,58 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
         await deletePartner(input.id);
         return { success: true };
       }),
+  }),
+
+  stripe: router({
+    createCheckout: protectedProcedure
+      .input(
+        z.object({
+          tier: z.enum(["starter", "pro", "scale"]),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const product = getProductByTier(input.tier);
+        
+        if (!product.stripePriceId) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Stripe price ID not configured for this tier. Please contact support.",
+          });
+        }
+
+        const origin = ctx.req.headers.origin || "http://localhost:3000";
+
+        const session = await createCheckoutSession({
+          userId: ctx.user.id,
+          userEmail: ctx.user.email || "",
+          userName: ctx.user.name || "",
+          priceId: product.stripePriceId,
+          tier: input.tier,
+          origin,
+        });
+
+        return { url: session.url };
+      }),
+
+    createPortal: protectedProcedure.mutation(async ({ ctx }) => {
+      const subscription = await getUserSubscription(ctx.user.id);
+      
+      if (!subscription || !subscription.stripeCustomerId) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "No active subscription found",
+        });
+      }
+
+      const origin = ctx.req.headers.origin || "http://localhost:3000";
+
+      const session = await createPortalSession({
+        customerId: subscription.stripeCustomerId,
+        origin,
+      });
+
+      return { url: session.url };
+    }),
   }),
 });
 

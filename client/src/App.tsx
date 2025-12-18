@@ -15,6 +15,7 @@ import MediaLists from "./pages/MediaLists";
 import AIAssistant from "./pages/AIAssistant";
 import CampaignLab from "./pages/CampaignLab";
 import Partners from "./pages/Partners";
+import WordPressSettings from "./pages/WordPressSettings";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -31,6 +32,7 @@ function Router() {
       <Route path="/ai-assistant" component={AIAssistant} />
       <Route path="/campaign-lab" component={CampaignLab} />
       <Route path="/partners" component={Partners} />
+      <Route path="/wordpress-settings" component={WordPressSettings} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

@@ -37,12 +37,24 @@ export default function Subscribe() {
     return null;
   }
 
-  const handleSelectPlan = (plan: string) => {
-    // TODO: Integrate with Stripe
-    toast.info("Stripe integration coming soon! For now, you'll be redirected to onboarding.");
-    setTimeout(() => {
-      setLocation("/onboarding");
-    }, 1500);
+  const checkoutMutation = trpc.stripe.createCheckout.useMutation({
+    onSuccess: (data) => {
+      if (data.url) {
+        toast.success("Redirecting to checkout...");
+        window.open(data.url, "_blank");
+      }
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to create checkout session");
+    },
+  });
+
+  const handleSelectPlan = (tier: "starter" | "pro" | "scale") => {
+    if (!user) {
+      toast.error("Please sign in to subscribe");
+      return;
+    }
+    checkoutMutation.mutate({ tier });
   };
 
   const pricingTiers = [
@@ -169,7 +181,7 @@ export default function Subscribe() {
                 <Button
                   className="w-full"
                   variant={tier.highlighted ? "default" : "outline"}
-                  onClick={() => handleSelectPlan(tier.id)}
+                  onClick={() => handleSelectPlan(tier.id as "starter" | "pro" | "scale")}
                 >
                   {tier.cta}
                 </Button>

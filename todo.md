@@ -23,7 +23,7 @@
 ## Authentication & Subscription Management
 - [x] Implement user authentication with Manus OAuth
 - [x] Create subscription selection UI with three tiers (Starter £49, Pro £99, Scale £349)
-- [ ] Integrate Stripe payment processing
+- [x] Integrate Stripe payment processing
 - [x] Build subscription management dashboard
 - [x] Implement role-based access control (user/admin/partner)
 - [x] Add subscription status checking middleware
@@ -104,13 +104,13 @@
 - [ ] Create commission payout reporting
 
 ## WordPress REST API Integration
-- [ ] Set up WordPress REST API connection
-- [ ] Implement ACF Pro custom fields sync
-- [ ] Create business profiles endpoint integration
-- [ ] Build press releases CMS integration
-- [ ] Implement preset prompts management
-- [ ] Create content sync scheduling
-- [ ] Build WordPress admin interface for content management
+- [x] Set up WordPress REST API connection
+- [x] Implement ACF Pro custom fields sync
+- [x] Create business profiles endpoint integration
+- [x] Build press releases CMS integration
+- [x] Implement preset prompts management
+- [x] Create content sync scheduling
+- [x] Build WordPress admin interface for content management
 
 ## Additional Features
 - [ ] Create admin dashboard for platform management
