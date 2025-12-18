@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
-import { Zap, Beaker, Plus, ArrowLeft, Play, Pause, TrendingUp, Eye, BarChart3 } from "lucide-react";
+import { Zap, Beaker, Plus, ArrowLeft, Play, Pause, TrendingUp, Eye, BarChart3, Search, Filter } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -20,10 +20,26 @@ export default function CampaignLab() {
   const [campaignName, setCampaignName] = useState("");
   const [campaignGoal, setCampaignGoal] = useState("");
   const [campaignBudget, setCampaignBudget] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   const { data: campaigns, isLoading, refetch } = trpc.campaign.list.useQuery(undefined, {
     enabled: !!user,
   });
+
+  const filteredCampaigns = useMemo(() => {
+    if (!campaigns) return [];
+
+    return campaigns.filter((campaign) => {
+      const matchesSearch = !searchQuery ||
+        campaign.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (campaign.goal && campaign.goal.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      const matchesStatus = statusFilter === "all" || campaign.status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [campaigns, searchQuery, statusFilter]);
 
   const createMutation = trpc.campaign.create.useMutation({
     onSuccess: () => {
@@ -197,6 +213,43 @@ export default function CampaignLab() {
           </Card>
         </div>
 
+        {/* Search and Filter */}
+        {campaigns && campaigns.length > 0 && (
+          <div className="mb-6 flex gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Search campaigns by name or goal..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-4 py-2 border border-input rounded-md bg-background text-foreground"
+            >
+              <option value="all">All Status</option>
+              <option value="draft">Draft</option>
+              <option value="active">Active</option>
+              <option value="paused">Paused</option>
+              <option value="completed">Completed</option>
+            </select>
+            {(searchQuery || statusFilter !== "all") && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearchQuery("");
+                  setStatusFilter("all");
+                }}
+              >
+                Clear Filters
+              </Button>
+            )}
+          </div>
+        )}
+
         {/* Campaigns List */}
         {!campaigns || campaigns.length === 0 ? (
           <Card>
@@ -211,10 +264,28 @@ export default function CampaignLab() {
                 Create Campaign
               </Button>
             </CardContent>
+          </Card>        ) : filteredCampaigns.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <Search className="w-16 h-16 text-muted-foreground mb-4 opacity-50" />
+              <h3 className="text-xl font-semibold mb-2">No campaigns found</h3>
+              <p className="text-muted-foreground mb-6 text-center max-w-md">
+                Try adjusting your search or filter criteria
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearchQuery("");
+                  setStatusFilter("all");
+                }}
+              >
+                Clear Filters
+              </Button>
+            </CardContent>
           </Card>
         ) : (
-          <div className="space-y-6">
-            {campaigns.map((campaign) => (
+          <div className="grid gap-6">
+            {filteredCampaigns.map((campaign) => (
               <Card key={campaign.id} className="hover:border-primary/50 transition-colors">
                 <CardHeader>
                   <div className="flex items-start justify-between">
