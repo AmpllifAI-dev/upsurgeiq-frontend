@@ -27,6 +27,22 @@ import {
   getContactsByMediaList,
   bulkCreateContacts,
 } from "./mediaLists";
+import {
+  createCampaign,
+  getCampaignsByBusiness,
+  getCampaignById,
+  updateCampaign,
+  deleteCampaign,
+  createCampaignVariant,
+  getVariantsByCampaign,
+} from "./campaigns";
+import {
+  createPartner,
+  getAllPartners,
+  getPartnerById,
+  updatePartner,
+  deletePartner,
+} from "./partners";
 import { invokeLLM } from "./_core/llm";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
@@ -446,6 +462,184 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
         const message = response.choices[0]?.message?.content || "I apologize, but I couldn't generate a response. Please try again.";
 
         return { message: typeof message === 'string' ? message : '' };
+      }),
+  }),
+
+  campaign: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const business = await getUserBusiness(ctx.user.id);
+      if (!business) {
+        return [];
+      }
+      return await getCampaignsByBusiness(business.id);
+    }),
+
+    get: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return await getCampaignById(input.id);
+      }),
+
+    create: protectedProcedure
+      .input(
+        z.object({
+          name: z.string(),
+          goal: z.string().optional(),
+          budget: z.number().optional(),
+          status: z.enum(["draft", "active", "paused", "completed"]).optional(),
+          platforms: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const business = await getUserBusiness(ctx.user.id);
+        if (!business) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Business profile not found",
+          });
+        }
+
+        const campaign = await createCampaign({
+          businessId: business.id,
+          userId: ctx.user.id,
+          name: input.name,
+          goal: input.goal,
+          budget: input.budget,
+          status: input.status || "draft",
+          platforms: input.platforms,
+        });
+
+        return campaign;
+      }),
+
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          name: z.string().optional(),
+          status: z.enum(["draft", "active", "paused", "completed"]).optional(),
+
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { id, ...updates } = input;
+        await updateCampaign(id, updates);
+        return { success: true };
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteCampaign(input.id);
+        return { success: true };
+      }),
+
+    getVariants: protectedProcedure
+      .input(z.object({ campaignId: z.number() }))
+      .query(async ({ input }) => {
+        return await getVariantsByCampaign(input.campaignId);
+      }),
+
+    createVariant: protectedProcedure
+      .input(
+        z.object({
+          campaignId: z.number(),
+          name: z.string(),
+          content: z.string(),
+          targetAudience: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const variant = await createCampaignVariant(input);
+        return variant;
+      }),
+  }),
+
+  partner: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      // Only admins can list partners
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Admin access required",
+        });
+      }
+      return await getAllPartners();
+    }),
+
+    get: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Admin access required",
+          });
+        }
+        return await getPartnerById(input.id);
+      }),
+
+    create: protectedProcedure
+      .input(
+        z.object({
+          name: z.string(),
+          type: z.string().optional(),
+          contactName: z.string().optional(),
+          contactEmail: z.string().email(),
+          commissionRate: z.number().optional(),
+          status: z.enum(["active", "inactive", "pending"]).optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Admin access required",
+          });
+        }
+
+        const partner = await createPartner({
+          userId: ctx.user.id,
+          organizationName: input.name,
+          organizationType: input.type,
+          commissionRate: input.commissionRate || 20,
+          status: input.status || "active",
+        });
+
+        return partner;
+      }),
+
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          organizationName: z.string().optional(),
+          status: z.enum(["active", "inactive", "pending"]).optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Admin access required",
+          });
+        }
+        const { id, ...updates } = input;
+        await updatePartner(id, updates);
+        return { success: true };
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Admin access required",
+          });
+        }
+        await deletePartner(input.id);
+        return { success: true };
       }),
   }),
 });
