@@ -2,15 +2,19 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Zap, FileText, Plus, Calendar, ArrowLeft, Eye, Edit, Trash2 } from "lucide-react";
+import { Zap, FileText, Plus, Calendar, ArrowLeft, Eye, Edit, Trash2, Search } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useState, useMemo } from "react";
+import { Input } from "@/components/ui/input";
 
 export default function PressReleases() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   
   const { data: pressReleases, isLoading, refetch } = trpc.pressRelease.list.useQuery(undefined, {
     enabled: !!user,
@@ -57,6 +61,21 @@ export default function PressReleases() {
     return variants[status] || "secondary";
   };
 
+  // Filter press releases based on search and status
+  const filteredPressReleases = useMemo(() => {
+    if (!pressReleases) return [];
+    return pressReleases.filter((pr) => {
+      const matchesSearch = searchQuery === "" || 
+        pr.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (pr.subtitle && pr.subtitle.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        pr.body.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesStatus = statusFilter === "all" || pr.status === statusFilter;
+      
+      return matchesSearch && matchesStatus;
+    });
+  }, [pressReleases, searchQuery, statusFilter]);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -89,6 +108,32 @@ export default function PressReleases() {
           </Button>
         </div>
 
+        {/* Search and Filters */}
+        {pressReleases && pressReleases.length > 0 && (
+          <div className="flex items-center gap-4 mb-6">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Search press releases by title, subtitle, or content..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+            >
+              <option value="all">All Status</option>
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="scheduled">Scheduled</option>
+            </select>
+          </div>
+        )}
+
         {!pressReleases || pressReleases.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-16">
@@ -103,9 +148,22 @@ export default function PressReleases() {
               </Button>
             </CardContent>
           </Card>
+        ) : filteredPressReleases.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <Search className="w-16 h-16 text-muted-foreground mb-4 opacity-50" />
+              <h3 className="text-xl font-semibold mb-2">No press releases found</h3>
+              <p className="text-muted-foreground mb-6 text-center max-w-md">
+                Try adjusting your search or filter criteria
+              </p>
+              <Button onClick={() => { setSearchQuery(""); setStatusFilter("all"); }} variant="outline">
+                Clear Filters
+              </Button>
+            </CardContent>
+          </Card>
         ) : (
           <div className="grid gap-6">
-            {pressReleases.map((pr) => (
+            {filteredPressReleases.map((pr) => (
               <Card key={pr.id} className="hover:border-primary/50 transition-colors">
                 <CardHeader>
                   <div className="flex items-start justify-between">

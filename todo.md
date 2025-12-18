@@ -207,11 +207,11 @@
 - [x] Build account settings page
 
 ### Search and Filtering
-- [ ] Add search functionality to press releases
-- [ ] Implement media list search and filtering
+- [x] Add search functionality to press releases
+- [x] Implement media list search and filtering
 - [ ] Create campaign search and filtering
 - [ ] Add global search across platform
-- [ ] Implement advanced filtering options
+- [x] Implement advanced filtering options
 
 ### Export Functionality
 - [ ] Add PDF export for press releases
