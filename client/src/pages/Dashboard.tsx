@@ -130,6 +130,9 @@ export default function Dashboard() {
             <a href="/campaigns" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Campaigns
             </a>
+            <a href="/analytics" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Analytics
+            </a>
             {user.role === "admin" && (
               <a href="/error-logs" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 Error Logs
@@ -137,7 +140,7 @@ export default function Dashboard() {
             )}
             <div className="flex items-center gap-3">
               <Badge variant="secondary">{planName} Plan</Badge>
-              <Button variant="ghost" size="sm" onClick={() => setLocation("/settings")}>
+              <Button variant="ghost" size="sm" onClick={() => setLocation("/profile")}>
                 Settings
               </Button>
             </div>

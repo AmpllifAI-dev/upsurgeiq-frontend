@@ -17,6 +17,8 @@ import CampaignLab from "./pages/CampaignLab";
 import Partners from "./pages/Partners";
 import WordPressSettings from "./pages/WordPressSettings";
 import ErrorLogs from "./pages/ErrorLogs";
+import Analytics from "./pages/Analytics";
+import Profile from "./pages/Profile";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -35,6 +37,8 @@ function Router() {
       <Route path="/partners" component={Partners} />
       <Route path="/wordpress-settings" component={WordPressSettings} />
       <Route path="/error-logs" component={ErrorLogs} />
+      <Route path="/analytics" component={Analytics} />
+      <Route path="/profile" component={Profile} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
