@@ -4,6 +4,7 @@ import { exportCampaignToPDF } from "@/lib/pdfExport";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { SearchFilter } from "@/components/SearchFilter";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +28,13 @@ export default function CampaignLab() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [startDateFilter, setStartDateFilter] = useState("");
   const [endDateFilter, setEndDateFilter] = useState("");
+
+  const statusOptions = [
+    { label: "Draft", value: "draft" },
+    { label: "Active", value: "active" },
+    { label: "Paused", value: "paused" },
+    { label: "Completed", value: "completed" },
+  ];
 
   const { data: campaigns, isLoading, refetch } = trpc.campaign.list.useQuery(undefined, {
     enabled: !!user,
@@ -267,54 +275,41 @@ export default function CampaignLab() {
 
         {/* Search and Filter */}
         {campaigns && campaigns.length > 0 && (
-          <div className="mb-6 flex gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Search campaigns by name or goal..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
+          <div className="mb-6">
+            <SearchFilter
+              searchPlaceholder="Search campaigns by name or goal..."
+              statusOptions={statusOptions}
+              onSearchChange={setSearchQuery}
+              onStatusChange={setStatusFilter}
+              onClearFilters={() => {
+                setSearchQuery("");
+                setStatusFilter("all");
+                setStartDateFilter("");
+                setEndDateFilter("");
+              }}
+              showStatusFilter={true}
+            />
+            {/* Date Range Filters */}
+            <div className="flex gap-4 mt-4">
+              <div className="flex-1">
+                <Label htmlFor="start-date" className="text-sm mb-2 block">Start Date From</Label>
+                <Input
+                  id="start-date"
+                  type="date"
+                  value={startDateFilter}
+                  onChange={(e) => setStartDateFilter(e.target.value)}
+                />
+              </div>
+              <div className="flex-1">
+                <Label htmlFor="end-date" className="text-sm mb-2 block">End Date To</Label>
+                <Input
+                  id="end-date"
+                  type="date"
+                  value={endDateFilter}
+                  onChange={(e) => setEndDateFilter(e.target.value)}
+                />
+              </div>
             </div>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 border border-input rounded-md bg-background text-foreground"
-            >
-              <option value="all">All Status</option>
-              <option value="draft">Draft</option>
-              <option value="active">Active</option>
-              <option value="paused">Paused</option>
-              <option value="completed">Completed</option>
-            </select>
-            <Input
-              type="date"
-              placeholder="Start date from"
-              value={startDateFilter}
-              onChange={(e) => setStartDateFilter(e.target.value)}
-              className="w-40"
-            />
-            <Input
-              type="date"
-              placeholder="End date to"
-              value={endDateFilter}
-              onChange={(e) => setEndDateFilter(e.target.value)}
-              className="w-40"
-            />
-            {(searchQuery || statusFilter !== "all" || startDateFilter || endDateFilter) && (
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setSearchQuery("");
-                  setStatusFilter("all");
-                  setStartDateFilter("");
-                  setEndDateFilter("");
-                }}
-              >
-                Clear Filters
-              </Button>
-            )}
           </div>
         )}
 

@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { EngagementDashboard } from "@/components/EngagementDashboard";
 import { ArrowLeft, Send, Calendar as CalendarIcon, Users, Mail, Clock } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -311,6 +312,12 @@ export default function DistributePressRelease() {
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* Engagement Analytics */}
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Distribution Analytics</h2>
+          <EngagementDashboard pressReleaseId={parseInt(id || "0")} />
         </div>
       </main>
     </div>

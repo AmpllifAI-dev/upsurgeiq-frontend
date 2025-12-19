@@ -16,6 +16,7 @@ import { Streamdown } from "streamdown";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { CopyButton } from "@/components/CopyButton";
 import { CharacterCounter } from "@/components/CharacterCounter";
+import { AIImageGenerator } from "@/components/AIImageGenerator";
 
 export default function PressReleaseNew() {
   const { user, loading } = useAuth();
@@ -29,6 +30,7 @@ export default function PressReleaseNew() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
+  const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
 
   const { data: business } = trpc.business.get.useQuery(undefined, {
     enabled: !!user,
@@ -320,13 +322,34 @@ export default function PressReleaseNew() {
 
               {generatedContent && isEditing && (
                 <div className="space-y-4">
+                  {generatedImageUrl && (
+                    <div className="relative">
+                      <img
+                        src={generatedImageUrl}
+                        alt="Generated press release image"
+                        className="w-full h-auto rounded-lg border mb-4"
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setGeneratedImageUrl(null)}
+                        className="absolute top-2 right-2"
+                      >
+                        Remove Image
+                      </Button>
+                    </div>
+                  )}
                   <Textarea
                     value={generatedContent}
                     onChange={(e) => setGeneratedContent(e.target.value)}
                     rows={20}
                     className="font-mono text-sm"
                   />
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
+                    <AIImageGenerator
+                      onImageGenerated={(url) => setGeneratedImageUrl(url)}
+                      suggestedPrompt={topic ? `Professional image for: ${topic}` : undefined}
+                    />
                     <Button
                       variant="outline"
                       className="flex-1"

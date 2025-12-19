@@ -48,6 +48,8 @@ import { getProductByTier } from "./products";
 import { invokeLLM } from "./_core/llm";
 import { generateImage } from "./_core/imageGeneration";
 import { getErrorLogs, getErrorStats } from "./errorLogs";
+import { logActivity } from "./activityLog";
+import { checkLimit, incrementUsage } from "./usageTracking";
 import { createLogger } from "./_core/logger";
 import { getPressReleaseEngagement } from "./tracking";
 import {
@@ -288,12 +290,34 @@ Generate a complete, publication-ready press release.`;
           });
         }
 
+        // Check usage limits
+        const { allowed } = await checkLimit(ctx.user.id, "pressReleases");
+        if (!allowed) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Press release limit reached for your subscription tier. Please upgrade to create more.",
+          });
+        }
+
         const pressRelease = await createPressRelease({
           userId: ctx.user.id,
           businessId: business.id,
           title: input.title,
           body: input.content,
           status: input.status,
+        });
+
+        // Increment usage counter
+        await incrementUsage(ctx.user.id, "pressReleases");
+
+        // Log activity
+        await logActivity({
+          userId: ctx.user.id,
+          action: "create",
+          entityType: "press_release",
+          entityId: pressRelease.id,
+          description: `Created press release: ${input.title}`,
+          metadata: { title: input.title, status: input.status },
         });
 
         // Send notification email if published
@@ -366,6 +390,15 @@ Generate a complete, publication-ready press release.`;
           });
         }
 
+        // Check usage limits
+        const { allowed } = await checkLimit(ctx.user.id, "socialPosts");
+        if (!allowed) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Social media post limit reached for your subscription tier. Please upgrade to create more.",
+          });
+        }
+
         // Create a post for each selected platform
         const posts = await Promise.all(
           input.platforms.map((platform) =>
@@ -378,6 +411,18 @@ Generate a complete, publication-ready press release.`;
             })
           )
         );
+
+        // Increment usage counter
+        await incrementUsage(ctx.user.id, "socialPosts");
+
+        // Log activity
+        await logActivity({
+          userId: ctx.user.id,
+          action: "create",
+          entityType: "social_media_post",
+          description: `Created social media posts for ${input.platforms.join(", ")}`,
+          metadata: { platforms: input.platforms, postCount: posts.length },
+        });
 
         return { success: true, posts };
       }),
@@ -509,8 +554,31 @@ Generate a complete, publication-ready press release.`;
   ai: router({
     generateImage: protectedProcedure
       .input(z.object({ prompt: z.string() }))
-      .mutation(async ({ input }) => {
-        return await generateImage({ prompt: input.prompt });
+      .mutation(async ({ ctx, input }) => {
+        // Check usage limits
+        const { allowed } = await checkLimit(ctx.user.id, "aiImages");
+        if (!allowed) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "AI image generation limit reached for your subscription tier. Please upgrade to generate more images.",
+          });
+        }
+
+        const result = await generateImage({ prompt: input.prompt });
+
+        // Increment usage counter
+        await incrementUsage(ctx.user.id, "aiImages");
+
+        // Log activity
+        await logActivity({
+          userId: ctx.user.id,
+          action: "generate",
+          entityType: "ai_image",
+          description: `Generated AI image: ${input.prompt.substring(0, 50)}...`,
+          metadata: { prompt: input.prompt },
+        });
+
+        return result;
       }),
 
     chat: protectedProcedure
@@ -532,6 +600,15 @@ Generate a complete, publication-ready press release.`;
           action: "chat",
           metadata: { messageLength: input.message.length },
         });
+
+        // Check usage limits
+        const { allowed } = await checkLimit(ctx.user.id, "aiChatMessages");
+        if (!allowed) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "AI chat message limit reached for your subscription tier. Please upgrade to continue chatting.",
+          });
+        }
 
         const business = await getUserBusiness(ctx.user.id);
         if (!business) {
@@ -577,6 +654,18 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
             metadata: { 
               responseLength: typeof message === 'string' ? message.length : 0 
             },
+          });
+
+          // Increment usage counter
+          await incrementUsage(ctx.user.id, "aiChatMessages");
+
+          // Log activity
+          await logActivity({
+            userId: ctx.user.id,
+            action: "chat",
+            entityType: "ai_assistant",
+            description: `AI chat: ${input.message.substring(0, 50)}...`,
+            metadata: { messageLength: input.message.length },
           });
 
           return { message: typeof message === 'string' ? message : '' };
@@ -625,6 +714,15 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
           });
         }
 
+        // Check usage limits
+        const { allowed } = await checkLimit(ctx.user.id, "campaigns");
+        if (!allowed) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Campaign limit reached for your subscription tier. Please upgrade to create more.",
+          });
+        }
+
         const campaign = await createCampaign({
           businessId: business.id,
           userId: ctx.user.id,
@@ -633,6 +731,19 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
           budget: input.budget,
           status: input.status || "draft",
           platforms: input.platforms,
+        });
+
+        // Increment usage counter
+        await incrementUsage(ctx.user.id, "campaigns");
+
+        // Log activity
+        await logActivity({
+          userId: ctx.user.id,
+          action: "create",
+          entityType: "campaign",
+          entityId: campaign.id,
+          description: `Created campaign: ${input.name}`,
+          metadata: { name: input.name, status: input.status || "draft" },
         });
 
         return campaign;
@@ -862,13 +973,37 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
           recipientCount: z.number().optional(),
         })
       )
-      .mutation(async ({ input }) => {
-        return await createDistribution({
+      .mutation(async ({ ctx, input }) => {
+        // Check usage limits
+        const { allowed } = await checkLimit(ctx.user.id, "distributions");
+        if (!allowed) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Distribution limit reached for your subscription tier. Please upgrade to send more distributions.",
+          });
+        }
+
+        const distribution = await createDistribution({
           pressReleaseId: input.pressReleaseId,
           mediaListId: input.mediaListId,
           status: "pending",
           recipientCount: input.recipientCount || 0,
         });
+
+        // Increment usage counter
+        await incrementUsage(ctx.user.id, "distributions");
+
+        // Log activity
+        await logActivity({
+          userId: ctx.user.id,
+          action: "create",
+          entityType: "distribution",
+          entityId: distribution.id,
+          description: `Created distribution for press release ID ${input.pressReleaseId}`,
+          metadata: { pressReleaseId: input.pressReleaseId, mediaListId: input.mediaListId },
+        });
+
+        return distribution;
       }),
 
     markSent: protectedProcedure

@@ -11,12 +11,19 @@ import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { exportPressReleaseToPDF } from "@/lib/pdfExport";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SearchFilter } from "@/components/SearchFilter";
 
 export default function PressReleases() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  const statusOptions = [
+    { label: "Draft", value: "draft" },
+    { label: "Scheduled", value: "scheduled" },
+    { label: "Published", value: "published" },
+  ];
   
   const { data: pressReleases, isLoading, refetch } = trpc.pressRelease.list.useQuery(undefined, {
     enabled: !!user,
@@ -158,27 +165,18 @@ export default function PressReleases() {
 
         {/* Search and Filters */}
         {pressReleases && pressReleases.length > 0 && (
-          <div className="flex items-center gap-4 mb-6">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Search press releases by title, subtitle, or content..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-            >
-              <option value="all">All Status</option>
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-              <option value="scheduled">Scheduled</option>
-            </select>
+          <div className="mb-6">
+            <SearchFilter
+              searchPlaceholder="Search press releases by title, subtitle, or content..."
+              statusOptions={statusOptions}
+              onSearchChange={setSearchQuery}
+              onStatusChange={setStatusFilter}
+              onClearFilters={() => {
+                setSearchQuery("");
+                setStatusFilter("all");
+              }}
+              showStatusFilter={true}
+            />
           </div>
         )}
 
