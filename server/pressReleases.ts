@@ -108,3 +108,36 @@ export async function getSocialMediaPostsByBusiness(
     .where(eq(socialMediaPosts.businessId, businessId))
     .orderBy(desc(socialMediaPosts.createdAt));
 }
+
+/**
+ * Bulk delete press releases
+ */
+export async function bulkDeletePressReleases(ids: number[]): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { inArray } = await import("drizzle-orm");
+  
+  const result = await db.delete(pressReleases).where(inArray(pressReleases.id, ids));
+  return result[0].affectedRows || 0;
+}
+
+/**
+ * Bulk update press release status
+ */
+export async function bulkUpdatePressReleaseStatus(
+  ids: number[],
+  status: "draft" | "scheduled" | "published" | "archived"
+): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { inArray } = await import("drizzle-orm");
+  
+  const result = await db
+    .update(pressReleases)
+    .set({ status, updatedAt: new Date() })
+    .where(inArray(pressReleases.id, ids));
+  
+  return result[0].affectedRows || 0;
+}

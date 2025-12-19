@@ -6,7 +6,9 @@ import {
   getUserSubscription, 
   getUserBusiness, 
   createBusiness, 
-  updateBusiness 
+  updateBusiness,
+  getNotificationPreferences,
+  upsertNotificationPreferences
 } from "./db";
 import {
   createPressRelease,
@@ -16,6 +18,8 @@ import {
   deletePressRelease,
   createSocialMediaPost,
   getSocialMediaPostsByBusiness,
+  bulkDeletePressReleases,
+  bulkUpdatePressReleaseStatus,
 } from "./pressReleases";
 import {
   createMediaList,
@@ -35,6 +39,8 @@ import {
   deleteCampaign,
   createCampaignVariant,
   getVariantsByCampaign,
+  bulkDeleteCampaigns,
+  bulkUpdateCampaignStatus,
 } from "./campaigns";
 import {
   createPartner,
@@ -48,8 +54,8 @@ import { getProductByTier } from "./products";
 import { invokeLLM } from "./_core/llm";
 import { generateImage } from "./_core/imageGeneration";
 import { getErrorLogs, getErrorStats } from "./errorLogs";
-import { logActivity } from "./activityLog";
-import { checkLimit, incrementUsage } from "./usageTracking";
+import { logActivity, getActivityLogs, getRecentActivity } from "./activityLog";
+import { checkLimit, incrementUsage, getCurrentUsage, TIER_LIMITS } from "./usageTracking";
 import { createLogger } from "./_core/logger";
 import { getPressReleaseEngagement } from "./tracking";
 import {
@@ -360,6 +366,45 @@ Generate a complete, publication-ready press release.`;
       .mutation(async ({ input }) => {
         await deletePressRelease(input.id);
         return { success: true };
+      }),
+
+    bulkDelete: protectedProcedure
+      .input(z.object({ ids: z.array(z.number()) }))
+      .mutation(async ({ ctx, input }) => {
+        const affectedRows = await bulkDeletePressReleases(input.ids);
+        
+        // Log activity
+        await logActivity({
+          userId: ctx.user.id,
+          action: "delete",
+          entityType: "press_release",
+          description: `Bulk deleted ${affectedRows} press releases`,
+          metadata: { count: affectedRows, ids: input.ids },
+        });
+
+        return { success: true, count: affectedRows };
+      }),
+
+    bulkUpdateStatus: protectedProcedure
+      .input(
+        z.object({
+          ids: z.array(z.number()),
+          status: z.enum(["draft", "scheduled", "published", "archived"]),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const affectedRows = await bulkUpdatePressReleaseStatus(input.ids, input.status);
+        
+        // Log activity
+        await logActivity({
+          userId: ctx.user.id,
+          action: "update",
+          entityType: "press_release",
+          description: `Bulk updated ${affectedRows} press releases to ${input.status}`,
+          metadata: { count: affectedRows, status: input.status, ids: input.ids },
+        });
+
+        return { success: true, count: affectedRows };
       }),
   }),
 
@@ -790,6 +835,45 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
         const variant = await createCampaignVariant(input);
         return variant;
       }),
+
+    bulkDelete: protectedProcedure
+      .input(z.object({ ids: z.array(z.number()) }))
+      .mutation(async ({ ctx, input }) => {
+        const affectedRows = await bulkDeleteCampaigns(input.ids);
+        
+        // Log activity
+        await logActivity({
+          userId: ctx.user.id,
+          action: "delete",
+          entityType: "campaign",
+          description: `Bulk deleted ${affectedRows} campaigns`,
+          metadata: { count: affectedRows, ids: input.ids },
+        });
+
+        return { success: true, count: affectedRows };
+      }),
+
+    bulkUpdateStatus: protectedProcedure
+      .input(
+        z.object({
+          ids: z.array(z.number()),
+          status: z.enum(["draft", "active", "paused", "completed"]),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const affectedRows = await bulkUpdateCampaignStatus(input.ids, input.status);
+        
+        // Log activity
+        await logActivity({
+          userId: ctx.user.id,
+          action: "update",
+          entityType: "campaign",
+          description: `Bulk updated ${affectedRows} campaigns to ${input.status}`,
+          metadata: { count: affectedRows, status: input.status, ids: input.ids },
+        });
+
+        return { success: true, count: affectedRows };
+      }),
   }),
 
   partner: router({
@@ -1098,6 +1182,123 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
       }
 
       return await getErrorStats();
+    }),
+  }),
+
+  notificationPreferences: router({
+    get: protectedProcedure.query(async ({ ctx }) => {
+      const preferences = await getNotificationPreferences(ctx.user.id);
+      
+      // Return with boolean values
+      if (!preferences) {
+        return {
+          emailNotifications: true,
+          pressReleaseNotifications: true,
+          campaignNotifications: true,
+          socialMediaNotifications: true,
+          weeklyDigest: true,
+          marketingEmails: false,
+        };
+      }
+
+      return {
+        emailNotifications: !!preferences.emailNotifications,
+        pressReleaseNotifications: !!preferences.pressReleaseNotifications,
+        campaignNotifications: !!preferences.campaignNotifications,
+        socialMediaNotifications: !!preferences.socialMediaNotifications,
+        weeklyDigest: !!preferences.weeklyDigest,
+        marketingEmails: !!preferences.marketingEmails,
+      };
+    }),
+
+    update: protectedProcedure
+      .input(
+        z.object({
+          emailNotifications: z.boolean().optional(),
+          pressReleaseNotifications: z.boolean().optional(),
+          campaignNotifications: z.boolean().optional(),
+          socialMediaNotifications: z.boolean().optional(),
+          weeklyDigest: z.boolean().optional(),
+          marketingEmails: z.boolean().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const updated = await upsertNotificationPreferences(ctx.user.id, input);
+
+        // Log activity
+        await logActivity({
+          userId: ctx.user.id,
+          action: "update",
+          entityType: "notification_preferences",
+          entityId: updated?.id || 0,
+          description: "Updated notification preferences",
+          metadata: input,
+        });
+
+        return {
+          success: true,
+          preferences: updated,
+        };
+      }),
+  }),
+
+  activityLog: router({
+    recent: protectedProcedure
+      .input(z.object({ limit: z.number().optional().default(10) }))
+      .query(async ({ ctx, input }) => {
+        const logs = await getActivityLogs(ctx.user.id, input.limit);
+        
+        // Parse metadata JSON strings back to objects
+        return logs.map((log: any) => ({
+          ...log,
+          metadata: log.metadata ? JSON.parse(log.metadata) : {},
+        }));
+      }),
+
+    byDateRange: protectedProcedure
+      .input(z.object({ days: z.number().optional().default(7) }))
+      .query(async ({ ctx, input }) => {
+        const logs = await getRecentActivity(ctx.user.id, input.days);
+        
+        // Parse metadata JSON strings back to objects
+        return logs.map((log: any) => ({
+          ...log,
+          metadata: log.metadata ? JSON.parse(log.metadata) : {},
+        }));
+      }),
+  }),
+
+  usageTracking: router({
+    current: protectedProcedure.query(async ({ ctx }) => {
+      const usage = await getCurrentUsage(ctx.user.id);
+      const subscription = await getUserSubscription(ctx.user.id);
+
+      if (!subscription || !usage) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Usage or subscription data not found",
+        });
+      }
+
+      const tierLimits = TIER_LIMITS[subscription.plan];
+
+      return {
+        pressReleases: usage.pressReleasesCreated,
+        socialMediaPosts: usage.socialPostsCreated,
+        campaigns: usage.campaignsCreated,
+        distributions: usage.distributionsSent,
+        aiImages: usage.aiImagesGenerated,
+        aiChatMessages: usage.aiChatMessages,
+        limits: {
+          pressReleases: tierLimits.pressReleases,
+          socialMediaPosts: tierLimits.socialPosts,
+          campaigns: tierLimits.campaigns,
+          distributions: tierLimits.distributions,
+          aiImages: tierLimits.aiImages,
+          aiChatMessages: tierLimits.aiChatMessages,
+        },
+        period: usage.period,
+      };
     }),
   }),
 });

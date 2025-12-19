@@ -113,3 +113,36 @@ export async function deleteCampaignVariant(id: number): Promise<void> {
 
   await db.delete(campaignVariants).where(eq(campaignVariants.id, id));
 }
+
+/**
+ * Bulk delete campaigns
+ */
+export async function bulkDeleteCampaigns(ids: number[]): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { inArray } = await import("drizzle-orm");
+  
+  const result = await db.delete(campaigns).where(inArray(campaigns.id, ids));
+  return result[0].affectedRows || 0;
+}
+
+/**
+ * Bulk update campaign status
+ */
+export async function bulkUpdateCampaignStatus(
+  ids: number[],
+  status: "draft" | "active" | "paused" | "completed"
+): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { inArray } = await import("drizzle-orm");
+  
+  const result = await db
+    .update(campaigns)
+    .set({ status, updatedAt: new Date() })
+    .where(inArray(campaigns.id, ids));
+  
+  return result[0].affectedRows || 0;
+}

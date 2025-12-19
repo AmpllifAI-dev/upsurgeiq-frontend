@@ -192,3 +192,75 @@ export async function getBusinessById(businessId: number): Promise<Business | un
 
   return result.length > 0 ? result[0] : undefined;
 }
+
+// Notification Preferences
+export async function getNotificationPreferences(userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const { notificationPreferences } = await import("../drizzle/schema");
+  const result = await db
+    .select()
+    .from(notificationPreferences)
+    .where(eq(notificationPreferences.userId, userId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function upsertNotificationPreferences(
+  userId: number,
+  preferences: {
+    emailNotifications?: boolean;
+    pressReleaseNotifications?: boolean;
+    campaignNotifications?: boolean;
+    socialMediaNotifications?: boolean;
+    weeklyDigest?: boolean;
+    marketingEmails?: boolean;
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { notificationPreferences } = await import("../drizzle/schema");
+
+  // Convert boolean to int (MySQL doesn't have boolean type)
+  const values = {
+    userId,
+    emailNotifications: preferences.emailNotifications !== undefined ? (preferences.emailNotifications ? 1 : 0) : undefined,
+    pressReleaseNotifications: preferences.pressReleaseNotifications !== undefined ? (preferences.pressReleaseNotifications ? 1 : 0) : undefined,
+    campaignNotifications: preferences.campaignNotifications !== undefined ? (preferences.campaignNotifications ? 1 : 0) : undefined,
+    socialMediaNotifications: preferences.socialMediaNotifications !== undefined ? (preferences.socialMediaNotifications ? 1 : 0) : undefined,
+    weeklyDigest: preferences.weeklyDigest !== undefined ? (preferences.weeklyDigest ? 1 : 0) : undefined,
+    marketingEmails: preferences.marketingEmails !== undefined ? (preferences.marketingEmails ? 1 : 0) : undefined,
+  };
+
+  // Remove undefined values
+  const cleanedValues = Object.fromEntries(
+    Object.entries(values).filter(([_, v]) => v !== undefined)
+  );
+
+  // Check if preferences exist
+  const existing = await getNotificationPreferences(userId);
+
+  if (existing) {
+    // Update existing preferences
+    await db
+      .update(notificationPreferences)
+      .set(cleanedValues)
+      .where(eq(notificationPreferences.userId, userId));
+  } else {
+    // Create new preferences with defaults
+    await db.insert(notificationPreferences).values({
+      userId,
+      emailNotifications: cleanedValues.emailNotifications ?? 1,
+      pressReleaseNotifications: cleanedValues.pressReleaseNotifications ?? 1,
+      campaignNotifications: cleanedValues.campaignNotifications ?? 1,
+      socialMediaNotifications: cleanedValues.socialMediaNotifications ?? 1,
+      weeklyDigest: cleanedValues.weeklyDigest ?? 1,
+      marketingEmails: cleanedValues.marketingEmails ?? 0,
+    });
+  }
+
+  return await getNotificationPreferences(userId);
+}

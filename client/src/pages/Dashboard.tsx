@@ -21,6 +21,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { KeyboardShortcut } from "@/components/KeyboardShortcut";
+import { ActivityTimeline } from "@/components/ActivityTimeline";
+import { UsageDashboard } from "@/components/UsageDashboard";
 
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -298,29 +300,14 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5" />
-                Performance Insights
-              </CardTitle>
-              <CardDescription>Your content performance</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center gap-4 p-4 rounded-lg bg-muted/50">
-                  <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center">
-                    <TrendingUp className="w-6 h-6 text-secondary" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-sm">Start creating content</p>
-                    <p className="text-xs text-muted-foreground">Analytics will appear once you publish content</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <ActivityTimeline limit={5} />
         </div>
+        </section>
+
+        {/* Usage Dashboard */}
+        <section aria-labelledby="usage-dashboard-heading" className="mt-6">
+          <h2 id="usage-dashboard-heading" className="sr-only">Usage Dashboard</h2>
+          <UsageDashboard />
         </section>
       </div>
     </div>

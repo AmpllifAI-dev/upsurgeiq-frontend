@@ -6,10 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { SocialMediaConnections } from "@/components/SocialMediaConnections";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { User, Mail, Building, Calendar, Shield, Bell, Download } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 export default function Profile() {
@@ -20,12 +21,40 @@ export default function Profile() {
 
   const { data: subscription, isLoading: subLoading } = trpc.subscription.get.useQuery();
   const { data: business, isLoading: businessLoading } = trpc.business.get.useQuery();
+  const { data: notificationPrefs, isLoading: prefsLoading } = trpc.notificationPreferences.get.useQuery();
 
   // Notification preferences state
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [pressReleaseNotifications, setPressReleaseNotifications] = useState(true);
-  const [campaignNotifications, setCampaignNotifications] = useState(true);
-  const [weeklyDigest, setWeeklyDigest] = useState(true);
+  const [emailNotifications, setEmailNotifications] = useState(notificationPrefs?.emailNotifications ?? true);
+  const [pressReleaseNotifications, setPressReleaseNotifications] = useState(notificationPrefs?.pressReleaseNotifications ?? true);
+  const [campaignNotifications, setCampaignNotifications] = useState(notificationPrefs?.campaignNotifications ?? true);
+  const [socialMediaNotifications, setSocialMediaNotifications] = useState(notificationPrefs?.socialMediaNotifications ?? true);
+  const [weeklyDigest, setWeeklyDigest] = useState(notificationPrefs?.weeklyDigest ?? true);
+  const [marketingEmails, setMarketingEmails] = useState(notificationPrefs?.marketingEmails ?? false);
+
+  // Update state when preferences load
+  useEffect(() => {
+    if (notificationPrefs) {
+      setEmailNotifications(notificationPrefs.emailNotifications);
+      setPressReleaseNotifications(notificationPrefs.pressReleaseNotifications);
+      setCampaignNotifications(notificationPrefs.campaignNotifications);
+      setSocialMediaNotifications(notificationPrefs.socialMediaNotifications);
+      setWeeklyDigest(notificationPrefs.weeklyDigest);
+      setMarketingEmails(notificationPrefs.marketingEmails);
+    }
+  }, [notificationPrefs]);
+
+  const updateNotificationsMutation = trpc.notificationPreferences.update.useMutation({
+    onSuccess: () => {
+      toast.success("Notification preferences updated", {
+        description: "Your notification settings have been saved successfully.",
+      });
+    },
+    onError: (error) => {
+      toast.error("Failed to update preferences", {
+        description: error.message,
+      });
+    },
+  });
 
   if (authLoading || !user) {
     return (
@@ -116,9 +145,13 @@ export default function Profile() {
   };
 
   const handleSaveNotifications = () => {
-    // TODO: Implement notification preferences update
-    toast.success("Preferences saved!", {
-      description: "Your notification preferences have been updated."
+    updateNotificationsMutation.mutate({
+      emailNotifications,
+      pressReleaseNotifications,
+      campaignNotifications,
+      socialMediaNotifications,
+      weeklyDigest,
+      marketingEmails,
     });
   };
 
@@ -335,6 +368,23 @@ export default function Profile() {
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
+                    <Label htmlFor="social-notifications">Social Media Notifications</Label>
+                    <p className="text-sm text-gray-600">
+                      Get notified about social media post performance
+                    </p>
+                  </div>
+                  <Switch
+                    id="social-notifications"
+                    checked={socialMediaNotifications}
+                    onCheckedChange={setSocialMediaNotifications}
+                    disabled={!emailNotifications}
+                  />
+                </div>
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
                     <Label htmlFor="weekly-digest">Weekly Digest</Label>
                     <p className="text-sm text-gray-600">
                       Get a weekly summary of your activity
@@ -348,11 +398,31 @@ export default function Profile() {
                   />
                 </div>
 
-                <Button onClick={handleSaveNotifications} className="w-full mt-4">
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="marketing-emails">Marketing Emails</Label>
+                    <p className="text-sm text-gray-600">
+                      Receive product updates and promotional emails
+                    </p>
+                  </div>
+                  <Switch
+                    id="marketing-emails"
+                    checked={marketingEmails}
+                    onCheckedChange={setMarketingEmails}
+                    disabled={!emailNotifications}
+                  />
+                </div>
+
+                <Button onClick={handleSaveNotifications} className="w-full mt-4" disabled={updateNotificationsMutation.isPending}>
                   Save Notification Preferences
                 </Button>
               </CardContent>
             </Card>
+
+            {/* Social Media Connections */}
+            <SocialMediaConnections />
 
             {/* Data & Privacy */}
             <Card>

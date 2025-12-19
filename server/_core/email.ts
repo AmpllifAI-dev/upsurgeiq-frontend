@@ -813,3 +813,117 @@ If you wish to unsubscribe from future press releases, please contact the sender
     text,
   });
 }
+
+/**
+ * Send press release distribution email with tracking
+ */
+export async function sendDistributionEmail(params: {
+  to: string;
+  recipientName: string;
+  pressReleaseTitle: string;
+  pressReleaseContent: string;
+  businessName: string;
+  distributionId: number;
+  trackingUrl: string;
+}): Promise<boolean> {
+  const subject = `${params.businessName}: ${params.pressReleaseTitle}`;
+  
+  // Add UTM parameters to links
+  const addUTMParams = (url: string) => {
+    const urlObj = new URL(url);
+    urlObj.searchParams.set('utm_source', 'upsurgeiq');
+    urlObj.searchParams.set('utm_medium', 'email');
+    urlObj.searchParams.set('utm_campaign', 'press_release_distribution');
+    urlObj.searchParams.set('distribution_id', params.distributionId.toString());
+    return urlObj.toString();
+  };
+
+  // Tracking pixel (1x1 transparent GIF)
+  const trackingPixel = `<img src="${params.trackingUrl}" width="1" height="1" alt="" style="display:none;" />`;
+  
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: 'Inter', Arial, sans-serif; line-height: 1.8; color: #333; }
+        .container { max-width: 650px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #008080 0%, #7FFF00 100%); color: white; padding: 40px 30px; text-align: center; border-radius: 8px 8px 0 0; }
+        .content { background: #ffffff; padding: 40px 30px; border: 1px solid #e0e0e0; border-top: none; }
+        .press-release { margin: 30px 0; }
+        .press-release h2 { color: #008080; margin-bottom: 20px; }
+        .footer { text-align: center; padding: 30px 20px; color: #666; font-size: 13px; border-top: 1px solid #e0e0e0; }
+        .button { display: inline-block; background: #008080; color: white; padding: 14px 35px; text-decoration: none; border-radius: 6px; margin: 25px 0; font-weight: 600; }
+        a { color: #008080; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1 style="margin: 0; font-size: 28px;">${params.businessName}</h1>
+          <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.95;">Press Release</p>
+        </div>
+        <div class="content">
+          <p>Dear ${params.recipientName},</p>
+          
+          <p>We are pleased to share our latest press release with you:</p>
+          
+          <div class="press-release">
+            <h2>${params.pressReleaseTitle}</h2>
+            ${params.pressReleaseContent}
+          </div>
+          
+          <div style="text-align: center;">
+            <a href="${addUTMParams(ENV.frontendUrl + '/press-releases/' + params.distributionId)}" class="button">Read Full Press Release</a>
+          </div>
+          
+          <p>For media inquiries or additional information, please don't hesitate to contact us.</p>
+          
+          <p>Best regards,<br>
+          ${params.businessName}</p>
+        </div>
+        <div class="footer">
+          <p><strong>${params.businessName}</strong></p>
+          <p>This email was sent via upsurgeIQ</p>
+          <p style="font-size: 11px; margin-top: 15px;">
+            If you no longer wish to receive press releases from ${params.businessName}, 
+            <a href="${addUTMParams(ENV.frontendUrl + '/unsubscribe?email=' + params.to)}">click here to unsubscribe</a>.
+          </p>
+        </div>
+        ${trackingPixel}
+      </div>
+    </body>
+    </html>
+  `;
+
+  const text = `
+${params.businessName}
+Press Release
+
+Dear ${params.recipientName},
+
+We are pleased to share our latest press release with you:
+
+${params.pressReleaseTitle}
+
+${params.pressReleaseContent.replace(/<[^>]*>/g, '')}
+
+Read the full press release: ${addUTMParams(ENV.frontendUrl + '/press-releases/' + params.distributionId)}
+
+For media inquiries or additional information, please don't hesitate to contact us.
+
+Best regards,
+${params.businessName}
+
+---
+This email was sent via upsurgeIQ
+If you no longer wish to receive press releases from ${params.businessName}, visit: ${addUTMParams(ENV.frontendUrl + '/unsubscribe?email=' + params.to)}
+  `;
+
+  return await sendEmail({
+    to: params.to,
+    subject,
+    html,
+    text,
+  });
+}
