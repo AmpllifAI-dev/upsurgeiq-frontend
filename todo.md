@@ -229,11 +229,11 @@
 - [x] Create empty state for no results
 
 ### Press Release Distribution Tracking
-- [ ] Build distribution history table for press releases
-- [ ] Track which publications received each release
-- [ ] Add engagement stats (opens, clicks) placeholder
-- [ ] Create distribution report view
-- [ ] Remove CSV export option for media lists (proprietary data)
+- [x] Build distribution history table for press releases
+- [x] Track which publications received each release
+- [x] Add engagement stats (opens, clicks) placeholder
+- [x] Create distribution report view
+- [x] Remove CSV export option for media lists (proprietary data)
 
 ### Analytics Enhancements
 - [ ] Add CSV export for analytics dashboard data

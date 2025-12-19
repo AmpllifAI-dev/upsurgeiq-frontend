@@ -48,6 +48,12 @@ import { getProductByTier } from "./products";
 import { invokeLLM } from "./_core/llm";
 import { getErrorLogs, getErrorStats } from "./errorLogs";
 import { createLogger } from "./_core/logger";
+import {
+  createDistribution,
+  getDistributionsByPressRelease,
+  updateDistributionStats,
+  markDistributionSent,
+} from "./distributions";
 import { sendPressReleaseNotificationEmail } from "./_core/email";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
@@ -164,7 +170,7 @@ export const appRouter = router({
   }),
 
   pressRelease: router({
-    list: protectedProcedure.query(async ({ ctx }) => {
+    list: protectedProcedure.query(async ({ ctx}) => {
       const business = await getUserBusiness(ctx.user.id);
       if (!business) {
         return [];
@@ -172,7 +178,7 @@ export const appRouter = router({
       return await getPressReleasesByBusiness(business.id);
     }),
 
-    get: protectedProcedure
+    getById: protectedProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {
         return await getPressReleaseById(input.id);
@@ -772,6 +778,52 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
 
       return { url: session.url };
     }),
+  }),
+
+  distribution: router({
+    getByPressRelease: protectedProcedure
+      .input(z.object({ pressReleaseId: z.number() }))
+      .query(async ({ input }) => {
+        return await getDistributionsByPressRelease(input.pressReleaseId);
+      }),
+
+    create: protectedProcedure
+      .input(
+        z.object({
+          pressReleaseId: z.number(),
+          mediaListId: z.number(),
+          recipientCount: z.number().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return await createDistribution({
+          pressReleaseId: input.pressReleaseId,
+          mediaListId: input.mediaListId,
+          status: "pending",
+          recipientCount: input.recipientCount || 0,
+        });
+      }),
+
+    markSent: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await markDistributionSent(input.id);
+        return { success: true };
+      }),
+
+    updateStats: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          openCount: z.number().optional(),
+          clickCount: z.number().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { id, ...stats } = input;
+        await updateDistributionStats(id, stats);
+        return { success: true };
+      }),
   }),
 
   errorLogs: router({
