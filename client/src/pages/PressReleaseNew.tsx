@@ -7,11 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { Zap, Sparkles, FileText, ArrowLeft, Wand2 } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Streamdown } from "streamdown";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { CopyButton } from "@/components/CopyButton";
+import { CharacterCounter } from "@/components/CharacterCounter";
 
 export default function PressReleaseNew() {
   const { user, loading } = useAuth();
@@ -24,6 +28,7 @@ export default function PressReleaseNew() {
   const [generatedContent, setGeneratedContent] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [generationProgress, setGenerationProgress] = useState(0);
 
   const { data: business } = trpc.business.get.useQuery(undefined, {
     enabled: !!user,

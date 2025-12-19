@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { Zap, Users, Plus, ArrowLeft, Upload, Eye, Edit, Trash2, Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLocation } from "wouter";
@@ -21,6 +22,8 @@ export default function MediaLists() {
   const [newListDescription, setNewListDescription] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleteListId, setDeleteListId] = useState<number | null>(null);
   
   const { data: mediaLists, isLoading, refetch } = trpc.mediaList.list.useQuery(undefined, {
     enabled: !!user,
@@ -112,8 +115,14 @@ export default function MediaLists() {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm("Are you sure you want to delete this media list?")) {
-      deleteMutation.mutate({ id });
+    setDeleteListId(id);
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (deleteListId) {
+      deleteMutation.mutate({ id: deleteListId });
+      setDeleteListId(null);
     }
   };
 
@@ -437,6 +446,18 @@ export default function MediaLists() {
           </Card>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        onConfirm={confirmDelete}
+        title="Delete Media List"
+        description="Are you sure you want to delete this media list? This action cannot be undone and all contacts in this list will be removed."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+      />
     </div>
   );
 }

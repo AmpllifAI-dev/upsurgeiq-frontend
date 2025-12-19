@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Progress } from "@/components/ui/progress";
-import { Zap, Building2, Palette, Globe, CheckCircle2 } from "lucide-react";
+import { Zap, Building2, Palette, Globe, CheckCircle2, HelpCircle } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -250,7 +251,19 @@ export default function Onboarding() {
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="targetAudience">Target Audience (Optional)</Label>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="targetAudience">Target Audience (Optional)</Label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <HelpCircle className="w-4 h-4 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p>Describe your ideal customer demographics, interests, and pain points. This helps our AI tailor content that resonates with your audience.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                   <Textarea
                     id="targetAudience"
                     placeholder="Describe your ideal customer..."
@@ -316,7 +329,19 @@ export default function Onboarding() {
             {currentStep === "brand" && (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="brandTone">Brand Tone *</Label>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="brandTone">Brand Tone *</Label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <HelpCircle className="w-4 h-4 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p>Choose the emotional tone for your content. This affects how your AI-generated press releases and social posts will sound to your audience.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                   <Select value={brandTone} onValueChange={setBrandTone}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select tone" />
@@ -331,7 +356,19 @@ export default function Onboarding() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="brandStyle">Brand Style *</Label>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="brandStyle">Brand Style *</Label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <HelpCircle className="w-4 h-4 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p>Select your preferred content structure. This determines whether your content will be brief and punchy or detailed and comprehensive.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                   <Select value={brandStyle} onValueChange={setBrandStyle}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select style" />

@@ -15,10 +15,12 @@ import {
   TrendingUp,
   Calendar,
   Target,
-  AlertCircle
+  AlertCircle,
+  Search
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { KeyboardShortcut } from "@/components/KeyboardShortcut";
 
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -144,6 +146,17 @@ export default function Dashboard() {
               </a>
             )}
             <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-2"
+                onClick={() => {/* Command palette will handle this */}}
+                aria-label="Open search (Ctrl+K)"
+              >
+                <Search className="w-4 h-4" />
+                <span className="hidden sm:inline">Search</span>
+                <KeyboardShortcut keys={["Ctrl", "K"]} className="hidden md:inline-flex" />
+              </Button>
               <Badge variant="secondary">{planName} Plan</Badge>
               <Button variant="ghost" size="sm" onClick={() => setLocation("/profile")} aria-label="Go to settings and profile">
                 Settings
