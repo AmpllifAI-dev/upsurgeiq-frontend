@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Zap, Share2, ArrowLeft, Sparkles, Calendar, Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CharacterCounter } from "@/components/CharacterCounter";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -184,16 +185,16 @@ export default function SocialMediaNew() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="content">Message *</Label>
-                  <Textarea
-                    id="content"
-                    placeholder="What would you like to share?"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    rows={8}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    {content.length} characters
-                  </p>
+                  <div className="relative">
+                    <Textarea
+                      id="content"
+                      placeholder="What would you like to share?"
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                      rows={8}
+                    />
+                    <CharacterCounter current={content.length} max={280} />
+                  </div>
                 </div>
 
                 <div className="space-y-2">

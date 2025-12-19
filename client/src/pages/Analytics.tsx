@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Calendar, TrendingUp, FileText, Share2, Users, BarChart3 } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
+import { AnalyticsCharts } from "@/components/AnalyticsCharts";
+import { exportAnalyticsToCSV } from "@/lib/csvExport";
+import { Download } from "lucide-react";
 
 export default function Analytics() {
   const { user, loading: authLoading } = useAuth();
@@ -75,6 +78,14 @@ export default function Analytics() {
                 size="sm"
               >
                 90 Days
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => exportAnalyticsToCSV({ pressReleases: pressReleases || [], socialPosts: socialPosts || [], campaigns: campaigns || [] })}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export CSV
               </Button>
             </div>
           </div>
@@ -151,6 +162,15 @@ export default function Analytics() {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+
+            {/* Analytics Charts */}
+            <div className="mb-8">
+              <AnalyticsCharts
+                pressReleases={pressReleases}
+                socialPosts={socialPosts}
+                campaigns={campaigns}
+              />
             </div>
 
             {/* Content Performance */}

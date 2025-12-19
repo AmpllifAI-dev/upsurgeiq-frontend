@@ -46,3 +46,31 @@ export async function markDistributionSent(id: number) {
     })
     .where(eq(pressReleaseDistributions.id, id));
 }
+
+
+export async function sendDistribution(distributionId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Get distribution details
+  const [distribution] = await db
+    .select()
+    .from(pressReleaseDistributions)
+    .where(eq(pressReleaseDistributions.id, distributionId));
+
+  if (!distribution) {
+    throw new Error("Distribution not found");
+  }
+
+  // TODO: Implement actual email sending logic
+  // This will involve:
+  // 1. Get press release content
+  // 2. Get media list contacts
+  // 3. Send emails to each contact
+  // 4. Track sending status
+
+  // For now, just mark as sent
+  await markDistributionSent(distributionId);
+  
+  return distribution;
+}

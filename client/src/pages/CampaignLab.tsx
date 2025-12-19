@@ -1,14 +1,16 @@
 import { useState, useMemo } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { exportCampaignToPDF } from "@/lib/pdfExport";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
-import { Zap, Beaker, Plus, ArrowLeft, Play, Pause, TrendingUp, Eye, BarChart3, Search, Filter } from "lucide-react";
+import { Zap, Beaker, Plus, ArrowLeft, Play, Pause, TrendingUp, Eye, BarChart3, Search, Filter, FileDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -23,6 +25,8 @@ export default function CampaignLab() {
   const [campaignBudget, setCampaignBudget] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [startDateFilter, setStartDateFilter] = useState("");
+  const [endDateFilter, setEndDateFilter] = useState("");
 
   const { data: campaigns, isLoading, refetch } = trpc.campaign.list.useQuery(undefined, {
     enabled: !!user,
@@ -38,9 +42,15 @@ export default function CampaignLab() {
 
       const matchesStatus = statusFilter === "all" || campaign.status === statusFilter;
 
-      return matchesSearch && matchesStatus;
+      const matchesStartDate = !startDateFilter || 
+        (campaign.startDate && new Date(campaign.startDate) >= new Date(startDateFilter));
+
+      const matchesEndDate = !endDateFilter || 
+        (campaign.endDate && new Date(campaign.endDate) <= new Date(endDateFilter));
+
+      return matchesSearch && matchesStatus && matchesStartDate && matchesEndDate;
     });
-  }, [campaigns, searchQuery, statusFilter]);
+  }, [campaigns, searchQuery, statusFilter, startDateFilter, endDateFilter]);
 
   const createMutation = trpc.campaign.create.useMutation({
     onSuccess: () => {
@@ -142,6 +152,12 @@ export default function CampaignLab() {
       </nav>
 
       <div id="main-content" className="container mx-auto py-8">
+        <Breadcrumb
+          items={[
+            { label: "Dashboard", href: "/dashboard" },
+            { label: "Campaign Lab" },
+          ]}
+        />
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div>
             <Badge variant="secondary" className="mb-2">
@@ -272,12 +288,28 @@ export default function CampaignLab() {
               <option value="paused">Paused</option>
               <option value="completed">Completed</option>
             </select>
-            {(searchQuery || statusFilter !== "all") && (
+            <Input
+              type="date"
+              placeholder="Start date from"
+              value={startDateFilter}
+              onChange={(e) => setStartDateFilter(e.target.value)}
+              className="w-40"
+            />
+            <Input
+              type="date"
+              placeholder="End date to"
+              value={endDateFilter}
+              onChange={(e) => setEndDateFilter(e.target.value)}
+              className="w-40"
+            />
+            {(searchQuery || statusFilter !== "all" || startDateFilter || endDateFilter) && (
               <Button
                 variant="outline"
                 onClick={() => {
                   setSearchQuery("");
                   setStatusFilter("all");
+                  setStartDateFilter("");
+                  setEndDateFilter("");
                 }}
               >
                 Clear Filters
@@ -316,6 +348,8 @@ export default function CampaignLab() {
                 onClick={() => {
                   setSearchQuery("");
                   setStatusFilter("all");
+                  setStartDateFilter("");
+                  setEndDateFilter("");
                 }}
               >
                 Clear Filters
@@ -371,6 +405,20 @@ export default function CampaignLab() {
                     )}
 
                     <div className="flex items-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => exportCampaignToPDF({
+                          ...campaign,
+                          goal: campaign.goal || undefined,
+                          budget: campaign.budget || undefined,
+                          startDate: campaign.startDate || undefined,
+                          endDate: campaign.endDate || undefined,
+                        })}
+                      >
+                        <FileDown className="w-4 h-4 mr-2" />
+                        Export PDF
+                      </Button>
                       <Button variant="outline" size="sm" disabled>
                         <Eye className="w-4 h-4 mr-2" />
                         View Variants

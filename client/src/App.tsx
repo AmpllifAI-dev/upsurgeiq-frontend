@@ -24,6 +24,7 @@ import ErrorLogs from "./pages/ErrorLogs";
 import Analytics from "./pages/Analytics";
 import Profile from "./pages/Profile";
 import PressReleaseDistribution from "./pages/PressReleaseDistribution";
+import DistributePressRelease from "./pages/DistributePressRelease";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -36,6 +37,7 @@ function Router() {
       <Route path="/press-releases/new" component={PressReleaseNew} />
       <Route path="/press-releases" component={PressReleases} />
       <Route path="/press-release/:id/distribution" component={PressReleaseDistribution} />
+      <Route path="/press-releases/:id/distribute" component={DistributePressRelease} />
       <Route path="/social-media/new" component={SocialMediaNew} />
       <Route path="/media-lists" component={MediaLists} />
       <Route path="/ai-assistant" component={AIAssistant} />
