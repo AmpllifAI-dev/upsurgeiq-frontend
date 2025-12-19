@@ -183,7 +183,7 @@ export default function Home() {
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-6 h-6 text-primary" />
+                    <Sparkles className="w-6 h-6 text-primary" aria-hidden="true" />
                   </div>
                   <div className="space-y-2 flex-1">
                     <div className="h-3 bg-muted rounded w-3/4"></div>
@@ -193,7 +193,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                    <TrendingUp className="w-6 h-6 text-secondary" />
+                    <TrendingUp className="w-6 h-6 text-secondary" aria-hidden="true" />
                   </div>
                   <div className="space-y-2 flex-1">
                     <div className="h-3 bg-muted rounded w-2/3"></div>
@@ -202,7 +202,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <BarChart3 className="w-6 h-6 text-primary" />
+                    <BarChart3 className="w-6 h-6 text-primary" aria-hidden="true" />
                   </div>
                   <div className="space-y-2 flex-1">
                     <div className="h-3 bg-muted rounded w-4/5"></div>

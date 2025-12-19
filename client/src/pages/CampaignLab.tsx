@@ -44,7 +44,9 @@ export default function CampaignLab() {
 
   const createMutation = trpc.campaign.create.useMutation({
     onSuccess: () => {
-      toast.success("Campaign created successfully");
+      toast.success("Campaign created!", {
+        description: "Your A/B testing campaign is ready. Add ad variations to start testing."
+      });
       setIsCreateOpen(false);
       setCampaignName("");
       setCampaignGoal("");
@@ -117,6 +119,10 @@ export default function CampaignLab() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Skip Navigation Link */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between py-4 gap-4">
@@ -135,7 +141,7 @@ export default function CampaignLab() {
         </div>
       </nav>
 
-      <div className="container mx-auto py-8">
+      <div id="main-content" className="container mx-auto py-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div>
             <Badge variant="secondary" className="mb-2">

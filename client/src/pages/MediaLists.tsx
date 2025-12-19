@@ -28,7 +28,9 @@ export default function MediaLists() {
 
   const createMutation = trpc.mediaList.create.useMutation({
     onSuccess: () => {
-      toast.success("Media list created successfully");
+      toast.success("Media list created!", {
+        description: "Your custom media list is ready. Start adding journalist contacts."
+      });
       setIsCreateOpen(false);
       setNewListName("");
       setNewListDescription("");
@@ -41,7 +43,9 @@ export default function MediaLists() {
 
   const deleteMutation = trpc.mediaList.delete.useMutation({
     onSuccess: () => {
-      toast.success("Media list deleted successfully");
+      toast.success("Media list deleted", {
+        description: "The media list and all its contacts have been removed."
+      });
       refetch();
     },
     onError: (error) => {
@@ -172,6 +176,10 @@ export default function MediaLists() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Skip Navigation Link */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex items-center justify-between py-4">
@@ -190,7 +198,7 @@ export default function MediaLists() {
         </div>
       </nav>
 
-      <div className="container mx-auto py-8">
+      <div id="main-content" className="container mx-auto py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-bold text-foreground">Media Lists</h1>
@@ -409,8 +417,11 @@ export default function MediaLists() {
             <CardContent className="flex flex-col items-center justify-center py-16">
               <Users className="w-16 h-16 text-muted-foreground mb-4 opacity-50" />
               <h3 className="text-xl font-semibold mb-2">No custom lists yet</h3>
-              <p className="text-muted-foreground mb-6 text-center max-w-md">
-                Create your first media list or import contacts from a CSV file
+              <p className="text-muted-foreground mb-4 text-center max-w-md">
+                Build targeted media lists for your press release distribution. Start with our pre-curated default lists or create your own.
+              </p>
+              <p className="text-sm text-muted-foreground mb-6 text-center max-w-md">
+                You can import contacts from CSV files or add journalists manually to reach the right audience.
               </p>
               <div className="flex gap-2">
                 <Button onClick={() => setIsCreateOpen(true)}>

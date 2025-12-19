@@ -231,6 +231,7 @@ export default function Onboarding() {
                     placeholder="Acme Corporation"
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
+                    aria-required="true"
                   />
                 </div>
                 <div className="space-y-2">
@@ -241,8 +242,10 @@ export default function Onboarding() {
                     placeholder="https://example.com"
                     value={website}
                     onChange={(e) => setWebsite(e.target.value)}
+                    aria-required="true"
+                    aria-describedby="website-help"
                   />
-                  <p className="text-xs text-muted-foreground">
+                  <p id="website-help" className="text-xs text-muted-foreground">
                     Our AI will analyze your website to understand your business
                   </p>
                 </div>

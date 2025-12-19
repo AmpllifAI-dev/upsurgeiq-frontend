@@ -271,9 +271,12 @@
 - [x] Add keyboard shortcuts for common actions
 - [x] Implement global command palette (Ctrl+K) for search and navigation
 - [x] Add keyboard navigation to command palette (arrow keys, Enter)
-- [ ] Improve focus indicators throughout app
-- [ ] Add ARIA labels for screen readers
-- [ ] Implement skip navigation links
+- [x] Improve focus indicators throughout app
+- [x] Add ARIA labels for screen readers (navigation, icons)
+- [x] Add aria-hidden to decorative icons
+- [x] Implement skip navigation links across major pages
+- [x] Add aria-required to required form fields
+- [x] Add aria-describedby to form fields with help text
 - [ ] Test with screen reader software
 
 ### Error Messages & Guidance
@@ -334,6 +337,7 @@
 ## Additional UX Improvements (Current Work)
 ### Skip Navigation & Focus Management
 - [x] Add skip navigation links to Dashboard and Press Releases
+- [x] Add skip navigation links to CampaignLab and MediaLists
 - [x] Improve focus indicators with visible outlines (outline-2 outline-primary)
 - [x] Add focus-visible styles for all interactive elements
 - [x] Create skip-link utility class with keyboard-only visibility
@@ -343,15 +347,17 @@
 ### Empty States
 - [x] Create informative empty state for press releases list
 - [x] Create informative empty state for campaigns list
+- [x] Create informative empty state for media lists
 - [x] Add clear CTAs and onboarding guidance in empty states
 - [x] Add helpful descriptions explaining platform features
-- [ ] Create informative empty state for media lists
-- [ ] Create informative empty state for social media posts
+- [x] Explain CSV import and manual contact addition in media lists
 
 ### Success Confirmations
 - [x] Add success toast for press release creation with description
 - [x] Add success toast for profile updates with description
 - [x] Add success toast for notification preferences with description
 - [x] Add info toast for data export with helpful guidance
-- [ ] Add success toast for campaign creation
-- [ ] Add success toast for media list creation
+- [x] Add success toast for campaign creation with next steps
+- [x] Add success toast for media list creation with guidance
+- [x] Add success toast for media list deletion with confirmation
+- [x] Add success toast for social media post creation

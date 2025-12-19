@@ -34,7 +34,9 @@ export default function SocialMediaNew() {
 
   const createMutation = trpc.socialMedia.create.useMutation({
     onSuccess: () => {
-      toast.success("Social media post created successfully!");
+      toast.success("Social media post created!", {
+        description: "Your post has been saved. Connect your social accounts to publish it."
+      });
       setLocation("/social-media");
     },
     onError: (error) => {
