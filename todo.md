@@ -382,3 +382,15 @@
 - [x] Add recent activity timeline to dashboard (RecentActivity component)
 - [x] Implement quick actions menu (QuickActions component)
 - [x] Add export functionality for press releases (bulkExport utility)
+
+
+## Stripe Webhook Enhancements (Current Work)
+- [x] Add payment_intent.succeeded handler for one-time payments
+- [x] Add payment_intent.payment_failed handler
+- [x] Add payment_intent.canceled handler
+- [x] Add charge.refunded handler for refunds
+- [x] Add customer.subscription.trial_will_end handler
+- [x] Add invoice.payment_action_required handler for 3D Secure
+- [x] Create payments table for tracking one-time purchases
+- [x] Push database schema changes with pnpm db:push
+- [ ] Test all webhook events with Stripe CLI

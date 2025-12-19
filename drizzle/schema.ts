@@ -313,3 +313,23 @@ export const errorLogs = mysqlTable("error_logs", {
 
 export type ErrorLog = typeof errorLogs.$inferSelect;
 export type InsertErrorLog = typeof errorLogs.$inferInsert;
+
+// Payments (One-time purchases like media list distribution)
+export const payments = mysqlTable("payments", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }).notNull().unique(),
+  stripeChargeId: varchar("stripeChargeId", { length: 255 }),
+  amount: int("amount").notNull(), // Amount in cents
+  currency: varchar("currency", { length: 3 }).default("gbp").notNull(),
+  status: mysqlEnum("status", ["pending", "succeeded", "failed", "canceled", "refunded"]).notNull(),
+  paymentType: mysqlEnum("paymentType", ["media_list_purchase", "other"]).notNull(),
+  metadata: text("metadata"), // JSON string for additional data (e.g., which media list, press release ID)
+  refundedAmount: int("refundedAmount").default(0),
+  refundedAt: timestamp("refundedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Payment = typeof payments.$inferSelect;
+export type InsertPayment = typeof payments.$inferInsert;

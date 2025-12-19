@@ -3,7 +3,7 @@ import Stripe from "stripe";
 import { stripe } from "../stripe";
 import { ENV } from "../_core/env";
 import { getDb } from "../db";
-import { subscriptions, users } from "../../drizzle/schema";
+import { subscriptions, users, payments } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { createLogger } from "../_core/logger";
 import { sendPaymentConfirmationEmail } from "../_core/email";
@@ -92,6 +92,42 @@ export async function handleStripeWebhook(req: Request, res: Response) {
       case "invoice.payment_failed": {
         const invoice = event.data.object as Stripe.Invoice;
         await handleInvoicePaymentFailed(invoice);
+        break;
+      }
+
+      case "payment_intent.succeeded": {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        await handlePaymentIntentSucceeded(paymentIntent);
+        break;
+      }
+
+      case "payment_intent.payment_failed": {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        await handlePaymentIntentFailed(paymentIntent);
+        break;
+      }
+
+      case "payment_intent.canceled": {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        await handlePaymentIntentCanceled(paymentIntent);
+        break;
+      }
+
+      case "charge.refunded": {
+        const charge = event.data.object as Stripe.Charge;
+        await handleChargeRefunded(charge);
+        break;
+      }
+
+      case "customer.subscription.trial_will_end": {
+        const subscription = event.data.object as Stripe.Subscription;
+        await handleTrialWillEnd(subscription);
+        break;
+      }
+
+      case "invoice.payment_action_required": {
+        const invoice = event.data.object as Stripe.Invoice;
+        await handlePaymentActionRequired(invoice);
         break;
       }
 
@@ -283,4 +319,242 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
   console.log("[Stripe Webhook] Invoice payment failed:", invoice.id);
   // Additional logic for failed payments (e.g., notify user) can be added here
+}
+
+async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent) {
+  logger.info("Payment intent succeeded", {
+    action: "handlePaymentIntent",
+    metadata: { paymentIntentId: paymentIntent.id, amount: paymentIntent.amount },
+  });
+
+  const userId = paymentIntent.metadata?.user_id;
+  const paymentType = paymentIntent.metadata?.payment_type || "other";
+
+  if (!userId) {
+    logger.error("No user_id in payment intent metadata", undefined, {
+      action: "handlePaymentIntent",
+      metadata: { paymentIntentId: paymentIntent.id },
+    });
+    return;
+  }
+
+  const db = await getDb();
+  if (!db) {
+    logger.error("Database not available", undefined, {
+      action: "handlePaymentIntent",
+      userId: parseInt(userId),
+    });
+    return;
+  }
+
+  // Create or update payment record
+  const existingPayment = await db
+    .select()
+    .from(payments)
+    .where(eq(payments.stripePaymentIntentId, paymentIntent.id))
+    .limit(1);
+
+  const chargeId = paymentIntent.latest_charge as string;
+
+  if (existingPayment.length > 0) {
+    await db
+      .update(payments)
+      .set({
+        status: "succeeded",
+        stripeChargeId: chargeId,
+        updatedAt: new Date(),
+      })
+      .where(eq(payments.stripePaymentIntentId, paymentIntent.id));
+  } else {
+    await db.insert(payments).values({
+      userId: parseInt(userId),
+      stripePaymentIntentId: paymentIntent.id,
+      stripeChargeId: chargeId,
+      amount: paymentIntent.amount,
+      currency: paymentIntent.currency,
+      status: "succeeded",
+      paymentType: paymentType as "media_list_purchase" | "other",
+      metadata: JSON.stringify(paymentIntent.metadata),
+    });
+  }
+
+  logger.info("Payment recorded successfully", {
+    action: "handlePaymentIntent",
+    userId: parseInt(userId),
+    metadata: { paymentIntentId: paymentIntent.id, type: paymentType },
+  });
+}
+
+async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
+  logger.error("Payment intent failed", undefined, {
+    action: "handlePaymentIntent",
+    metadata: { 
+      paymentIntentId: paymentIntent.id,
+      lastPaymentError: paymentIntent.last_payment_error?.message 
+    },
+  });
+
+  const userId = paymentIntent.metadata?.user_id;
+  if (!userId) return;
+
+  const db = await getDb();
+  if (!db) return;
+
+  const existingPayment = await db
+    .select()
+    .from(payments)
+    .where(eq(payments.stripePaymentIntentId, paymentIntent.id))
+    .limit(1);
+
+  if (existingPayment.length > 0) {
+    await db
+      .update(payments)
+      .set({
+        status: "failed",
+        updatedAt: new Date(),
+      })
+      .where(eq(payments.stripePaymentIntentId, paymentIntent.id));
+  } else {
+    await db.insert(payments).values({
+      userId: parseInt(userId),
+      stripePaymentIntentId: paymentIntent.id,
+      amount: paymentIntent.amount,
+      currency: paymentIntent.currency,
+      status: "failed",
+      paymentType: (paymentIntent.metadata?.payment_type as "media_list_purchase" | "other") || "other",
+      metadata: JSON.stringify(paymentIntent.metadata),
+    });
+  }
+
+  logger.info("Failed payment recorded", {
+    action: "handlePaymentIntent",
+    userId: parseInt(userId),
+  });
+}
+
+async function handlePaymentIntentCanceled(paymentIntent: Stripe.PaymentIntent) {
+  logger.info("Payment intent canceled", {
+    action: "handlePaymentIntent",
+    metadata: { paymentIntentId: paymentIntent.id },
+  });
+
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .update(payments)
+    .set({
+      status: "canceled",
+      updatedAt: new Date(),
+    })
+    .where(eq(payments.stripePaymentIntentId, paymentIntent.id));
+}
+
+async function handleChargeRefunded(charge: Stripe.Charge) {
+  logger.info("Charge refunded", {
+    action: "handleRefund",
+    metadata: { chargeId: charge.id, amountRefunded: charge.amount_refunded },
+  });
+
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .update(payments)
+    .set({
+      status: "refunded",
+      refundedAmount: charge.amount_refunded,
+      refundedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(eq(payments.stripeChargeId, charge.id));
+
+  logger.info("Refund recorded successfully", {
+    action: "handleRefund",
+    metadata: { chargeId: charge.id },
+  });
+}
+
+async function handleTrialWillEnd(subscription: Stripe.Subscription) {
+  logger.info("Trial will end soon", {
+    action: "handleTrialWillEnd",
+    metadata: { 
+      subscriptionId: subscription.id,
+      trialEnd: subscription.trial_end 
+    },
+  });
+
+  const db = await getDb();
+  if (!db) return;
+
+  // Find user by subscription
+  const existingSubscription = await db
+    .select()
+    .from(subscriptions)
+    .where(eq(subscriptions.stripeSubscriptionId, subscription.id))
+    .limit(1);
+
+  if (existingSubscription.length === 0) {
+    logger.warn("Subscription not found for trial end notification", {
+      action: "handleTrialWillEnd",
+      metadata: { subscriptionId: subscription.id },
+    });
+    return;
+  }
+
+  const userId = existingSubscription[0].userId;
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  if (user.length > 0 && user[0].email) {
+    // TODO: Send trial ending reminder email
+    logger.info("Trial ending reminder needed", {
+      action: "handleTrialWillEnd",
+      userId,
+      metadata: { email: user[0].email },
+    });
+  }
+}
+
+async function handlePaymentActionRequired(invoice: Stripe.Invoice) {
+  logger.info("Payment action required (3D Secure)", {
+    action: "handlePaymentActionRequired",
+    metadata: { 
+      invoiceId: invoice.id
+    },
+  });
+
+  const db = await getDb();
+  if (!db) return;
+
+  // Find subscription by invoice
+  const subscriptionId = (invoice as any).subscription as string | null;
+  if (!subscriptionId) return;
+
+  const existingSubscription = await db
+    .select()
+    .from(subscriptions)
+    .where(eq(subscriptions.stripeSubscriptionId, subscriptionId))
+    .limit(1);
+
+  if (existingSubscription.length === 0) return;
+
+  const userId = existingSubscription[0].userId;
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  if (user.length > 0 && user[0].email) {
+    // TODO: Send email with payment action required link
+    logger.info("Payment action required notification needed", {
+      action: "handlePaymentActionRequired",
+      userId,
+      metadata: { email: user[0].email },
+    });
+  }
 }
