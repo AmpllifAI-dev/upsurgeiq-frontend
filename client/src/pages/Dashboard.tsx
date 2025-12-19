@@ -18,6 +18,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -109,7 +110,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50" role="navigation" aria-label="Main navigation">
         <div className="container mx-auto flex flex-col md:flex-row items-start md:items-center justify-between py-4 gap-4">
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
@@ -118,7 +119,7 @@ export default function Dashboard() {
             <span className="text-2xl font-bold text-foreground">upsurgeIQ</span>
           </div>
           <div className="flex flex-wrap items-center gap-3 md:gap-6 text-sm">
-            <a href="/dashboard" className="text-sm font-medium text-foreground">
+            <a href="/dashboard" className="text-sm font-medium text-foreground" aria-current="page">
               Dashboard
             </a>
             <a href="/press-releases" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
@@ -140,7 +141,7 @@ export default function Dashboard() {
             )}
             <div className="flex items-center gap-3">
               <Badge variant="secondary">{planName} Plan</Badge>
-              <Button variant="ghost" size="sm" onClick={() => setLocation("/profile")}>
+              <Button variant="ghost" size="sm" onClick={() => setLocation("/profile")} aria-label="Go to settings and profile">
                 Settings
               </Button>
             </div>
@@ -148,21 +149,23 @@ export default function Dashboard() {
         </div>
       </nav>
 
-      <div className="container mx-auto py-8 space-y-8">
+      <div className="container mx-auto py-8 space-y-8" role="main">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <header className="flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold text-foreground">Welcome back, {user.name?.split(' ')[0] || 'there'}!</h1>
             <p className="text-muted-foreground mt-2">Here's what's happening with your campaigns today.</p>
           </div>
-          <Button size="lg" onClick={() => setLocation("/press-releases/new")}>
+          <Button size="lg" onClick={() => setLocation("/press-releases/new")} aria-label="Create new press release">
             <Plus className="w-5 h-5 mr-2" />
             New Press Release
           </Button>
-        </div>
+        </header>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <section aria-labelledby="stats-heading">
+          <h2 id="stats-heading" className="sr-only">Statistics Overview</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Press Releases</CardTitle>
@@ -213,18 +216,22 @@ export default function Dashboard() {
           </Card>
         </div>
 
+        </section>
+
         {/* Quick Actions */}
-        <div>
+        <section aria-labelledby="quick-actions-heading">
+          <div>
           <h2 className="text-2xl font-bold text-foreground mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {quickActions.map((action, index) => (
-              <Card
-                key={index}
-                className={`cursor-pointer hover:border-primary/50 transition-all duration-300 hover:shadow-lg ${
-                  action.disabled ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-                onClick={() => !action.disabled && setLocation(action.href)}
-              >
+              <Tooltip key={index}>
+                <TooltipTrigger asChild>
+                  <Card
+                    className={`cursor-pointer hover:border-primary/50 transition-all duration-300 hover:shadow-lg ${
+                      action.disabled ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    onClick={() => !action.disabled && setLocation(action.href)}
+                  >
                 <CardHeader>
                   <div className={`w-12 h-12 rounded-lg ${action.bgColor} flex items-center justify-center mb-4`}>
                     <action.icon className={`w-6 h-6 ${action.color}`} />
@@ -236,11 +243,20 @@ export default function Dashboard() {
                   )}
                 </CardHeader>
               </Card>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{action.description}</p>
+                  {action.disabled && <p className="text-xs mt-1">Upgrade to Pro plan to unlock</p>}
+                </TooltipContent>
+              </Tooltip>
             ))}
           </div>
-        </div>
+          </div>
+        </section>
 
         {/* Recent Activity */}
+        <section aria-labelledby="recent-activity-heading">
+          <h2 id="recent-activity-heading" className="sr-only">Recent Activity</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           <Card>
             <CardHeader>
@@ -288,6 +304,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
+        </section>
       </div>
     </div>
   );

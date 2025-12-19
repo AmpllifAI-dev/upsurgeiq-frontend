@@ -75,7 +75,16 @@ export default function PressReleaseNew() {
 
   const handleGenerate = () => {
     if (!topic) {
-      toast.error("Please enter a topic for your press release");
+      toast.error("Topic required", {
+        description: "Please enter a topic or headline for your press release to get started."
+      });
+      return;
+    }
+
+    if (topic.length < 10) {
+      toast.error("Topic too short", {
+        description: "Please provide a more descriptive topic (at least 10 characters) for better AI results."
+      });
       return;
     }
 
@@ -90,7 +99,16 @@ export default function PressReleaseNew() {
 
   const handleSave = () => {
     if (!generatedContent) {
-      toast.error("Please generate content first");
+      toast.error("No content to save", {
+        description: "Please generate press release content using the AI before saving."
+      });
+      return;
+    }
+
+    if (generatedContent.length < 100) {
+      toast.error("Content too short", {
+        description: "The press release content seems too brief. Consider adding more details or regenerating."
+      });
       return;
     }
 

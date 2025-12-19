@@ -75,20 +75,56 @@ export default function Onboarding() {
 
   const handleNext = () => {
     if (currentStep === "company") {
-      if (!companyName || !website) {
-        toast.error("Please fill in all required fields");
+      if (!companyName) {
+        toast.error("Company name required", {
+          description: "Please enter your company name to continue."
+        });
+        return;
+      }
+      if (!website) {
+        toast.error("Website required", {
+          description: "Please enter your company website URL to help us understand your brand."
+        });
+        return;
+      }
+      if (!website.startsWith('http://') && !website.startsWith('https://')) {
+        toast.error("Invalid website URL", {
+          description: "Please enter a valid URL starting with http:// or https://"
+        });
         return;
       }
       setCurrentStep("industry");
     } else if (currentStep === "industry") {
-      if (!sicSection || !sicDivision || !sicGroup) {
-        toast.error("Please select your industry classification");
+      if (!sicSection) {
+        toast.error("Industry section required", {
+          description: "Please select your primary industry section."
+        });
+        return;
+      }
+      if (!sicDivision) {
+        toast.error("Industry division required", {
+          description: "Please select your industry division within the section."
+        });
+        return;
+      }
+      if (!sicGroup) {
+        toast.error("Industry group required", {
+          description: "Please select your specific industry group for targeted media lists."
+        });
         return;
       }
       setCurrentStep("brand");
     } else if (currentStep === "brand") {
-      if (!brandTone || !brandStyle) {
-        toast.error("Please select your brand voice preferences");
+      if (!brandTone) {
+        toast.error("Brand tone required", {
+          description: "Please select a tone that matches how you want to communicate with your audience."
+        });
+        return;
+      }
+      if (!brandStyle) {
+        toast.error("Brand style required", {
+          description: "Please select a style that reflects your brand personality."
+        });
         return;
       }
       setCurrentStep("social");

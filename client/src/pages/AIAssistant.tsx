@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Zap, MessageSquare, ArrowLeft, Send, Mic, Phone, Sparkles } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -56,10 +57,44 @@ export default function AIAssistant() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <Zap className="w-12 h-12 text-primary mx-auto animate-pulse" />
-          <p className="text-muted-foreground mt-4">Loading...</p>
+      <div className="min-h-screen bg-background">
+        <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+          <div className="container mx-auto flex items-center justify-between py-4">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
+                <Zap className="w-6 h-6 text-primary-foreground" />
+              </div>
+              <span className="text-2xl font-bold text-foreground">upsurgeIQ</span>
+            </div>
+          </div>
+        </nav>
+        <div className="container mx-auto py-8 max-w-4xl">
+          <div className="mb-8">
+            <Skeleton className="h-10 w-64 mb-2" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <Card className="h-[600px] flex flex-col">
+            <CardHeader>
+              <Skeleton className="h-6 w-48" />
+            </CardHeader>
+            <CardContent className="flex-1 space-y-4">
+              <div className="flex justify-start">
+                <div className="max-w-[80%]">
+                  <Skeleton className="h-20 w-64" />
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <div className="max-w-[80%]">
+                  <Skeleton className="h-16 w-48" />
+                </div>
+              </div>
+              <div className="flex justify-start">
+                <div className="max-w-[80%]">
+                  <Skeleton className="h-24 w-72" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
