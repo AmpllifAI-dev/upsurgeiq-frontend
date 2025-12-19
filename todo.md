@@ -898,3 +898,50 @@
 - [ ] Test saved filters functionality
 - [ ] Run full test suite
 - [ ] Save final checkpoint
+
+## Approval Workflow System
+
+### Database Schema
+- [x] Create approval_requests table with press_release_id, requester_id, status, comments
+- [x] Create approval_comments table for threaded discussions
+- [x] Add database functions for approval management
+
+### Backend Endpoints
+- [x] Add approval request creation endpoint
+- [x] Add approval/rejection endpoints
+- [x] Add comment endpoints for approval discussions
+- [x] Add activity logging for approval events
+
+### Frontend UI
+- [ ] Add "Request Approval" button to press release editor
+- [ ] Create approval request list page for admins
+- [ ] Add approval status badge to press releases
+- [ ] Create approval dialog with comment thread
+
+## Email Notification System
+
+- [ ] Create email templates for team invitations
+- [ ] Create email templates for approval requests
+- [ ] Create email templates for approval decisions
+- [ ] Create email templates for distribution reports
+- [ ] Add email sending to invitation flow
+- [ ] Add email sending to approval workflow
+- [ ] Test email delivery
+
+## Content Version History
+
+### Database Schema
+- [x] Create content_versions table with press_release_id, version_number, content, user_id
+- [x] Add database functions for version management
+
+### Backend Endpoints
+- [ ] Add version creation on press release update (needs integration into update endpoint)
+- [x] Add version list endpoint
+- [x] Add version get endpoint
+- [ ] Add version comparison endpoint (can be done in frontend)
+
+### Frontend UI
+- [ ] Add version history viewer to press release page
+- [ ] Add version comparison UI
+- [ ] Add restore version functionality
+- [ ] Show who made changes and when

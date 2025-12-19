@@ -64,6 +64,13 @@
       "when": 1766145279665,
       "tag": "0008_bitter_scourge",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1766147233060,
+      "tag": "0009_red_mister_fear",
+      "breakpoints": true
     }
   ]
 }

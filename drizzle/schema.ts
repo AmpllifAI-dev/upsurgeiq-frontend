@@ -510,3 +510,50 @@ export const savedFilters = mysqlTable("saved_filters", {
 
 export type SavedFilter = typeof savedFilters.$inferSelect;
 export type InsertSavedFilter = typeof savedFilters.$inferInsert;
+
+// Approval Requests
+export const approvalRequests = mysqlTable("approval_requests", {
+  id: int("id").autoincrement().primaryKey(),
+  pressReleaseId: int("pressReleaseId").notNull().references(() => pressReleases.id, { onDelete: "cascade" }),
+  requesterId: int("requesterId").notNull().references(() => users.id),
+  approverId: int("approverId").references(() => users.id),
+  status: varchar("status", { length: 50 }).notNull().default("pending"), // pending, approved, rejected
+  requestMessage: text("requestMessage"),
+  responseMessage: text("responseMessage"),
+  requestedAt: timestamp("requestedAt").defaultNow().notNull(),
+  respondedAt: timestamp("respondedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ApprovalRequest = typeof approvalRequests.$inferSelect;
+export type InsertApprovalRequest = typeof approvalRequests.$inferInsert;
+
+// Approval Comments
+export const approvalComments = mysqlTable("approval_comments", {
+  id: int("id").autoincrement().primaryKey(),
+  approvalRequestId: int("approvalRequestId").notNull().references(() => approvalRequests.id, { onDelete: "cascade" }),
+  userId: int("userId").notNull().references(() => users.id),
+  comment: text("comment").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ApprovalComment = typeof approvalComments.$inferSelect;
+export type InsertApprovalComment = typeof approvalComments.$inferInsert;
+
+// Content Versions
+export const contentVersions = mysqlTable("content_versions", {
+  id: int("id").autoincrement().primaryKey(),
+  pressReleaseId: int("pressReleaseId").notNull().references(() => pressReleases.id, { onDelete: "cascade" }),
+  versionNumber: int("versionNumber").notNull(),
+  title: varchar("title", { length: 500 }).notNull(),
+  subtitle: varchar("subtitle", { length: 500 }),
+  content: text("content").notNull(),
+  userId: int("userId").notNull().references(() => users.id),
+  changeDescription: text("changeDescription"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ContentVersion = typeof contentVersions.$inferSelect;
+export type InsertContentVersion = typeof contentVersions.$inferInsert;

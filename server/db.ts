@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser,
@@ -571,4 +571,139 @@ export async function deleteSavedFilter(id: number) {
     .where(eq(savedFilters.id, id));
 
   return true;
+}
+
+// Approval Requests
+export async function createApprovalRequest(data: {
+  pressReleaseId: number;
+  requesterId: number;
+  requestMessage?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { approvalRequests } = await import("../drizzle/schema");
+  
+  const result = await db.insert(approvalRequests).values(data);
+  return result;
+}
+
+export async function getApprovalRequestsByPressRelease(pressReleaseId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { approvalRequests } = await import("../drizzle/schema");
+  
+  return await db
+    .select()
+    .from(approvalRequests)
+    .where(eq(approvalRequests.pressReleaseId, pressReleaseId))
+    .orderBy(desc(approvalRequests.createdAt));
+}
+
+export async function getPendingApprovalRequests(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { approvalRequests } = await import("../drizzle/schema");
+  
+  return await db
+    .select()
+    .from(approvalRequests)
+    .where(eq(approvalRequests.status, "pending"))
+    .orderBy(desc(approvalRequests.createdAt));
+}
+
+export async function updateApprovalRequest(id: number, data: {
+  status: string;
+  approverId: number;
+  responseMessage?: string;
+  respondedAt: Date;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { approvalRequests } = await import("../drizzle/schema");
+  
+  await db
+    .update(approvalRequests)
+    .set(data)
+    .where(eq(approvalRequests.id, id));
+
+  return true;
+}
+
+// Approval Comments
+export async function createApprovalComment(data: {
+  approvalRequestId: number;
+  userId: number;
+  comment: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { approvalComments } = await import("../drizzle/schema");
+  
+  const result = await db.insert(approvalComments).values(data);
+  return result;
+}
+
+export async function getApprovalComments(approvalRequestId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { approvalComments } = await import("../drizzle/schema");
+  
+  return await db
+    .select()
+    .from(approvalComments)
+    .where(eq(approvalComments.approvalRequestId, approvalRequestId))
+    .orderBy(approvalComments.createdAt);
+}
+
+// Content Versions
+export async function createContentVersion(data: {
+  pressReleaseId: number;
+  versionNumber: number;
+  title: string;
+  subtitle?: string;
+  content: string;
+  userId: number;
+  changeDescription?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { contentVersions } = await import("../drizzle/schema");
+  
+  const result = await db.insert(contentVersions).values(data);
+  return result;
+}
+
+export async function getContentVersions(pressReleaseId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { contentVersions } = await import("../drizzle/schema");
+  
+  return await db
+    .select()
+    .from(contentVersions)
+    .where(eq(contentVersions.pressReleaseId, pressReleaseId))
+    .orderBy(desc(contentVersions.versionNumber));
+}
+
+export async function getContentVersion(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { contentVersions } = await import("../drizzle/schema");
+  
+  const versions = await db
+    .select()
+    .from(contentVersions)
+    .where(eq(contentVersions.id, id))
+    .limit(1);
+
+  return versions[0] || null;
 }

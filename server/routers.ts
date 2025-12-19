@@ -27,6 +27,15 @@ import {
   getSavedFiltersByUserId,
   createSavedFilter,
   deleteSavedFilter,
+  createApprovalRequest,
+  getApprovalRequestsByPressRelease,
+  getPendingApprovalRequests,
+  updateApprovalRequest,
+  createApprovalComment,
+  getApprovalComments,
+  createContentVersion,
+  getContentVersions,
+  getContentVersion,
 } from "./db";
 import { generateInvitationToken, getInvitationExpiry, hasPermission } from "./teamUtils";
 import {
@@ -1745,6 +1754,129 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
       .mutation(async ({ ctx, input }) => {
         await deleteSavedFilter(input.id);
         return { success: true };
+      }),
+  }),
+
+  approvalRequests: router({
+    create: protectedProcedure
+      .input(
+        z.object({
+          pressReleaseId: z.number(),
+          requestMessage: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await createApprovalRequest({
+          pressReleaseId: input.pressReleaseId,
+          requesterId: ctx.user.id,
+          requestMessage: input.requestMessage,
+        });
+
+        await logActivity({
+          userId: ctx.user.id,
+          action: "approval_requested",
+          entityType: "press_release",
+          entityId: input.pressReleaseId,
+        });
+
+        return { success: true };
+      }),
+
+    listByPressRelease: protectedProcedure
+      .input(z.object({ pressReleaseId: z.number() }))
+      .query(async ({ input }) => {
+        return await getApprovalRequestsByPressRelease(input.pressReleaseId);
+      }),
+
+    listPending: protectedProcedure.query(async ({ ctx }) => {
+      return await getPendingApprovalRequests(ctx.user.id);
+    }),
+
+    approve: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          responseMessage: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await updateApprovalRequest(input.id, {
+          status: "approved",
+          approverId: ctx.user.id,
+          responseMessage: input.responseMessage,
+          respondedAt: new Date(),
+        });
+
+        await logActivity({
+          userId: ctx.user.id,
+          action: "approval_granted",
+          entityType: "approval_request",
+          entityId: input.id,
+        });
+
+        return { success: true };
+      }),
+
+    reject: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          responseMessage: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await updateApprovalRequest(input.id, {
+          status: "rejected",
+          approverId: ctx.user.id,
+          responseMessage: input.responseMessage,
+          respondedAt: new Date(),
+        });
+
+        await logActivity({
+          userId: ctx.user.id,
+          action: "approval_rejected",
+          entityType: "approval_request",
+          entityId: input.id,
+        });
+
+        return { success: true };
+      }),
+
+    addComment: protectedProcedure
+      .input(
+        z.object({
+          approvalRequestId: z.number(),
+          comment: z.string(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await createApprovalComment({
+          approvalRequestId: input.approvalRequestId,
+          userId: ctx.user.id,
+          comment: input.comment,
+        });
+
+        return { success: true };
+      }),
+
+    getComments: protectedProcedure
+      .input(z.object({ approvalRequestId: z.number() }))
+      .query(async ({ input }) => {
+        return await getApprovalComments(input.approvalRequestId);
+      }),
+  }),
+
+  contentVersions: router({
+    list: protectedProcedure
+      .input(z.object({ pressReleaseId: z.number() }))
+      .query(async ({ input }) => {
+        return await getContentVersions(input.pressReleaseId);
+      }),
+
+    get: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return await getContentVersion(input.id);
       }),
   }),
 
