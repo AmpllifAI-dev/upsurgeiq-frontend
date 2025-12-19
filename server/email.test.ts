@@ -118,3 +118,37 @@ describe("Email Error Handling", () => {
     ).resolves.toBeDefined();
   });
 });
+
+
+describe("SendGrid API Key Validation", () => {
+  it("should have valid SendGrid API key configured", async () => {
+    const { ENV } = await import("./_core/env");
+    expect(ENV.sendGridApiKey).toBeDefined();
+    expect(ENV.sendGridApiKey).not.toBe("");
+    expect(ENV.sendGridApiKey).toMatch(/^SG\./);
+  });
+
+  it("should successfully send a test email to admin", async () => {
+    const { sendEmail } = await import("./_core/email");
+    const { ENV } = await import("./_core/env");
+    
+    const result = await sendEmail({
+      to: ENV.adminEmail || "test@example.com",
+      subject: "upsurgeIQ - SendGrid Configuration Test",
+      text: "This is a test email to verify SendGrid configuration is working correctly.",
+      html: `
+        <html>
+          <body style="font-family: Arial, sans-serif; padding: 20px;">
+            <h2 style="color: #008080;">SendGrid Configuration Test</h2>
+            <p>This is a test email to verify SendGrid configuration is working correctly.</p>
+            <p>If you received this email, your SendGrid API key is valid and email sending is functional.</p>
+            <hr style="border: 1px solid #e0e0e0; margin: 20px 0;">
+            <p style="color: #666; font-size: 14px;">Sent from upsurgeIQ Platform</p>
+          </body>
+        </html>
+      `,
+    });
+
+    expect(result).toBe(true);
+  }, 30000); // 30 second timeout for email sending
+});

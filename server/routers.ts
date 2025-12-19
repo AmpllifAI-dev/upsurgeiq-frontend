@@ -390,6 +390,39 @@ Generate a complete, publication-ready press release.`;
       return await getMediaListsByBusiness(business.id);
     }),
 
+    getPurchasedListIds: protectedProcedure.query(async ({ ctx }) => {
+      const db = await import("./db").then(m => m.getDb());
+      if (!db) return [];
+      
+      const { payments } = await import("../drizzle/schema");
+      const { eq, and } = await import("drizzle-orm");
+      
+      const purchasedPayments = await db
+        .select()
+        .from(payments)
+        .where(
+          and(
+            eq(payments.userId, ctx.user.id),
+            eq(payments.status, "succeeded"),
+            eq(payments.paymentType, "media_list_purchase")
+          )
+        );
+      
+      // Extract media list IDs from metadata
+      const listIds = purchasedPayments
+        .map(p => {
+          try {
+            const metadata = JSON.parse(p.metadata || "{}");
+            return metadata.media_list_id ? parseInt(metadata.media_list_id) : null;
+          } catch {
+            return null;
+          }
+        })
+        .filter((id): id is number => id !== null);
+      
+      return listIds;
+    }),
+
     get: protectedProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {

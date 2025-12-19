@@ -29,6 +29,10 @@ export default function MediaLists() {
     enabled: !!user,
   });
 
+  const { data: purchasedListIds = [] } = trpc.mediaList.getPurchasedListIds.useQuery(undefined, {
+    enabled: !!user,
+  });
+
   const createMutation = trpc.mediaList.create.useMutation({
     onSuccess: () => {
       toast.success("Media list created!", {
@@ -345,7 +349,12 @@ export default function MediaLists() {
               <Card key={list.id} className="hover:border-primary/50 transition-colors">
                 <CardHeader>
                   <div className="flex items-start justify-between mb-2">
-                    <Badge variant="outline">Default</Badge>
+                    <div className="flex gap-2">
+                      <Badge variant="outline">Default</Badge>
+                      {purchasedListIds.includes(Number(list.id)) && (
+                        <Badge variant="default" className="bg-green-500">Purchased</Badge>
+                      )}
+                    </div>
                     <Users className="w-5 h-5 text-muted-foreground" />
                   </div>
                   <CardTitle className="text-xl">{list.name}</CardTitle>
@@ -368,18 +377,36 @@ export default function MediaLists() {
                     </div>
                     )}
                     <div className="space-y-2">
-                      <Button 
-                        variant="default" 
-                        size="sm" 
-                        className="w-full"
-                        onClick={() => handlePurchaseList(Number(list.id), list.name)}
-                        disabled={purchaseMutation.isPending}
-                      >
-                        Purchase for £4
-                      </Button>
-                      <p className="text-xs text-muted-foreground text-center">
-                        One-time payment per press release
-                      </p>
+                      {purchasedListIds.includes(Number(list.id)) ? (
+                        <>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="w-full"
+                            onClick={() => setLocation(`/media-lists/${list.id}`)}
+                          >
+                            View Contacts
+                          </Button>
+                          <p className="text-xs text-success text-center font-medium">
+                            ✓ Ready to use for press release distribution
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <Button 
+                            variant="default" 
+                            size="sm" 
+                            className="w-full"
+                            onClick={() => handlePurchaseList(Number(list.id), list.name)}
+                            disabled={purchaseMutation.isPending}
+                          >
+                            Purchase for £4
+                          </Button>
+                          <p className="text-xs text-muted-foreground text-center">
+                            One-time payment per press release
+                          </p>
+                        </>
+                      )}
                     </div>
                   </div>
                 </CardContent>

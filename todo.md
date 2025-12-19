@@ -419,3 +419,27 @@
 - [x] Create press release to journalist email (sendPressReleaseToJournalist)
 - [ ] Integrate email functions into webhook handlers
 - [ ] Test email delivery for all webhook events
+
+
+## SendGrid Configuration & Email Integration (Current Work)
+- [x] Add SendGrid API key via webdev_request_secrets
+- [x] Add FROM_EMAIL and ADMIN_EMAIL configuration
+- [x] Add FRONTEND_URL configuration
+- [x] Integrate sendTrialEndingEmail into handleTrialWillEnd webhook
+- [x] Integrate sendPaymentActionRequiredEmail into handlePaymentActionRequired webhook
+- [x] Integrate sendMediaListPurchaseEmail into handlePaymentIntentSucceeded webhook
+- [ ] Verify sender email (noreply@upsurgeiq.com) in SendGrid Dashboard
+- [ ] Test email delivery for all webhook events after sender verification
+
+## Remaining Platform Features
+- [x] Display purchased status in media list cards
+- [x] Add getPurchasedListIds query to backend
+- [x] Show "Purchased" badge on purchased media lists
+- [x] Replace purchase button with "View Contacts" for purchased lists
+- [ ] Apply Breadcrumb to more pages (CampaignLab, MediaLists detail)
+- [ ] Apply CharacterCounter to more form fields
+- [ ] Add CSV export for analytics data
+- [ ] Create campaign report PDF export
+- [ ] Implement date range filtering for campaigns
+- [ ] Add loading skeleton to profile page
+- [ ] Create informative empty states for remaining pages

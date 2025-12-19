@@ -6,7 +6,12 @@ import { getDb } from "../db";
 import { subscriptions, users, payments } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { createLogger } from "../_core/logger";
-import { sendPaymentConfirmationEmail } from "../_core/email";
+import {
+  sendPaymentConfirmationEmail,
+  sendMediaListPurchaseEmail,
+  sendTrialEndingEmail,
+  sendPaymentActionRequiredEmail,
+} from "../_core/email";
 
 const logger = createLogger("StripeWebhook");
 
@@ -383,6 +388,20 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
     userId: parseInt(userId),
     metadata: { paymentIntentId: paymentIntent.id, type: paymentType },
   });
+
+  // Send email notification for media list purchase
+  if (paymentType === "media_list_purchase") {
+    const user = await db.select().from(users).where(eq(users.id, parseInt(userId))).limit(1);
+    if (user.length > 0 && user[0].email) {
+      const mediaListName = paymentIntent.metadata?.media_list_name || "Media List";
+      await sendMediaListPurchaseEmail({
+        to: user[0].email,
+        name: user[0].name || "Customer",
+        mediaListName,
+        amount: paymentIntent.amount,
+      });
+    }
+  }
 }
 
 async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
@@ -510,8 +529,17 @@ async function handleTrialWillEnd(subscription: Stripe.Subscription) {
     .limit(1);
 
   if (user.length > 0 && user[0].email) {
-    // TODO: Send trial ending reminder email
-    logger.info("Trial ending reminder needed", {
+    const plan = existingSubscription[0].plan;
+    const trialEndDate = subscription.trial_end ? new Date(subscription.trial_end * 1000) : new Date();
+    
+    await sendTrialEndingEmail({
+      to: user[0].email,
+      name: user[0].name || "Customer",
+      plan: plan.charAt(0).toUpperCase() + plan.slice(1),
+      trialEndDate: trialEndDate.toLocaleDateString(),
+    });
+    
+    logger.info("Trial ending reminder sent", {
       action: "handleTrialWillEnd",
       userId,
       metadata: { email: user[0].email },
@@ -550,8 +578,16 @@ async function handlePaymentActionRequired(invoice: Stripe.Invoice) {
     .limit(1);
 
   if (user.length > 0 && user[0].email) {
-    // TODO: Send email with payment action required link
-    logger.info("Payment action required notification needed", {
+    const plan = existingSubscription[0].plan;
+    const amount = invoice.amount_due / 100; // Convert from cents to dollars
+    
+    await sendPaymentActionRequiredEmail({
+      to: user[0].email,
+      name: user[0].name || "Customer",
+      paymentUrl: invoice.hosted_invoice_url || `${ENV.frontendUrl}/billing`,
+    });
+    
+    logger.info("Payment action required notification sent", {
       action: "handlePaymentActionRequired",
       userId,
       metadata: { email: user[0].email },
