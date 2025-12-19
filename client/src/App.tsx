@@ -30,6 +30,7 @@ import ContentCalendar from "./pages/ContentCalendar";
 import EmailTemplates from "./pages/EmailTemplates";
 import PressReleaseTemplates from "./pages/PressReleaseTemplates";
 import TeamManagement from "./pages/TeamManagement";
+import WebhookSettings from "./pages/WebhookSettings";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -56,6 +57,7 @@ function Router() {
       <Route path="/email-templates" component={EmailTemplates} />
       <Route path="/press-release-templates" component={PressReleaseTemplates} />
       <Route path="/team" component={TeamManagement} />
+      <Route path="/webhook-settings" component={WebhookSettings} />
       <Route path="/help" component={Help} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

@@ -1001,3 +1001,17 @@
 - [x] Implement hero section with background image
 - [x] Implement feature section images with alternating layout
 - [x] Test responsive design across screen sizes
+
+
+## Admin Webhook Dashboard (Dec 19, 2025)
+
+- [x] Create webhook_delivery_logs table in database schema (already exists)
+- [x] Add database helper functions for webhook logs (already exists)
+- [x] Create tRPC endpoints for webhook CRUD operations (already exists)
+- [x] Create tRPC endpoints for webhook logs retrieval (already exists)
+- [x] Build admin webhook settings page UI
+- [x] Implement webhook configuration form (add/edit/delete)
+- [x] Implement webhook delivery logs table with filters
+- [x] Add success/failure statistics dashboard
+- [x] Test webhook dashboard functionality
+- [x] Write vitest tests for webhook endpoints (15/15 tests passing)
