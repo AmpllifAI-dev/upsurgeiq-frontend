@@ -264,3 +264,112 @@ export async function upsertNotificationPreferences(
 
   return await getNotificationPreferences(userId);
 }
+
+
+// Email Templates
+export async function getEmailTemplates(businessId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { emailTemplates } = await import("../drizzle/schema");
+  return await db
+    .select()
+    .from(emailTemplates)
+    .where(eq(emailTemplates.businessId, businessId));
+}
+
+export async function getEmailTemplateById(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { emailTemplates } = await import("../drizzle/schema");
+  const results = await db
+    .select()
+    .from(emailTemplates)
+    .where(eq(emailTemplates.id, id))
+    .limit(1);
+
+  return results[0] || null;
+}
+
+export async function createEmailTemplate(data: {
+  businessId: number;
+  name: string;
+  subject?: string;
+  headerHtml?: string;
+  footerHtml?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  logoUrl?: string;
+  isDefault?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { emailTemplates } = await import("../drizzle/schema");
+  
+  const result = await db.insert(emailTemplates).values(data);
+  const insertId = (result as any).insertId;
+  return await getEmailTemplateById(Number(insertId));
+}
+
+export async function updateEmailTemplate(
+  id: number,
+  data: {
+    name?: string;
+    subject?: string;
+    headerHtml?: string;
+    footerHtml?: string;
+    primaryColor?: string;
+    secondaryColor?: string;
+    logoUrl?: string;
+    isDefault?: number;
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { emailTemplates } = await import("../drizzle/schema");
+  
+  await db
+    .update(emailTemplates)
+    .set(data)
+    .where(eq(emailTemplates.id, id));
+
+  return await getEmailTemplateById(id);
+}
+
+export async function deleteEmailTemplate(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { emailTemplates } = await import("../drizzle/schema");
+  
+  await db
+    .delete(emailTemplates)
+    .where(eq(emailTemplates.id, id));
+
+  return true;
+}
+
+export async function getDefaultEmailTemplate(businessId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { emailTemplates } = await import("../drizzle/schema");
+  
+  const { and } = await import("drizzle-orm");
+  
+  const results = await db
+    .select()
+    .from(emailTemplates)
+    .where(
+      and(
+        eq(emailTemplates.businessId, businessId),
+        eq(emailTemplates.isDefault, 1)
+      )
+    )
+    .limit(1);
+
+  return results[0] || null;
+}

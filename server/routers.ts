@@ -3,12 +3,18 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { 
-  getUserSubscription, 
+  getEmailTemplates,
+  getEmailTemplateById,
+  createEmailTemplate,
+  updateEmailTemplate,
+  deleteEmailTemplate,
+  getDefaultEmailTemplate,
   getUserBusiness, 
   createBusiness, 
   updateBusiness,
   getNotificationPreferences,
-  upsertNotificationPreferences
+  upsertNotificationPreferences,
+  getUserSubscription
 } from "./db";
 import {
   createPressRelease,
@@ -1348,6 +1354,175 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
         const csv = await exportAnalyticsToCSV(business.id, options);
         return { csv, filename: `analytics-${Date.now()}.csv` };
       }),
+  }),
+
+  aiTemplate: router({
+    fillTemplate: protectedProcedure
+      .input(
+        z.object({
+          templateBody: z.string(),
+          templateTitle: z.string(),
+          templateSubtitle: z.string(),
+          data: z.object({
+            companyName: z.string().optional(),
+            industry: z.string().optional(),
+            productName: z.string().optional(),
+            keyBenefit: z.string().optional(),
+            uniqueFeature: z.string().optional(),
+            ceoName: z.string().optional(),
+            ceoTitle: z.string().optional(),
+            website: z.string().optional(),
+            additionalContext: z.string().optional(),
+          }),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { fillPressReleaseTemplate } = await import("./aiTemplateFiller");
+        
+        const result = await fillPressReleaseTemplate(
+          input.templateBody,
+          input.templateTitle,
+          input.templateSubtitle,
+          input.data
+        );
+
+        await logActivity({
+          userId: ctx.user.id,
+          action: "ai_template_filled",
+          entityType: "press_release",
+          metadata: { templateTitle: input.templateTitle },
+        });
+
+        return result;
+      }),
+
+    suggestFields: protectedProcedure
+      .input(
+        z.object({
+          templateType: z.string(),
+          companyInfo: z.object({
+            name: z.string().optional(),
+            industry: z.string().optional(),
+            description: z.string().optional(),
+          }),
+        })
+      )
+      .query(async ({ input }) => {
+        const { suggestTemplateFields } = await import("./aiTemplateFiller");
+        return await suggestTemplateFields(input.templateType, input.companyInfo);
+      }),
+  }),
+
+  emailTemplate: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const business = await getUserBusiness(ctx.user.id);
+      if (!business) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Business profile not found",
+        });
+      }
+      return await getEmailTemplates(business.id);
+    }),
+
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return await getEmailTemplateById(input.id);
+      }),
+
+    create: protectedProcedure
+      .input(
+        z.object({
+          name: z.string(),
+          subject: z.string().optional(),
+          headerHtml: z.string().optional(),
+          footerHtml: z.string().optional(),
+          primaryColor: z.string().optional(),
+          secondaryColor: z.string().optional(),
+          logoUrl: z.string().optional(),
+          isDefault: z.number().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const business = await getUserBusiness(ctx.user.id);
+        if (!business) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Business profile not found",
+          });
+        }
+
+        const template = await createEmailTemplate({
+          businessId: business.id,
+          ...input,
+        });
+
+        await logActivity({
+          userId: ctx.user.id,
+          action: "email_template_created",
+          entityType: "email_template",
+          entityId: template!.id,
+          metadata: { templateName: input.name },
+        });
+
+        return template;
+      }),
+
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          name: z.string().optional(),
+          subject: z.string().optional(),
+          headerHtml: z.string().optional(),
+          footerHtml: z.string().optional(),
+          primaryColor: z.string().optional(),
+          secondaryColor: z.string().optional(),
+          logoUrl: z.string().optional(),
+          isDefault: z.number().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { id, ...data } = input;
+        const template = await updateEmailTemplate(id, data);
+
+        await logActivity({
+          userId: ctx.user.id,
+          action: "email_template_updated",
+          entityType: "email_template",
+          entityId: id,
+          metadata: { templateName: data.name },
+        });
+
+        return template;
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await deleteEmailTemplate(input.id);
+
+        await logActivity({
+          userId: ctx.user.id,
+          action: "email_template_deleted",
+          entityType: "email_template",
+          entityId: input.id,
+        });
+
+        return { success: true };
+      }),
+
+    getDefault: protectedProcedure.query(async ({ ctx }) => {
+      const business = await getUserBusiness(ctx.user.id);
+      if (!business) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Business profile not found",
+        });
+      }
+      return await getDefaultEmailTemplate(business.id);
+    }),
   }),
 
   usageTracking: router({

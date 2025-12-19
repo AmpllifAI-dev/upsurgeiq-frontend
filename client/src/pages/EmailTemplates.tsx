@@ -36,22 +36,31 @@ export default function EmailTemplates() {
     enabled: !!user,
   });
 
-  // TODO: Add email template endpoints to routers
-  // const { data: templates, isLoading, refetch } = trpc.emailTemplate.list.useQuery(undefined, {
-  //   enabled: !!user && !!business,
-  // });
+  const { data: templates, isLoading, refetch } = trpc.emailTemplate.list.useQuery(undefined, {
+    enabled: !!user && !!business,
+  });
 
-  // const createMutation = trpc.emailTemplate.create.useMutation({
-  //   onSuccess: () => {
-  //     toast.success("Email template created!");
-  //     setIsCreateOpen(false);
-  //     resetForm();
-  //     refetch();
-  //   },
-  //   onError: (error) => {
-  //     toast.error(error.message || "Failed to create template");
-  //   },
-  // });
+  const createMutation = trpc.emailTemplate.create.useMutation({
+    onSuccess: () => {
+      toast.success("Email template created!");
+      setIsCreateOpen(false);
+      resetForm();
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to create template");
+    },
+  });
+
+  const deleteMutation = trpc.emailTemplate.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Email template deleted!");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to delete template");
+    },
+  });
 
   const resetForm = () => {
     setFormData({
@@ -71,11 +80,7 @@ export default function EmailTemplates() {
       return;
     }
 
-    // createMutation.mutate({
-    //   businessId: business!.id,
-    //   ...formData,
-    // });
-    toast.info("Email template endpoints coming soon");
+    createMutation.mutate(formData);
   };
 
   const handlePreview = (template?: any) => {
@@ -141,17 +146,11 @@ export default function EmailTemplates() {
     return null;
   }
 
-  // Mock templates for now
-  const templates = [
-    {
-      id: 1,
-      name: "Default Template",
-      subject: "Press Release: {{title}}",
-      primaryColor: "#008080",
-      secondaryColor: "#7FFF00",
-      isDefault: true,
-    },
-  ];
+  const handleDelete = (id: number) => {
+    if (confirm("Are you sure you want to delete this template?")) {
+      deleteMutation.mutate({ id });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -312,7 +311,7 @@ export default function EmailTemplates() {
 
         {/* Templates Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {templates.map((template) => (
+          {(templates || []).map((template) => (
             <Card key={template.id} className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -335,14 +334,14 @@ export default function EmailTemplates() {
                   <div className="flex items-center gap-2">
                     <div
                       className="w-6 h-6 rounded border"
-                      style={{ backgroundColor: template.primaryColor }}
+                      style={{ backgroundColor: template.primaryColor || undefined }}
                     />
                     <span className="text-xs text-muted-foreground">Primary</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div
                       className="w-6 h-6 rounded border"
-                      style={{ backgroundColor: template.secondaryColor }}
+                      style={{ backgroundColor: template.secondaryColor || undefined }}
                     />
                     <span className="text-xs text-muted-foreground">Secondary</span>
                   </div>
@@ -362,7 +361,7 @@ export default function EmailTemplates() {
                       <Button variant="outline" size="sm">
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={() => handleDelete(template.id)}>
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </>
@@ -374,7 +373,7 @@ export default function EmailTemplates() {
         </div>
 
         {/* Empty State */}
-        {templates.length === 1 && (
+        {(templates || []).length === 0 && (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-16">
               <Palette className="w-16 h-16 text-muted-foreground mb-4 opacity-50" />
