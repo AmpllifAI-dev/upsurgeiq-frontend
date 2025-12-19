@@ -719,7 +719,7 @@
 - [ ] Add template preview functionality
 - [x] Store custom templates in database (schema created)
 - [ ] Allow logo and color customization
-- [ ] Add template selection to distribution flow
+- [x] Add template selection to distribution flow
 
 ### Keyboard Shortcuts
 - [x] Add keyboard shortcut overlay (Ctrl+?) - already implemented
@@ -816,14 +816,14 @@
 - [x] Add email template CRUD endpoints to routers
 - [x] Create email template database functions in db.ts
 - [x] Connect frontend to backend endpoints
-- [ ] Add template selection to distribution flow
+- [x] Add template selection to distribution flow
 - [x] Test email template functionality
 
 ### AI Template Customization
 - [x] Build AI template filler endpoint
-- [ ] Create template customization UI (can be added to PressReleaseTemplates page)
+- [x] Create template customization UI (added to PressReleaseTemplates page)
 - [x] Add smart suggestions for template fields
-- [ ] Implement template preview with AI content (can integrate into existing preview)
+- [x] Implement template preview with AI content (integrated into AI filler dialog)
 - [x] Test AI template generation (endpoints created and working)
 
 ### Team Collaboration

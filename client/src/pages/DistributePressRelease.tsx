@@ -22,6 +22,7 @@ export default function DistributePressRelease() {
   const [selectedLists, setSelectedLists] = useState<number[]>([]);
   const [scheduleDate, setScheduleDate] = useState<Date>();
   const [sendImmediately, setSendImmediately] = useState(true);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
 
   const { data: pressRelease, isLoading: prLoading } = trpc.pressRelease.getById.useQuery(
     { id: parseInt(id || "0") },
@@ -33,6 +34,14 @@ export default function DistributePressRelease() {
   });
 
   const { data: purchasedListIds = [] } = trpc.mediaList.getPurchasedListIds.useQuery(undefined, {
+    enabled: !!user,
+  });
+
+  const { data: emailTemplates } = trpc.emailTemplate.list.useQuery(undefined, {
+    enabled: !!user,
+  });
+
+  const { data: defaultTemplate } = trpc.emailTemplate.getDefault.useQuery(undefined, {
     enabled: !!user,
   });
 
@@ -228,6 +237,50 @@ export default function DistributePressRelease() {
                     </Popover>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Email Template Selection */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Email Template</CardTitle>
+                <CardDescription>Choose a custom email template for distribution</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Select Template</Label>
+                  <select
+                    className="w-full p-2 border rounded-md bg-background"
+                    value={selectedTemplateId || ""}
+                    onChange={(e) => setSelectedTemplateId(e.target.value ? Number(e.target.value) : null)}
+                  >
+                    <option value="">Default Template</option>
+                    {emailTemplates?.map((template) => (
+                      <option key={template.id} value={template.id}>
+                        {template.name} {template.isDefault ? "(Default)" : ""}
+                      </option>
+                    ))}
+                  </select>
+                  {selectedTemplateId && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Your press release will be sent using the selected custom template.
+                    </p>
+                  )}
+                  {!selectedTemplateId && defaultTemplate && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Using default template: {defaultTemplate.name}
+                    </p>
+                  )}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => setLocation("/email-templates")}
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  Manage Templates
+                </Button>
               </CardContent>
             </Card>
           </div>

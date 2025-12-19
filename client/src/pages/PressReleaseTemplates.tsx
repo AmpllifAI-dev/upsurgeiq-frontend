@@ -5,7 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { FileText, Rocket, Megaphone, Calendar, Trophy, Users, ArrowLeft, Eye, Plus } from "lucide-react";
+import { FileText, Rocket, Megaphone, Calendar, Trophy, Users, ArrowLeft, Eye, Plus, Sparkles } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -156,7 +161,19 @@ export default function PressReleaseTemplates() {
   const [, setLocation] = useLocation();
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isAIFillerOpen, setIsAIFillerOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [aiFormData, setAiFormData] = useState({
+    companyName: "",
+    industry: "",
+    productName: "",
+    keyBenefit: "",
+    uniqueFeature: "",
+    ceoName: "",
+    ceoTitle: "",
+    website: "",
+    additionalContext: "",
+  });
 
   const categories = ["all", "Product", "Company News", "Events"];
 
@@ -173,6 +190,43 @@ export default function PressReleaseTemplates() {
   const handlePreview = (template: Template) => {
     setSelectedTemplate(template);
     setIsPreviewOpen(true);
+  };
+
+  const handleAIFill = (template: Template) => {
+    setSelectedTemplate(template);
+    setIsAIFillerOpen(true);
+  };
+
+  const fillTemplateMutation = trpc.aiTemplate.fillTemplate.useMutation({
+    onSuccess: (data) => {
+      // Store filled template in localStorage
+      localStorage.setItem("selectedPRTemplate", JSON.stringify({
+        ...selectedTemplate,
+        titleTemplate: data.title,
+        subtitleTemplate: data.subtitle,
+        bodyTemplate: data.body,
+      }));
+      toast.success("Template filled with AI!", {
+        description: "Your press release is ready to edit and publish.",
+      });
+      setLocation("/press-releases/new");
+    },
+    onError: (error) => {
+      toast.error("AI fill failed", {
+        description: error.message || "Unable to fill template. Please try again.",
+      });
+    },
+  });
+
+  const handleSubmitAIFill = () => {
+    if (!selectedTemplate) return;
+    
+    fillTemplateMutation.mutate({
+      templateBody: selectedTemplate.bodyTemplate,
+      templateTitle: selectedTemplate.titleTemplate,
+      templateSubtitle: selectedTemplate.subtitleTemplate,
+      data: aiFormData,
+    });
   };
 
   if (loading) {
@@ -260,23 +314,34 @@ export default function PressReleaseTemplates() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <CardDescription>{template.description}</CardDescription>
-                  <div className="flex gap-2">
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => handlePreview(template)}
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        Preview
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => handleUseTemplate(template)}
+                      >
+                        <FileText className="w-4 h-4 mr-2" />
+                        Use Template
+                      </Button>
+                    </div>
                     <Button
-                      variant="outline"
+                      variant="secondary"
                       size="sm"
-                      className="flex-1"
-                      onClick={() => handlePreview(template)}
+                      className="w-full"
+                      onClick={() => handleAIFill(template)}
                     >
-                      <Eye className="w-4 h-4 mr-2" />
-                      Preview
-                    </Button>
-                    <Button
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => handleUseTemplate(template)}
-                    >
-                      <FileText className="w-4 h-4 mr-2" />
-                      Use Template
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Fill with AI
                     </Button>
                   </div>
                 </CardContent>
@@ -329,6 +394,139 @@ export default function PressReleaseTemplates() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* AI Filler Dialog */}
+      <Dialog open={isAIFillerOpen} onOpenChange={setIsAIFillerOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5" />
+              Fill Template with AI
+            </DialogTitle>
+            <DialogDescription>
+              Provide your company details and AI will customize the template for you
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="companyName">Company Name *</Label>
+                <Input
+                  id="companyName"
+                  placeholder="Acme Inc."
+                  value={aiFormData.companyName}
+                  onChange={(e) => setAiFormData({ ...aiFormData, companyName: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="industry">Industry *</Label>
+                <Input
+                  id="industry"
+                  placeholder="SaaS, Healthcare, etc."
+                  value={aiFormData.industry}
+                  onChange={(e) => setAiFormData({ ...aiFormData, industry: e.target.value })}
+                />
+              </div>
+            </div>
+            
+            {selectedTemplate?.id === "product-launch" && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="productName">Product Name</Label>
+                  <Input
+                    id="productName"
+                    placeholder="Your product name"
+                    value={aiFormData.productName}
+                    onChange={(e) => setAiFormData({ ...aiFormData, productName: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="keyBenefit">Key Benefit</Label>
+                  <Input
+                    id="keyBenefit"
+                    placeholder="Main value proposition"
+                    value={aiFormData.keyBenefit}
+                    onChange={(e) => setAiFormData({ ...aiFormData, keyBenefit: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="uniqueFeature">Unique Feature</Label>
+                  <Input
+                    id="uniqueFeature"
+                    placeholder="What makes it special"
+                    value={aiFormData.uniqueFeature}
+                    onChange={(e) => setAiFormData({ ...aiFormData, uniqueFeature: e.target.value })}
+                  />
+                </div>
+              </>
+            )}
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="ceoName">CEO/Founder Name</Label>
+                <Input
+                  id="ceoName"
+                  placeholder="John Doe"
+                  value={aiFormData.ceoName}
+                  onChange={(e) => setAiFormData({ ...aiFormData, ceoName: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="ceoTitle">CEO Title</Label>
+                <Input
+                  id="ceoTitle"
+                  placeholder="CEO & Founder"
+                  value={aiFormData.ceoTitle}
+                  onChange={(e) => setAiFormData({ ...aiFormData, ceoTitle: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="website">Website</Label>
+              <Input
+                id="website"
+                placeholder="https://example.com"
+                value={aiFormData.website}
+                onChange={(e) => setAiFormData({ ...aiFormData, website: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="additionalContext">Additional Context (Optional)</Label>
+              <Textarea
+                id="additionalContext"
+                placeholder="Any additional information to help AI customize the template..."
+                rows={4}
+                value={aiFormData.additionalContext}
+                onChange={(e) => setAiFormData({ ...aiFormData, additionalContext: e.target.value })}
+              />
+            </div>
+
+            <div className="flex gap-2 justify-end pt-4">
+              <Button variant="outline" onClick={() => setIsAIFillerOpen(false)}>
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleSubmitAIFill}
+                disabled={!aiFormData.companyName || !aiFormData.industry || fillTemplateMutation.isPending}
+              >
+                {fillTemplateMutation.isPending ? (
+                  <>
+                    <Sparkles className="w-4 h-4 mr-2 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Generate Press Release
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
