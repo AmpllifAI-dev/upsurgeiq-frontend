@@ -277,3 +277,10 @@
 - [ ] Create onboarding tooltips for new users
 - [ ] Improve validation messages in forms
 - [ ] Add success confirmations for all actions
+
+
+## Keyboard Shortcuts (Completed)
+- [x] Add global keyboard shortcuts (Ctrl+D Dashboard, Ctrl+N New PR, Ctrl+Shift+P Press Releases, Ctrl+Shift+S Social, Ctrl+Shift+C Campaigns, Ctrl+Shift+A Analytics, Ctrl+Shift+M Media Lists)
+- [x] Create keyboard shortcuts help dialog (Ctrl+?)
+- [x] Add Esc to close dialogs
+- [x] Implement navigation shortcuts

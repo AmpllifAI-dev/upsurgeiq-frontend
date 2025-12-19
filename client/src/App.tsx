@@ -4,6 +4,8 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { useGlobalShortcuts } from "./hooks/useKeyboardShortcuts";
+import { KeyboardShortcutsDialog } from "./components/KeyboardShortcutsDialog";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Subscribe from "./pages/Subscribe";
@@ -54,11 +56,14 @@ function Router() {
 // - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
 function App() {
+  useGlobalShortcuts();
+  
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <Toaster />
+          <KeyboardShortcutsDialog />
           <Router />
         </TooltipProvider>
       </ThemeProvider>
