@@ -25,6 +25,7 @@ import Analytics from "./pages/Analytics";
 import Profile from "./pages/Profile";
 import PressReleaseDistribution from "./pages/PressReleaseDistribution";
 import DistributePressRelease from "./pages/DistributePressRelease";
+import Help from "./pages/Help";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -47,6 +48,7 @@ function Router() {
       <Route path="/error-logs" component={ErrorLogs} />
       <Route path="/analytics" component={Analytics} />
       <Route path="/profile" component={Profile} />
+      <Route path="/help" component={Help} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

@@ -234,11 +234,16 @@ export default function AIAssistant() {
           <div className="container mx-auto py-6 max-w-4xl">
             {messages.length === 0 ? (
               <div className="text-center py-16">
-                <MessageSquare className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-                <h3 className="text-xl font-semibold mb-2">Start a Conversation</h3>
-                <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                  Ask me anything about PR strategy, content creation, media outreach, or marketing campaigns
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-teal-100 to-lime-100 flex items-center justify-center mx-auto mb-6">
+                  <Sparkles className="w-10 h-10 text-teal-600" />
+                </div>
+                <h3 className="text-2xl font-bold mb-3">Your AI PR & Marketing Assistant</h3>
+                <p className="text-muted-foreground mb-8 max-w-2xl mx-auto text-lg">
+                  Get expert guidance on press releases, media outreach, campaign strategy, and content creation. I'm here to help you craft compelling narratives and maximize your PR impact.
                 </p>
+                <div className="mb-8">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Try asking me:</h4>
+                </div>
                 <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
                   {[
                     "Help me write a press release about our new product launch",

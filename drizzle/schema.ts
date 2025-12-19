@@ -333,3 +333,98 @@ export const payments = mysqlTable("payments", {
 
 export type Payment = typeof payments.$inferSelect;
 export type InsertPayment = typeof payments.$inferInsert;
+
+// Press Release Distributions (Email tracking)
+export const distributions = mysqlTable("distributions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  pressReleaseId: int("pressReleaseId").notNull().references(() => pressReleases.id, { onDelete: "cascade" }),
+  mediaListId: int("mediaListId").notNull().references(() => mediaLists.id, { onDelete: "cascade" }),
+  trackingId: varchar("trackingId", { length: 64 }).notNull().unique(), // UUID for tracking
+  recipientEmail: varchar("recipientEmail", { length: 320 }).notNull(),
+  recipientName: varchar("recipientName", { length: 255 }),
+  status: mysqlEnum("status", ["pending", "sending", "sent", "failed", "bounced"]).notNull().default("pending"),
+  sentAt: timestamp("sentAt"),
+  openedAt: timestamp("openedAt"),
+  clickedAt: timestamp("clickedAt"),
+  openCount: int("openCount").default(0).notNull(),
+  clickCount: int("clickCount").default(0).notNull(),
+  errorMessage: text("errorMessage"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Distribution = typeof distributions.$inferSelect;
+export type InsertDistribution = typeof distributions.$inferInsert;
+
+// Social Media Accounts (OAuth connections)
+export const socialAccounts = mysqlTable("social_accounts", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  businessId: int("businessId").references(() => businesses.id, { onDelete: "cascade" }),
+  platform: mysqlEnum("platform", ["facebook", "instagram", "linkedin", "x"]).notNull(),
+  accountId: varchar("accountId", { length: 255 }).notNull(), // Platform-specific account ID
+  accountName: varchar("accountName", { length: 255 }),
+  accessToken: text("accessToken").notNull(), // Encrypted in production
+  refreshToken: text("refreshToken"),
+  tokenExpiresAt: timestamp("tokenExpiresAt"),
+  status: mysqlEnum("status", ["active", "expired", "revoked", "error"]).notNull().default("active"),
+  lastSyncedAt: timestamp("lastSyncedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SocialAccount = typeof socialAccounts.$inferSelect;
+export type InsertSocialAccount = typeof socialAccounts.$inferInsert;
+
+// Activity Logs (Audit trail)
+export const activityLogs = mysqlTable("activity_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  action: varchar("action", { length: 100 }).notNull(), // e.g., "press_release.created", "campaign.updated"
+  entityType: varchar("entityType", { length: 50 }), // e.g., "press_release", "campaign"
+  entityId: int("entityId"),
+  description: text("description"),
+  metadata: text("metadata"), // JSON string for additional context
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ActivityLog = typeof activityLogs.$inferSelect;
+export type InsertActivityLog = typeof activityLogs.$inferInsert;
+
+// Usage Tracking (Tier limits enforcement)
+export const usageTracking = mysqlTable("usage_tracking", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  period: varchar("period", { length: 7 }).notNull(), // YYYY-MM format
+  pressReleasesCreated: int("pressReleasesCreated").default(0).notNull(),
+  socialPostsCreated: int("socialPostsCreated").default(0).notNull(),
+  campaignsCreated: int("campaignsCreated").default(0).notNull(),
+  distributionsSent: int("distributionsSent").default(0).notNull(),
+  aiImagesGenerated: int("aiImagesGenerated").default(0).notNull(),
+  aiChatMessages: int("aiChatMessages").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type UsageTracking = typeof usageTracking.$inferSelect;
+export type InsertUsageTracking = typeof usageTracking.$inferInsert;
+
+// Notification Preferences
+export const notificationPreferences = mysqlTable("notification_preferences", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  emailNotifications: int("emailNotifications").default(1).notNull(), // Boolean as int
+  pressReleaseNotifications: int("pressReleaseNotifications").default(1).notNull(),
+  campaignNotifications: int("campaignNotifications").default(1).notNull(),
+  socialMediaNotifications: int("socialMediaNotifications").default(1).notNull(),
+  weeklyDigest: int("weeklyDigest").default(1).notNull(),
+  marketingEmails: int("marketingEmails").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type NotificationPreferences = typeof notificationPreferences.$inferSelect;
+export type InsertNotificationPreferences = typeof notificationPreferences.$inferInsert;

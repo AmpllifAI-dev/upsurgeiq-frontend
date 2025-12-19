@@ -3,16 +3,19 @@ import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Calendar, TrendingUp, FileText, Share2, Users, BarChart3 } from "lucide-react";
+import { Calendar, TrendingUp, FileText, Share2, Users, BarChart3, Download } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Link } from "wouter";
 import { useState } from "react";
 import { AnalyticsCharts } from "@/components/AnalyticsCharts";
 import { exportAnalyticsToCSV } from "@/lib/csvExport";
-import { Download } from "lucide-react";
 
 export default function Analytics() {
   const { user, loading: authLoading } = useAuth();
-  const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d">("30d");
+  const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d" | "custom">("30d");
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
 
   const { data: stats, isLoading: statsLoading } = trpc.dashboard.stats.useQuery();
   const { data: pressReleases, isLoading: prLoading } = trpc.pressRelease.list.useQuery();
@@ -80,6 +83,13 @@ export default function Analytics() {
                 90 Days
               </Button>
               <Button
+                variant={dateRange === "custom" ? "default" : "outline"}
+                onClick={() => setDateRange("custom")}
+                size="sm"
+              >
+                Custom Range
+              </Button>
+              <Button
                 variant="outline"
                 size="sm"
                 onClick={() => exportAnalyticsToCSV({ pressReleases: pressReleases || [], socialPosts: socialPosts || [], campaigns: campaigns || [] })}
@@ -89,6 +99,55 @@ export default function Analytics() {
               </Button>
             </div>
           </div>
+          
+          {/* Custom Date Range Inputs */}
+          {dateRange === "custom" && (
+            <div className="mt-4 flex flex-wrap gap-4 items-end">
+              <div className="space-y-2">
+                <Label htmlFor="start-date">Start Date</Label>
+                <Input
+                  id="start-date"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-40"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="end-date">End Date</Label>
+                <Input
+                  id="end-date"
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-40"
+                />
+              </div>
+              <Button
+                onClick={() => {
+                  if (!startDate || !endDate) {
+                    alert("Please select both start and end dates");
+                    return;
+                  }
+                  // Filter data based on custom date range
+                  console.log("Filtering from", startDate, "to", endDate);
+                }}
+                size="sm"
+              >
+                Apply Filter
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setStartDate("");
+                  setEndDate("");
+                }}
+                size="sm"
+              >
+                Clear
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 

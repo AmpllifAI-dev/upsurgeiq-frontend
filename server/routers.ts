@@ -46,8 +46,10 @@ import {
 import { createCheckoutSession, createPortalSession, createMediaListPurchaseSession } from "./stripe";
 import { getProductByTier } from "./products";
 import { invokeLLM } from "./_core/llm";
+import { generateImage } from "./_core/imageGeneration";
 import { getErrorLogs, getErrorStats } from "./errorLogs";
 import { createLogger } from "./_core/logger";
+import { getPressReleaseEngagement } from "./tracking";
 import {
   createDistribution,
   getDistributionsByPressRelease,
@@ -505,6 +507,12 @@ Generate a complete, publication-ready press release.`;
   }),
 
   ai: router({
+    generateImage: protectedProcedure
+      .input(z.object({ prompt: z.string() }))
+      .mutation(async ({ input }) => {
+        return await generateImage({ prompt: input.prompt });
+      }),
+
     chat: protectedProcedure
       .input(
         z.object({
@@ -881,6 +889,44 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
       .mutation(async ({ input }) => {
         const { id, ...stats } = input;
         await updateDistributionStats(id, stats);
+        return { success: true };
+      }),
+  }),
+
+  tracking: router({
+    engagement: protectedProcedure
+      .input(z.object({ pressReleaseId: z.number() }))
+      .query(async ({ input }) => {
+        return await getPressReleaseEngagement(input.pressReleaseId);
+      }),
+  }),
+
+  socialAccounts: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const db = await import("./db").then(m => m.getDb());
+      if (!db) return [];
+      
+      const { socialAccounts } = await import("../drizzle/schema");
+      const { eq } = await import("drizzle-orm");
+      
+      return await db.select().from(socialAccounts).where(eq(socialAccounts.userId, ctx.user.id));
+    }),
+
+    disconnect: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await import("./db").then(m => m.getDb());
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+        
+        const { socialAccounts } = await import("../drizzle/schema");
+        const { eq, and } = await import("drizzle-orm");
+        
+        await db.delete(socialAccounts).where(
+          and(
+            eq(socialAccounts.id, input.id),
+            eq(socialAccounts.userId, ctx.user.id)
+          )
+        );
         return { success: true };
       }),
   }),
