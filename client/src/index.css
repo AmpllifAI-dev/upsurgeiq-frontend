@@ -117,7 +117,17 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
+  }
+  
+  /* Enhanced focus indicators for accessibility */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+  
+  /* Skip navigation link styles */
+  .skip-link {
+    @apply absolute left-0 top-0 bg-primary text-primary-foreground px-4 py-2 rounded-br-md z-[9999] -translate-y-full focus:translate-y-0 transition-transform;
   }
   body {
     @apply bg-background text-foreground;
@@ -133,6 +143,15 @@
   input[type="checkbox"]:not(:disabled),
   input[type="radio"]:not(:disabled) {
     @apply cursor-pointer;
+  }
+  
+  /* Ensure interactive elements have visible focus */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
   }
 }
 

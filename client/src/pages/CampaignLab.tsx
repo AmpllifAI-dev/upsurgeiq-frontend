@@ -286,8 +286,11 @@ export default function CampaignLab() {
             <CardContent className="flex flex-col items-center justify-center py-16">
               <Beaker className="w-16 h-16 text-muted-foreground mb-4 opacity-50" />
               <h3 className="text-xl font-semibold mb-2">No campaigns yet</h3>
-              <p className="text-muted-foreground mb-6 text-center max-w-md">
-                Create your first campaign to start testing and optimizing your marketing efforts
+              <p className="text-muted-foreground mb-4 text-center max-w-md">
+                Launch your first A/B testing campaign to discover which ad variations resonate best with your audience.
+              </p>
+              <p className="text-sm text-muted-foreground mb-6 text-center max-w-md">
+                Our AI generates 4-6 creative variations testing different psychological angles, then automatically identifies and scales the winners.
               </p>
               <Button onClick={() => setIsCreateOpen(true)}>
                 <Plus className="w-4 h-4 mr-2" />

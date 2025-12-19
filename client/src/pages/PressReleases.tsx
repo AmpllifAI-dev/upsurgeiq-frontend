@@ -122,6 +122,10 @@ export default function PressReleases() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Skip Navigation Link */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex items-center justify-between py-4">
@@ -140,7 +144,7 @@ export default function PressReleases() {
         </div>
       </nav>
 
-      <div className="container mx-auto py-8">
+      <div id="main-content" className="container mx-auto py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-bold text-foreground">Press Releases</h1>
@@ -183,8 +187,11 @@ export default function PressReleases() {
             <CardContent className="flex flex-col items-center justify-center py-16">
               <FileText className="w-16 h-16 text-muted-foreground mb-4 opacity-50" />
               <h3 className="text-xl font-semibold mb-2">No press releases yet</h3>
-              <p className="text-muted-foreground mb-6 text-center max-w-md">
-                Create your first AI-powered press release to start amplifying your brand voice
+              <p className="text-muted-foreground mb-4 text-center max-w-md">
+                Create your first AI-powered press release to start amplifying your brand voice across media channels.
+              </p>
+              <p className="text-sm text-muted-foreground mb-6 text-center max-w-md">
+                Our AI will use your business dossier to generate professional, on-brand content in seconds.
               </p>
               <Button onClick={() => setLocation("/press-releases/new")}>
                 <Plus className="w-4 h-4 mr-2" />

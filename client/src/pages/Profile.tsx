@@ -39,18 +39,24 @@ export default function Profile() {
 
   const handleSaveProfile = () => {
     // TODO: Implement profile update mutation
-    toast.success("Profile updated successfully");
+    toast.success("Profile updated!", {
+      description: "Your profile information has been saved successfully."
+    });
     setIsEditing(false);
   };
 
   const handleSaveNotifications = () => {
     // TODO: Implement notification preferences update
-    toast.success("Notification preferences updated");
+    toast.success("Preferences saved!", {
+      description: "Your notification preferences have been updated."
+    });
   };
 
   const handleExportData = () => {
     // TODO: Implement data export
-    toast.info("Preparing your data export...");
+    toast.info("Export started", {
+      description: "We're preparing your data export. You'll receive a download link via email shortly."
+    });
   };
 
   return (

@@ -329,3 +329,29 @@
 - [ ] Add contextual help for AI content generation
 - [ ] Implement onboarding tooltips for new users
 - [ ] Add keyboard shortcut hints in UI
+
+
+## Additional UX Improvements (Current Work)
+### Skip Navigation & Focus Management
+- [x] Add skip navigation links to Dashboard and Press Releases
+- [x] Improve focus indicators with visible outlines (outline-2 outline-primary)
+- [x] Add focus-visible styles for all interactive elements
+- [x] Create skip-link utility class with keyboard-only visibility
+- [ ] Add focus trap for modal dialogs
+- [ ] Ensure logical tab order throughout app
+
+### Empty States
+- [x] Create informative empty state for press releases list
+- [x] Create informative empty state for campaigns list
+- [x] Add clear CTAs and onboarding guidance in empty states
+- [x] Add helpful descriptions explaining platform features
+- [ ] Create informative empty state for media lists
+- [ ] Create informative empty state for social media posts
+
+### Success Confirmations
+- [x] Add success toast for press release creation with description
+- [x] Add success toast for profile updates with description
+- [x] Add success toast for notification preferences with description
+- [x] Add info toast for data export with helpful guidance
+- [ ] Add success toast for campaign creation
+- [ ] Add success toast for media list creation

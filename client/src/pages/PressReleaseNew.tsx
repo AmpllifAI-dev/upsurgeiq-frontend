@@ -44,7 +44,9 @@ export default function PressReleaseNew() {
 
   const saveMutation = trpc.pressRelease.create.useMutation({
     onSuccess: () => {
-      toast.success("Press release saved successfully!");
+      toast.success("Press release created!", {
+        description: "Your press release has been saved as a draft. You can publish it when ready."
+      });
       setLocation("/press-releases");
     },
     onError: (error) => {

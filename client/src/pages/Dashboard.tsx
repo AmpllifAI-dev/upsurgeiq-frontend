@@ -109,6 +109,10 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Skip Navigation Link */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50" role="navigation" aria-label="Main navigation">
         <div className="container mx-auto flex flex-col md:flex-row items-start md:items-center justify-between py-4 gap-4">
@@ -149,7 +153,7 @@ export default function Dashboard() {
         </div>
       </nav>
 
-      <div className="container mx-auto py-8 space-y-8" role="main">
+      <div id="main-content" className="container mx-auto py-8 space-y-8" role="main">
         {/* Header */}
         <header className="flex items-center justify-between">
           <div>
