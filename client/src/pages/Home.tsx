@@ -286,8 +286,8 @@ export default function Home() {
               Intelligence That Drives Growth
             </Badge>
             <h1 className="text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
-              AI-Powered PR & Marketing for{" "}
-              <span className="text-primary">Growing Businesses</span>
+              AI-Powered PR & Marketing to{" "}
+              <span className="text-primary">Grow Your Business</span>
             </h1>
             <p className="text-xl text-muted-foreground leading-relaxed">
               Amplify your voice across press releases, social media, and journalist networks. Professional content creation and distribution at a fraction of traditional agency costs.
