@@ -14,8 +14,21 @@ import {
   updateBusiness,
   getNotificationPreferences,
   upsertNotificationPreferences,
-  getUserSubscription
+  getUserSubscription,
+  getTeamMembersByBusinessId,
+  getTeamMemberByUserAndBusiness,
+  createTeamMember,
+  updateTeamMemberRole,
+  deleteTeamMember,
+  getTeamInvitationsByBusinessId,
+  getTeamInvitationByToken,
+  createTeamInvitation,
+  updateTeamInvitationStatus,
+  getSavedFiltersByUserId,
+  createSavedFilter,
+  deleteSavedFilter,
 } from "./db";
+import { generateInvitationToken, getInvitationExpiry, hasPermission } from "./teamUtils";
 import {
   createPressRelease,
   getPressReleasesByBusiness,
@@ -1523,6 +1536,216 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
       }
       return await getDefaultEmailTemplate(business.id);
     }),
+  }),
+
+  team: router({
+    members: protectedProcedure.query(async ({ ctx }) => {
+      const business = await getUserBusiness(ctx.user.id);
+      if (!business) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Business profile not found",
+        });
+      }
+      return await getTeamMembersByBusinessId(business.id);
+    }),
+
+    invitations: protectedProcedure.query(async ({ ctx }) => {
+      const business = await getUserBusiness(ctx.user.id);
+      if (!business) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Business profile not found",
+        });
+      }
+      return await getTeamInvitationsByBusinessId(business.id);
+    }),
+
+    invite: protectedProcedure
+      .input(
+        z.object({
+          email: z.string().email(),
+          role: z.enum(["admin", "editor", "viewer"]),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const business = await getUserBusiness(ctx.user.id);
+        if (!business) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Business profile not found",
+          });
+        }
+
+        const token = generateInvitationToken();
+        const expiresAt = getInvitationExpiry();
+
+        await createTeamInvitation({
+          businessId: business.id,
+          email: input.email,
+          role: input.role,
+          token,
+          invitedBy: ctx.user.id,
+          expiresAt,
+        });
+
+        await logActivity({
+          userId: ctx.user.id,
+          action: "team_member_invited",
+          entityType: "team_invitation",
+          metadata: { email: input.email, role: input.role },
+        });
+
+        return { success: true, token };
+      }),
+
+    acceptInvitation: protectedProcedure
+      .input(z.object({ token: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        const invitation = await getTeamInvitationByToken(input.token);
+        
+        if (!invitation) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Invitation not found",
+          });
+        }
+
+        if (invitation.status !== "pending") {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invitation is no longer valid",
+          });
+        }
+
+        if (new Date() > new Date(invitation.expiresAt)) {
+          await updateTeamInvitationStatus(invitation.id, "expired");
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invitation has expired",
+          });
+        }
+
+        await createTeamMember({
+          businessId: invitation.businessId,
+          userId: ctx.user.id,
+          role: invitation.role,
+          invitedBy: invitation.invitedBy,
+        });
+
+        await updateTeamInvitationStatus(invitation.id, "accepted");
+
+        await logActivity({
+          userId: ctx.user.id,
+          action: "team_invitation_accepted",
+          entityType: "team_member",
+          metadata: { role: invitation.role },
+        });
+
+        return { success: true };
+      }),
+
+    updateRole: protectedProcedure
+      .input(
+        z.object({
+          memberId: z.number(),
+          role: z.enum(["admin", "editor", "viewer"]),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const business = await getUserBusiness(ctx.user.id);
+        if (!business) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Business profile not found",
+          });
+        }
+
+        const member = await getTeamMemberByUserAndBusiness(ctx.user.id, business.id);
+        if (!member || !hasPermission(member.role, "admin")) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only admins can change roles",
+          });
+        }
+
+        await updateTeamMemberRole(input.memberId, input.role);
+
+        await logActivity({
+          userId: ctx.user.id,
+          action: "team_member_role_updated",
+          entityType: "team_member",
+          entityId: input.memberId,
+          metadata: { newRole: input.role },
+        });
+
+        return { success: true };
+      }),
+
+    removeMember: protectedProcedure
+      .input(z.object({ memberId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const business = await getUserBusiness(ctx.user.id);
+        if (!business) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Business profile not found",
+          });
+        }
+
+        const member = await getTeamMemberByUserAndBusiness(ctx.user.id, business.id);
+        if (!member || !hasPermission(member.role, "admin")) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only admins can remove team members",
+          });
+        }
+
+        await deleteTeamMember(input.memberId);
+
+        await logActivity({
+          userId: ctx.user.id,
+          action: "team_member_removed",
+          entityType: "team_member",
+          entityId: input.memberId,
+        });
+
+        return { success: true };
+      }),
+  }),
+
+  savedFilters: router({
+    list: protectedProcedure
+      .input(z.object({ entityType: z.string().optional() }))
+      .query(async ({ ctx, input }) => {
+        return await getSavedFiltersByUserId(ctx.user.id, input.entityType);
+      }),
+
+    create: protectedProcedure
+      .input(
+        z.object({
+          name: z.string(),
+          entityType: z.string(),
+          filterData: z.any(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await createSavedFilter({
+          userId: ctx.user.id,
+          name: input.name,
+          entityType: input.entityType,
+          filterData: input.filterData,
+        });
+
+        return { success: true };
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await deleteSavedFilter(input.id);
+        return { success: true };
+      }),
   }),
 
   usageTracking: router({

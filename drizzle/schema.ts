@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { int, json, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -464,3 +464,49 @@ export const pressReleaseTemplates = mysqlTable("press_release_templates", {
 
 export type PressReleaseTemplate = typeof pressReleaseTemplates.$inferSelect;
 export type InsertPressReleaseTemplate = typeof pressReleaseTemplates.$inferInsert;
+
+// Team Members
+export const teamMembers = mysqlTable("team_members", {
+  id: int("id").autoincrement().primaryKey(),
+  businessId: int("businessId").notNull().references(() => businesses.id, { onDelete: "cascade" }),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  role: varchar("role", { length: 50 }).notNull().default("viewer"), // admin, editor, viewer
+  status: varchar("status", { length: 50 }).notNull().default("active"), // active, suspended
+  invitedBy: int("invitedBy").references(() => users.id),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TeamMember = typeof teamMembers.$inferSelect;
+export type InsertTeamMember = typeof teamMembers.$inferInsert;
+
+// Team Invitations
+export const teamInvitations = mysqlTable("team_invitations", {
+  id: int("id").autoincrement().primaryKey(),
+  businessId: int("businessId").notNull().references(() => businesses.id, { onDelete: "cascade" }),
+  email: varchar("email", { length: 255 }).notNull(),
+  role: varchar("role", { length: 50 }).notNull().default("viewer"),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  invitedBy: int("invitedBy").notNull().references(() => users.id),
+  status: varchar("status", { length: 50 }).notNull().default("pending"), // pending, accepted, expired, revoked
+  expiresAt: timestamp("expiresAt").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TeamInvitation = typeof teamInvitations.$inferSelect;
+export type InsertTeamInvitation = typeof teamInvitations.$inferInsert;
+
+// Saved Filters
+export const savedFilters = mysqlTable("saved_filters", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 255 }).notNull(),
+  entityType: varchar("entityType", { length: 50 }).notNull(), // press_release, campaign, media_list
+  filterData: json("filterData").notNull(), // JSON object with filter criteria
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SavedFilter = typeof savedFilters.$inferSelect;
+export type InsertSavedFilter = typeof savedFilters.$inferInsert;

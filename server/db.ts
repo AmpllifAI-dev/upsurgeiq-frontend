@@ -373,3 +373,202 @@ export async function getDefaultEmailTemplate(businessId: number) {
 
   return results[0] || null;
 }
+
+
+// Team Members
+export async function getTeamMembersByBusinessId(businessId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { teamMembers, users } = await import("../drizzle/schema");
+  
+  const results = await db
+    .select({
+      id: teamMembers.id,
+      businessId: teamMembers.businessId,
+      userId: teamMembers.userId,
+      role: teamMembers.role,
+      status: teamMembers.status,
+      createdAt: teamMembers.createdAt,
+      userName: users.name,
+      userEmail: users.email,
+    })
+    .from(teamMembers)
+    .leftJoin(users, eq(teamMembers.userId, users.id))
+    .where(eq(teamMembers.businessId, businessId));
+
+  return results;
+}
+
+export async function getTeamMemberByUserAndBusiness(userId: number, businessId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { teamMembers } = await import("../drizzle/schema");
+  const { and } = await import("drizzle-orm");
+  
+  const results = await db
+    .select()
+    .from(teamMembers)
+    .where(
+      and(
+        eq(teamMembers.userId, userId),
+        eq(teamMembers.businessId, businessId)
+      )
+    )
+    .limit(1);
+
+  return results[0] || null;
+}
+
+export async function createTeamMember(data: {
+  businessId: number;
+  userId: number;
+  role: string;
+  invitedBy?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { teamMembers } = await import("../drizzle/schema");
+  
+  const result = await db.insert(teamMembers).values(data);
+  return result;
+}
+
+export async function updateTeamMemberRole(id: number, role: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { teamMembers } = await import("../drizzle/schema");
+  
+  await db
+    .update(teamMembers)
+    .set({ role })
+    .where(eq(teamMembers.id, id));
+
+  return true;
+}
+
+export async function deleteTeamMember(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { teamMembers } = await import("../drizzle/schema");
+  
+  await db
+    .delete(teamMembers)
+    .where(eq(teamMembers.id, id));
+
+  return true;
+}
+
+// Team Invitations
+export async function getTeamInvitationsByBusinessId(businessId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { teamInvitations } = await import("../drizzle/schema");
+  
+  const results = await db
+    .select()
+    .from(teamInvitations)
+    .where(eq(teamInvitations.businessId, businessId));
+
+  return results;
+}
+
+export async function getTeamInvitationByToken(token: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { teamInvitations } = await import("../drizzle/schema");
+  
+  const results = await db
+    .select()
+    .from(teamInvitations)
+    .where(eq(teamInvitations.token, token))
+    .limit(1);
+
+  return results[0] || null;
+}
+
+export async function createTeamInvitation(data: {
+  businessId: number;
+  email: string;
+  role: string;
+  token: string;
+  invitedBy: number;
+  expiresAt: Date;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { teamInvitations } = await import("../drizzle/schema");
+  
+  const result = await db.insert(teamInvitations).values(data);
+  return result;
+}
+
+export async function updateTeamInvitationStatus(id: number, status: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { teamInvitations } = await import("../drizzle/schema");
+  
+  await db
+    .update(teamInvitations)
+    .set({ status })
+    .where(eq(teamInvitations.id, id));
+
+  return true;
+}
+
+// Saved Filters
+export async function getSavedFiltersByUserId(userId: number, entityType?: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { savedFilters } = await import("../drizzle/schema");
+  const { and } = await import("drizzle-orm");
+  
+  const conditions = [eq(savedFilters.userId, userId)];
+  if (entityType) {
+    conditions.push(eq(savedFilters.entityType, entityType));
+  }
+  
+  const results = await db
+    .select()
+    .from(savedFilters)
+    .where(and(...conditions));
+
+  return results;
+}
+
+export async function createSavedFilter(data: {
+  userId: number;
+  name: string;
+  entityType: string;
+  filterData: any;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { savedFilters } = await import("../drizzle/schema");
+  
+  const result = await db.insert(savedFilters).values(data);
+  return result;
+}
+
+export async function deleteSavedFilter(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { savedFilters } = await import("../drizzle/schema");
+  
+  await db
+    .delete(savedFilters)
+    .where(eq(savedFilters.id, id));
+
+  return true;
+}

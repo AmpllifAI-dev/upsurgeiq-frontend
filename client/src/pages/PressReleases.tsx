@@ -2,7 +2,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Zap, FileText, Plus, Calendar, ArrowLeft, Eye, Edit, Trash2, Search, Download } from "lucide-react";
+import { Zap, FileText, Plus, Calendar, ArrowLeft, Eye, Edit, Trash2, Search, Download, Save, Star } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -12,6 +12,8 @@ import { Input } from "@/components/ui/input";
 import { exportPressReleaseToPDF, exportBulkPressReleasesToPDF } from "@/lib/pdfExport";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SearchFilter } from "@/components/SearchFilter";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 export default function PressReleases() {
   const { user, loading } = useAuth();
@@ -22,6 +24,47 @@ export default function PressReleases() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [bulkMode, setBulkMode] = useState(false);
+  const [showSaveFilterDialog, setShowSaveFilterDialog] = useState(false);
+  const [filterName, setFilterName] = useState("");
+
+  const { data: savedFilters } = trpc.savedFilters.list.useQuery({ entityType: "press_release" });
+
+  const saveFilterMutation = trpc.savedFilters.create.useMutation({
+    onSuccess: () => {
+      toast.success("Filter saved successfully");
+      setShowSaveFilterDialog(false);
+      setFilterName("");
+    },
+    onError: (error) => {
+      toast.error("Failed to save filter", { description: error.message });
+    },
+  });
+
+  const deleteSavedFilterMutation = trpc.savedFilters.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Filter deleted");
+    },
+  });
+
+  const handleSaveFilter = () => {
+    if (!filterName) {
+      toast.error("Please enter a filter name");
+      return;
+    }
+    saveFilterMutation.mutate({
+      name: filterName,
+      entityType: "press_release",
+      filterData: { searchQuery, statusFilter, sortBy, sortOrder },
+    });
+  };
+
+  const handleLoadFilter = (filter: any) => {
+    setSearchQuery(filter.filterData.searchQuery || "");
+    setStatusFilter(filter.filterData.statusFilter || "all");
+    setSortBy(filter.filterData.sortBy || "date");
+    setSortOrder(filter.filterData.sortOrder || "desc");
+    toast.success(`Loaded filter: ${filter.name}`);
+  };
 
   const statusOptions = [
     { label: "Draft", value: "draft" },
@@ -247,8 +290,7 @@ export default function PressReleases() {
 
         {/* Search and Filters */}
         {pressReleases && pressReleases.length > 0 && (
-          <div className="mb-6 space-y-4">
-            <SearchFilter
+          <div className="mb-6 space-y-4">            <SearchFilter
               searchPlaceholder="Search press releases by title, subtitle, or content..."
               statusOptions={statusOptions}
               onSearchChange={setSearchQuery}
@@ -259,8 +301,43 @@ export default function PressReleases() {
                 setSortBy("date");
                 setSortOrder("desc");
               }}
-              showStatusFilter={true}
             />
+
+            {/* Saved Filters */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowSaveFilterDialog(true)}
+              >
+                <Save className="w-4 h-4 mr-2" />
+                Save Current Filter
+              </Button>
+              {savedFilters && savedFilters.length > 0 && (
+                <>
+                  <div className="h-4 w-px bg-border" />
+                  {savedFilters.map((filter: any) => (
+                    <div key={filter.id} className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleLoadFilter(filter)}
+                      >
+                        <Star className="w-4 h-4 mr-1" />
+                        {filter.name}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deleteSavedFilterMutation.mutate({ id: filter.id })}
+                      >
+                        <Trash2 className="w-3 h-3 text-destructive" />
+                      </Button>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
             <div className="flex gap-2 items-center">
               <span className="text-sm text-muted-foreground">Sort by:</span>
               <Button
@@ -404,6 +481,37 @@ export default function PressReleases() {
           </div>
         )}
       </div>
+
+      {/* Save Filter Dialog */}
+      <Dialog open={showSaveFilterDialog} onOpenChange={setShowSaveFilterDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save Filter</DialogTitle>
+            <DialogDescription>
+              Save your current filter settings for quick access later
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="filterName">Filter Name</Label>
+              <Input
+                id="filterName"
+                placeholder="e.g., Published This Month"
+                value={filterName}
+                onChange={(e) => setFilterName(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-2 justify-end pt-4">
+              <Button variant="outline" onClick={() => setShowSaveFilterDialog(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSaveFilter} disabled={saveFilterMutation.isPending}>
+                {saveFilterMutation.isPending ? "Saving..." : "Save Filter"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

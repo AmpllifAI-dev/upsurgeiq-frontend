@@ -29,6 +29,7 @@ import Help from "./pages/Help";
 import ContentCalendar from "./pages/ContentCalendar";
 import EmailTemplates from "./pages/EmailTemplates";
 import PressReleaseTemplates from "./pages/PressReleaseTemplates";
+import TeamManagement from "./pages/TeamManagement";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -54,6 +55,7 @@ function Router() {
       <Route path="/content-calendar" component={ContentCalendar} />
       <Route path="/email-templates" component={EmailTemplates} />
       <Route path="/press-release-templates" component={PressReleaseTemplates} />
+      <Route path="/team" component={TeamManagement} />
       <Route path="/help" component={Help} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

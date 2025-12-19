@@ -864,3 +864,37 @@
 - [x] Update any email templates with branding
 - [x] Verify VITE_APP_TITLE environment variable (set to UpsurgeIQ)
 - [x] Test all pages for consistent branding
+
+## Team Collaboration System
+
+### Database Schema
+- [x] Create team_members table with user_id, business_id, role, status
+- [x] Create team_invitations table with email, role, token, expires_at
+- [x] Create saved_filters table for saving filter combinations
+- [x] Add database functions for team management
+
+### Backend Endpoints
+- [x] Add team member CRUD endpoints
+- [x] Add invitation endpoints (send, accept, revoke)
+- [x] Add role-based permission checks to existing endpoints
+- [ ] Add approval workflow endpoints (can be added later)
+- [x] Add saved filter CRUD endpoints
+
+### Frontend UI
+- [x] Create Team Management page in settings
+- [x] Add invitation form and pending invitations list
+- [x] Add role management UI
+- [x] Show team member list with permissionslow UI for content review
+
+### Saved Search Filters
+- [ ] Create saved_filters table in schema
+- [ ] Add saved filter CRUD endpoints
+- [ ] Add filter save/load UI to list pages
+- [ ] Add quick filter dropdown to PressReleases and CampaignLab
+
+### Testing
+- [ ] Test team invitation flow
+- [ ] Test role-based permissions
+- [ ] Test saved filters functionality
+- [ ] Run full test suite
+- [ ] Save final checkpoint

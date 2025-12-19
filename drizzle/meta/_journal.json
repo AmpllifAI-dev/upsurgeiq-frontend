@@ -57,6 +57,13 @@
       "when": 1766139233905,
       "tag": "0007_tranquil_doorman",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1766145279665,
+      "tag": "0008_bitter_scourge",
+      "breakpoints": true
     }
   ]
 }
