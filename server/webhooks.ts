@@ -222,3 +222,47 @@ export function buildUserOnboardedPayload(data: {
       : null,
   };
 }
+
+/**
+ * Trigger webhook for a specific event type
+ * Fetches active webhooks from database and sends payload to all matching endpoints
+ */
+export async function triggerWebhook(
+  eventType: WebhookEventType,
+  payload: any
+): Promise<void> {
+  const { getActiveWebhooksByEvent, logWebhookDelivery } = await import("./webhookConfigs");
+  
+  // Get all active webhooks for this event type
+  const webhooks = await getActiveWebhooksByEvent(eventType);
+  
+  if (webhooks.length === 0) {
+    console.log(`[Webhook] No active webhooks configured for event: ${eventType}`);
+    return;
+  }
+  
+  // Send to all configured webhooks
+  for (const webhook of webhooks) {
+    const result = await sendWebhookWithRetry(
+      webhook.webhookUrl,
+      {
+        event: eventType,
+        timestamp: new Date().toISOString(),
+        ...payload,
+      } as any,
+      webhook.retryAttempts
+    );
+    
+    // Log delivery result
+    await logWebhookDelivery({
+      webhookConfigId: webhook.id,
+      eventType,
+      payload: JSON.stringify(payload),
+      success: result.success ? 1 : 0,
+      statusCode: result.statusCode,
+      errorMessage: result.error,
+      attempts: webhook.retryAttempts,
+      deliveredAt: new Date(result.deliveredAt),
+    });
+  }
+}

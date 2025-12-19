@@ -2078,6 +2078,57 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
         }
         return await getRecentWebhookLogs(input.limit);
       }),
+
+    // Test endpoint to manually trigger webhook
+    test: protectedProcedure
+      .input(
+        z.object({
+          eventType: z.enum(["user.registered", "user.onboarded"]),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        // Admin only
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only admins can test webhooks",
+          });
+        }
+
+        const { triggerWebhook } = await import("./webhooks");
+        
+        // Create test payload
+        const testPayload = {
+          user: {
+            id: ctx.user.id,
+            email: ctx.user.email,
+            name: ctx.user.name || "Test User",
+            phone: "+1234567890",
+          },
+          business: {
+            name: "Test Business Corp",
+            industry: "Technology",
+            size: "11-50",
+            website: "https://testbusiness.com",
+            targetAudience: "B2B SaaS companies looking to scale their PR efforts",
+            marketingGoals: "Increase brand awareness and generate qualified leads",
+          },
+          subscription: {
+            plan: "Pro",
+            status: "active",
+          },
+          timestamp: new Date().toISOString(),
+          isTest: true,
+        };
+
+        await triggerWebhook(input.eventType, testPayload);
+        
+        return {
+          success: true,
+          message: "Test webhook triggered successfully. Check Make.com for delivery.",
+          payload: testPayload,
+        };
+      }),
   }),
 });
 

@@ -82,31 +82,37 @@ export default function Home() {
       icon: Sparkles,
       title: "AI-Powered Content",
       description: "Generate professional press releases and social media posts in seconds with our advanced AI.",
+      image: null,
     },
     {
       icon: Globe,
       title: "Multi-Platform Distribution",
       description: "Distribute to Facebook, Instagram, LinkedIn, X, and journalist media lists automatically.",
+      image: "/images/feature-social-media.jpg",
     },
     {
       icon: BarChart3,
       title: "Campaign Optimization",
       description: "Test multiple ad variations and automatically deploy winning campaigns with our Campaign Lab.",
+      image: "/images/feature-analytics-dashboard.jpg",
     },
     {
       icon: MessageSquare,
       title: "Conversational AI",
       description: "Refine content through natural conversation, or call in to draft content on the go.",
+      image: null,
     },
     {
       icon: Users,
       title: "Journalist Networks",
       description: "Access curated media lists by industry and region, or upload your own contacts.",
+      image: "/images/feature-media-relations.jpg",
     },
     {
       icon: TrendingUp,
       title: "Performance Analytics",
       description: "Track engagement, reach, and campaign performance across all channels in real-time.",
+      image: null,
     },
   ];
 
@@ -312,38 +318,12 @@ export default function Home() {
           </div>
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl blur-3xl"></div>
-            <div className="relative bg-card border border-border rounded-2xl p-8 shadow-2xl">
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-6 h-6 text-primary" aria-hidden="true" />
-                  </div>
-                  <div className="space-y-2 flex-1">
-                    <div className="h-3 bg-muted rounded w-3/4"></div>
-                    <div className="h-3 bg-muted rounded w-full"></div>
-                    <div className="h-3 bg-muted rounded w-5/6"></div>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                    <TrendingUp className="w-6 h-6 text-secondary" aria-hidden="true" />
-                  </div>
-                  <div className="space-y-2 flex-1">
-                    <div className="h-3 bg-muted rounded w-2/3"></div>
-                    <div className="h-3 bg-muted rounded w-full"></div>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <BarChart3 className="w-6 h-6 text-primary" aria-hidden="true" />
-                  </div>
-                  <div className="space-y-2 flex-1">
-                    <div className="h-3 bg-muted rounded w-4/5"></div>
-                    <div className="h-3 bg-muted rounded w-full"></div>
-                    <div className="h-3 bg-muted rounded w-2/3"></div>
-                  </div>
-                </div>
-              </div>
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-border">
+              <img 
+                src="/images/hero-business-professional.jpg" 
+                alt="Business professional managing communications" 
+                className="w-full h-auto object-cover"
+              />
             </div>
           </div>
         </div>
@@ -363,19 +343,39 @@ export default function Home() {
               Professional PR and marketing tools powered by AI, designed for businesses that want to grow.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          
+          {/* Feature Cards with Images */}
+          <div className="space-y-24">
             {features.map((feature, index) => (
-              <Card key={index} className="border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
-                <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                    <feature.icon className="w-6 h-6 text-primary" />
+              <div key={index} className={`grid lg:grid-cols-2 gap-12 items-center ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
+                <div className={`space-y-6 ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
+                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <feature.icon className="w-7 h-7 text-primary" />
                   </div>
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-base">{feature.description}</CardDescription>
-                </CardContent>
-              </Card>
+                  <h3 className="text-3xl font-bold text-foreground">{feature.title}</h3>
+                  <p className="text-lg text-muted-foreground leading-relaxed">{feature.description}</p>
+                </div>
+                <div className={`relative ${index % 2 === 1 ? 'lg:order-1' : ''}`}>
+                  {feature.image ? (
+                    <div className="relative rounded-xl overflow-hidden shadow-xl border border-border">
+                      <img 
+                        src={feature.image} 
+                        alt={feature.title} 
+                        className="w-full h-auto object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative bg-card border border-border rounded-xl p-8 shadow-xl">
+                      <div className="space-y-4">
+                        <div className="h-4 bg-muted rounded w-3/4"></div>
+                        <div className="h-4 bg-muted rounded w-full"></div>
+                        <div className="h-4 bg-muted rounded w-5/6"></div>
+                        <div className="h-32 bg-muted rounded mt-6"></div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             ))}
           </div>
         </div>
