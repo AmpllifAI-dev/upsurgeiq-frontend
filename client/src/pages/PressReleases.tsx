@@ -18,6 +18,8 @@ export default function PressReleases() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"date" | "title" | "status">("date");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   const statusOptions = [
     { label: "Draft", value: "draft" },
@@ -112,10 +114,12 @@ export default function PressReleases() {
     return variants[status] || "secondary";
   };
 
-  // Filter press releases based on search and status
+  // Filter and sort press releases
   const filteredPressReleases = useMemo(() => {
     if (!pressReleases) return [];
-    return pressReleases.filter((pr) => {
+    
+    // Filter
+    let filtered = pressReleases.filter((pr) => {
       const matchesSearch = searchQuery === "" || 
         pr.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (pr.subtitle && pr.subtitle.toLowerCase().includes(searchQuery.toLowerCase())) ||
@@ -125,7 +129,24 @@ export default function PressReleases() {
       
       return matchesSearch && matchesStatus;
     });
-  }, [pressReleases, searchQuery, statusFilter]);
+    
+    // Sort
+    filtered.sort((a, b) => {
+      let comparison = 0;
+      
+      if (sortBy === "date") {
+        comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      } else if (sortBy === "title") {
+        comparison = a.title.localeCompare(b.title);
+      } else if (sortBy === "status") {
+        comparison = a.status.localeCompare(b.status);
+      }
+      
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
+    
+    return filtered;
+  }, [pressReleases, searchQuery, statusFilter, sortBy, sortOrder]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -165,7 +186,7 @@ export default function PressReleases() {
 
         {/* Search and Filters */}
         {pressReleases && pressReleases.length > 0 && (
-          <div className="mb-6">
+          <div className="mb-6 space-y-4">
             <SearchFilter
               searchPlaceholder="Search press releases by title, subtitle, or content..."
               statusOptions={statusOptions}
@@ -174,9 +195,56 @@ export default function PressReleases() {
               onClearFilters={() => {
                 setSearchQuery("");
                 setStatusFilter("all");
+                setSortBy("date");
+                setSortOrder("desc");
               }}
               showStatusFilter={true}
             />
+            <div className="flex gap-2 items-center">
+              <span className="text-sm text-muted-foreground">Sort by:</span>
+              <Button
+                variant={sortBy === "date" ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  if (sortBy === "date") {
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                  } else {
+                    setSortBy("date");
+                    setSortOrder("desc");
+                  }
+                }}
+              >
+                Date {sortBy === "date" && (sortOrder === "asc" ? "↑" : "↓")}
+              </Button>
+              <Button
+                variant={sortBy === "title" ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  if (sortBy === "title") {
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                  } else {
+                    setSortBy("title");
+                    setSortOrder("asc");
+                  }
+                }}
+              >
+                Title {sortBy === "title" && (sortOrder === "asc" ? "↑" : "↓")}
+              </Button>
+              <Button
+                variant={sortBy === "status" ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  if (sortBy === "status") {
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                  } else {
+                    setSortBy("status");
+                    setSortOrder("asc");
+                  }
+                }}
+              >
+                Status {sortBy === "status" && (sortOrder === "asc" ? "↑" : "↓")}
+              </Button>
+            </div>
           </div>
         )}
 

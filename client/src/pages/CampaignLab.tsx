@@ -28,6 +28,8 @@ export default function CampaignLab() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [startDateFilter, setStartDateFilter] = useState("");
   const [endDateFilter, setEndDateFilter] = useState("");
+  const [sortBy, setSortBy] = useState<"date" | "name" | "status" | "budget">("date");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   const statusOptions = [
     { label: "Draft", value: "draft" },
@@ -43,7 +45,8 @@ export default function CampaignLab() {
   const filteredCampaigns = useMemo(() => {
     if (!campaigns) return [];
 
-    return campaigns.filter((campaign) => {
+    // Filter
+    let filtered = campaigns.filter((campaign) => {
       const matchesSearch = !searchQuery ||
         campaign.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (campaign.goal && campaign.goal.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -58,7 +61,26 @@ export default function CampaignLab() {
 
       return matchesSearch && matchesStatus && matchesStartDate && matchesEndDate;
     });
-  }, [campaigns, searchQuery, statusFilter, startDateFilter, endDateFilter]);
+    
+    // Sort
+    filtered.sort((a, b) => {
+      let comparison = 0;
+      
+      if (sortBy === "date") {
+        comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      } else if (sortBy === "name") {
+        comparison = a.name.localeCompare(b.name);
+      } else if (sortBy === "status") {
+        comparison = a.status.localeCompare(b.status);
+      } else if (sortBy === "budget") {
+        comparison = (a.budget || 0) - (b.budget || 0);
+      }
+      
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
+    
+    return filtered;
+  }, [campaigns, searchQuery, statusFilter, startDateFilter, endDateFilter, sortBy, sortOrder]);
 
   const createMutation = trpc.campaign.create.useMutation({
     onSuccess: () => {

@@ -56,6 +56,7 @@ import { generateImage } from "./_core/imageGeneration";
 import { getErrorLogs, getErrorStats } from "./errorLogs";
 import { logActivity, getActivityLogs, getRecentActivity } from "./activityLog";
 import { checkLimit, incrementUsage, getCurrentUsage, TIER_LIMITS } from "./usageTracking";
+import { exportPressReleasesToCSV, exportCampaignsToCSV, exportAnalyticsToCSV } from "./export";
 import { createLogger } from "./_core/logger";
 import { getPressReleaseEngagement } from "./tracking";
 import {
@@ -1265,6 +1266,87 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
           ...log,
           metadata: log.metadata ? JSON.parse(log.metadata) : {},
         }));
+      }),
+  }),
+
+  export: router({
+    pressReleases: protectedProcedure
+      .input(
+        z.object({
+          startDate: z.string().optional(),
+          endDate: z.string().optional(),
+          status: z.string().optional(),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        const business = await getUserBusiness(ctx.user.id);
+        if (!business) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Business profile not found",
+          });
+        }
+
+        const options = {
+          startDate: input.startDate ? new Date(input.startDate) : undefined,
+          endDate: input.endDate ? new Date(input.endDate) : undefined,
+          status: input.status,
+        };
+
+        const csv = await exportPressReleasesToCSV(business.id, options);
+        return { csv, filename: `press-releases-${Date.now()}.csv` };
+      }),
+
+    campaigns: protectedProcedure
+      .input(
+        z.object({
+          startDate: z.string().optional(),
+          endDate: z.string().optional(),
+          status: z.string().optional(),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        const business = await getUserBusiness(ctx.user.id);
+        if (!business) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Business profile not found",
+          });
+        }
+
+        const options = {
+          startDate: input.startDate ? new Date(input.startDate) : undefined,
+          endDate: input.endDate ? new Date(input.endDate) : undefined,
+          status: input.status,
+        };
+
+        const csv = await exportCampaignsToCSV(business.id, options);
+        return { csv, filename: `campaigns-${Date.now()}.csv` };
+      }),
+
+    analytics: protectedProcedure
+      .input(
+        z.object({
+          startDate: z.string().optional(),
+          endDate: z.string().optional(),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        const business = await getUserBusiness(ctx.user.id);
+        if (!business) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Business profile not found",
+          });
+        }
+
+        const options = {
+          startDate: input.startDate ? new Date(input.startDate) : undefined,
+          endDate: input.endDate ? new Date(input.endDate) : undefined,
+        };
+
+        const csv = await exportAnalyticsToCSV(business.id, options);
+        return { csv, filename: `analytics-${Date.now()}.csv` };
       }),
   }),
 
