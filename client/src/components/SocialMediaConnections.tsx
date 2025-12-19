@@ -86,7 +86,7 @@ export function SocialMediaConnections() {
       <CardHeader>
         <CardTitle>Social Media Connections</CardTitle>
         <CardDescription>
-          Connect your social media accounts to schedule and publish posts directly from upsurgeIQ
+          Connect your social media accounts to schedule and publish posts directly from UpsurgeIQ
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

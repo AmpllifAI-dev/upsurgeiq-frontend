@@ -92,7 +92,7 @@ const helpArticles: HelpArticle[] = [
   {
     id: "api-access",
     category: "Advanced",
-    question: "Does upsurgeIQ offer API access?",
+    question: "Does UpsurgeIQ offer API access?",
     answer: "API access is available on the Scale plan. You can programmatically create press releases, manage campaigns, and retrieve analytics data. Contact support for API documentation and credentials.",
     tags: ["api", "integration", "scale"],
   },
@@ -133,7 +133,7 @@ export default function Help() {
             <BookOpen className="w-16 h-16 mx-auto mb-4 opacity-90" />
             <h1 className="text-4xl font-bold mb-4">Help Center</h1>
             <p className="text-xl text-teal-50 mb-8">
-              Find answers, learn best practices, and get the most out of upsurgeIQ
+              Find answers, learn best practices, and get the most out of UpsurgeIQ
             </p>
 
             {/* Search */}
@@ -288,7 +288,7 @@ export default function Help() {
                   <TrendingUp className="w-10 h-10 text-teal-600 mx-auto mb-3" />
                   <h3 className="font-semibold mb-2">Advanced Features</h3>
                   <p className="text-sm text-gray-600">
-                    Unlock the full potential of upsurgeIQ
+                    Unlock the full potential of UpsurgeIQ
                   </p>
                 </CardContent>
               </Card>

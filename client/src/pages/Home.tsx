@@ -117,7 +117,7 @@ export default function Home() {
             <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
               <Zap className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-2xl font-bold text-foreground">upsurgeIQ</span>
+            <span className="text-2xl font-bold text-foreground">UpsurgeIQ</span>
           </div>
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
             <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
@@ -315,7 +315,7 @@ export default function Home() {
             Ready to Amplify Your Brand?
           </h2>
           <p className="text-xl opacity-90 max-w-2xl mx-auto">
-            Join hundreds of businesses using upsurgeIQ to scale their PR and marketing efforts.
+            Join hundreds of businesses using UpsurgeIQ to scale their PR and marketing efforts.
           </p>
           <Button size="lg" variant="secondary" onClick={handleGetStarted} className="text-base">
             Start Your Free Trial
@@ -333,7 +333,7 @@ export default function Home() {
                 <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary">
                   <Zap className="w-5 h-5 text-primary-foreground" />
                 </div>
-                <span className="text-lg font-bold">upsurgeIQ</span>
+                <span className="text-lg font-bold">UpsurgeIQ</span>
               </div>
               <p className="text-sm text-muted-foreground">
                 Intelligence That Drives Growth
@@ -365,7 +365,7 @@ export default function Home() {
             </div>
           </div>
           <div className="mt-12 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-            © 2025 upsurgeIQ. All rights reserved.
+            © 2025 UpsurgeIQ. All rights reserved.
           </div>
         </div>
       </footer>

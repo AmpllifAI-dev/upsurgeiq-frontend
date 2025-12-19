@@ -854,3 +854,13 @@
 - [ ] Implement smart filters
 - [ ] Add search history
 - [ ] Create shared filters for teams
+
+## Branding Consistency Fix
+
+- [x] Find all instances of "upsurgeIQ" (lowercase u)
+- [x] Update Home page branding
+- [x] Update DashboardLayout branding
+- [x] Update page titles and meta tags
+- [x] Update any email templates with branding
+- [x] Verify VITE_APP_TITLE environment variable (set to UpsurgeIQ)
+- [x] Test all pages for consistent branding

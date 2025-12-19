@@ -66,7 +66,7 @@ export default function Partners() {
               <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
                 <Zap className="w-6 h-6 text-primary-foreground" />
               </div>
-              <span className="text-2xl font-bold text-foreground">upsurgeIQ</span>
+              <span className="text-2xl font-bold text-foreground">UpsurgeIQ</span>
             </div>
             <div className="flex items-center gap-6">
               <Button variant="ghost" size="sm" onClick={() => setLocation("/dashboard")}>
@@ -120,7 +120,7 @@ export default function Partners() {
             <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
               <Zap className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-2xl font-bold text-foreground">upsurgeIQ</span>
+            <span className="text-2xl font-bold text-foreground">UpsurgeIQ</span>
           </div>
           <div className="flex items-center gap-6">
             <Button variant="ghost" size="sm" onClick={() => setLocation("/dashboard")}>

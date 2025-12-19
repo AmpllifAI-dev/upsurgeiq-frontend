@@ -65,7 +65,7 @@ export function KeyboardShortcutsDialog() {
             Keyboard Shortcuts
           </DialogTitle>
           <DialogDescription>
-            Use these shortcuts to navigate quickly around upsurgeIQ
+            Use these shortcuts to navigate quickly around UpsurgeIQ
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-2">
