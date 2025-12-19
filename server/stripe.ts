@@ -101,3 +101,71 @@ export async function createPortalSession(params: {
     throw error;
   }
 }
+
+/**
+ * Create a Stripe Checkout Session for one-time media list purchase
+ */
+export async function createMediaListPurchaseSession(params: {
+  userId: number;
+  userEmail: string;
+  userName: string;
+  mediaListId: number;
+  mediaListName: string;
+  pressReleaseId?: number;
+  amount: number; // Amount in pence (e.g., 400 for £4)
+  origin: string;
+}): Promise<Stripe.Checkout.Session> {
+  logger.info("Creating media list purchase checkout session", {
+    userId: params.userId,
+    action: "createMediaListPurchase",
+    metadata: { mediaListId: params.mediaListId, amount: params.amount },
+  });
+
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment", // One-time payment, not subscription
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "gbp",
+            product_data: {
+              name: `Media List: ${params.mediaListName}`,
+              description: "One-time access to distribute press release to this media list",
+            },
+            unit_amount: params.amount, // Amount in pence
+          },
+          quantity: 1,
+        },
+      ],
+      customer_email: params.userEmail,
+      client_reference_id: params.userId.toString(),
+      metadata: {
+        user_id: params.userId.toString(),
+        payment_type: "media_list_purchase",
+        media_list_id: params.mediaListId.toString(),
+        media_list_name: params.mediaListName,
+        press_release_id: params.pressReleaseId?.toString() || "",
+        customer_email: params.userEmail,
+        customer_name: params.userName,
+      },
+      success_url: `${params.origin}/media-lists?purchase=success&list_id=${params.mediaListId}`,
+      cancel_url: `${params.origin}/media-lists?purchase=canceled`,
+    });
+
+    logger.info("Media list purchase session created successfully", {
+      userId: params.userId,
+      action: "createMediaListPurchase",
+      metadata: { sessionId: session.id, mediaListId: params.mediaListId },
+    });
+
+    return session;
+  } catch (error) {
+    logger.error("Failed to create media list purchase session", error as Error, {
+      userId: params.userId,
+      action: "createMediaListPurchase",
+      metadata: { mediaListId: params.mediaListId, amount: params.amount },
+    });
+    throw error;
+  }
+}

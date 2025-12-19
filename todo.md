@@ -394,3 +394,28 @@
 - [x] Create payments table for tracking one-time purchases
 - [x] Push database schema changes with pnpm db:push
 - [ ] Test all webhook events with Stripe CLI
+
+
+## Media List Purchase Implementation (Current Work)
+- [x] Create Stripe checkout session endpoint for media list purchases
+- [x] Build media list purchase UI in MediaLists page
+- [x] Add purchase button to default media lists (£4 per list)
+- [x] Track purchased media lists in payments table
+- [ ] Display purchased status in media list cards
+- [ ] Test purchase flow with Stripe test mode
+
+## Component Integration (Current Work)
+- [x] Add Breadcrumb to PressReleaseNew page
+- [x] Add CharacterCounter to topic and keyPoints fields
+- [x] Add CopyButton to generated content header
+- [x] RecentActivity and QuickActions already exist in Dashboard
+- [ ] Apply Breadcrumb to CampaignLab detail pages
+- [ ] Apply CharacterCounter to more form fields
+
+## Email Notifications (Current Work)
+- [x] Create trial ending reminder email template (sendTrialEndingEmail)
+- [x] Create payment action required email template (sendPaymentActionRequiredEmail)
+- [x] Create media list purchase confirmation email (sendMediaListPurchaseEmail)
+- [x] Create press release to journalist email (sendPressReleaseToJournalist)
+- [ ] Integrate email functions into webhook handlers
+- [ ] Test email delivery for all webhook events

@@ -43,7 +43,7 @@ import {
   updatePartner,
   deletePartner,
 } from "./partners";
-import { createCheckoutSession, createPortalSession } from "./stripe";
+import { createCheckoutSession, createPortalSession, createMediaListPurchaseSession } from "./stripe";
 import { getProductByTier } from "./products";
 import { invokeLLM } from "./_core/llm";
 import { getErrorLogs, getErrorStats } from "./errorLogs";
@@ -778,6 +778,32 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
 
       return { url: session.url };
     }),
+
+    purchaseMediaList: protectedProcedure
+      .input(
+        z.object({
+          mediaListId: z.number(),
+          mediaListName: z.string(),
+          pressReleaseId: z.number().optional(),
+          amount: z.number().default(400), // £4 in pence
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const origin = ctx.req.headers.origin || "http://localhost:3000";
+
+        const session = await createMediaListPurchaseSession({
+          userId: ctx.user.id,
+          userEmail: ctx.user.email || "",
+          userName: ctx.user.name || "",
+          mediaListId: input.mediaListId,
+          mediaListName: input.mediaListName,
+          pressReleaseId: input.pressReleaseId,
+          amount: input.amount,
+          origin,
+        });
+
+        return { url: session.url };
+      }),
   }),
 
   distribution: router({

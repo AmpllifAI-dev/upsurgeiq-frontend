@@ -447,3 +447,369 @@ The upsurgeIQ Team
     text,
   });
 }
+
+/**
+ * Send trial ending reminder email
+ */
+export async function sendTrialEndingEmail(params: {
+  to: string;
+  name: string;
+  trialEndDate: string;
+  plan: string;
+}): Promise<boolean> {
+  const subject = "Your upsurgeIQ Trial Ends Soon - Continue Your Success";
+  
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: 'Inter', Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #008080 0%, #7FFF00 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+        .content { background: #ffffff; padding: 30px; border: 1px solid #e0e0e0; border-top: none; }
+        .highlight-box { background: #f0fdfa; padding: 20px; border-radius: 6px; border-left: 4px solid #008080; margin: 20px 0; }
+        .button { display: inline-block; background: #008080; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 14px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1 style="margin: 0;">Your Trial is Ending Soon</h1>
+          <p style="margin: 10px 0 0 0;">Continue your PR success with upsurgeIQ</p>
+        </div>
+        <div class="content">
+          <p>Hi ${params.name},</p>
+          
+          <p>Your <strong>${params.plan} Plan</strong> trial ends on <strong>${params.trialEndDate}</strong>. We hope you've enjoyed exploring the power of AI-driven PR and marketing!</p>
+          
+          <div class="highlight-box">
+            <h3 style="margin-top: 0;">Don't lose access to:</h3>
+            <ul style="margin-bottom: 0;">
+              <li>AI-powered press release generation</li>
+              <li>Automated social media distribution</li>
+              <li>Curated journalist media lists</li>
+              <li>Conversational AI assistant</li>
+              <li>Campaign performance analytics</li>
+            </ul>
+          </div>
+          
+          <p>To continue using upsurgeIQ without interruption, simply activate your subscription before your trial ends. Your payment method will be charged automatically, and you'll maintain full access to all features.</p>
+          
+          <div style="text-align: center;">
+            <a href="${ENV.frontendUrl || "https://upsurgeiq.com"}/dashboard" class="button">Manage Subscription</a>
+          </div>
+          
+          <p>If you have any questions about pricing, features, or need help getting the most out of upsurgeIQ, we're here to help. Just reply to this email!</p>
+          
+          <p>Best regards,<br>
+          The upsurgeIQ Team</p>
+        </div>
+        <div class="footer">
+          <p>© 2025 upsurgeIQ. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const text = `
+Hi ${params.name},
+
+Your ${params.plan} Plan trial ends on ${params.trialEndDate}. We hope you've enjoyed exploring the power of AI-driven PR and marketing!
+
+Don't lose access to:
+- AI-powered press release generation
+- Automated social media distribution
+- Curated journalist media lists
+- Conversational AI assistant
+- Campaign performance analytics
+
+To continue using upsurgeIQ without interruption, simply activate your subscription before your trial ends.
+
+Manage your subscription: ${ENV.frontendUrl || "https://upsurgeiq.com"}/dashboard
+
+If you have any questions, we're here to help!
+
+Best regards,
+The upsurgeIQ Team
+
+---
+© 2025 upsurgeIQ. All rights reserved.
+  `;
+
+  return await sendEmail({
+    to: params.to,
+    subject,
+    html,
+    text,
+  });
+}
+
+/**
+ * Send payment action required email (3D Secure)
+ */
+export async function sendPaymentActionRequiredEmail(params: {
+  to: string;
+  name: string;
+  paymentUrl: string;
+}): Promise<boolean> {
+  const subject = "Action Required: Confirm Your Payment";
+  
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: 'Inter', Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #f59e0b; color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+        .content { background: #ffffff; padding: 30px; border: 1px solid #e0e0e0; border-top: none; }
+        .warning-box { background: #fffbeb; padding: 20px; border-radius: 6px; border-left: 4px solid #f59e0b; margin: 20px 0; }
+        .button { display: inline-block; background: #f59e0b; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 14px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1 style="margin: 0;">⚠️ Payment Action Required</h1>
+          <p style="margin: 10px 0 0 0;">Please confirm your payment</p>
+        </div>
+        <div class="content">
+          <p>Hi ${params.name},</p>
+          
+          <p>Your bank requires additional authentication to complete your payment for upsurgeIQ. This is a standard security measure to protect your account.</p>
+          
+          <div class="warning-box">
+            <p style="margin: 0;"><strong>Action needed:</strong> Click the button below to complete the authentication process with your bank. This usually takes less than a minute.</p>
+          </div>
+          
+          <div style="text-align: center;">
+            <a href="${params.paymentUrl}" class="button">Confirm Payment Now</a>
+          </div>
+          
+          <p><strong>Important:</strong> If you don't complete this step within 24 hours, your payment will be canceled and your subscription may be interrupted.</p>
+          
+          <p>If you didn't attempt to make a payment, please contact us immediately.</p>
+          
+          <p>Best regards,<br>
+          The upsurgeIQ Team</p>
+        </div>
+        <div class="footer">
+          <p>© 2025 upsurgeIQ. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const text = `
+Hi ${params.name},
+
+⚠️ PAYMENT ACTION REQUIRED
+
+Your bank requires additional authentication to complete your payment for upsurgeIQ. This is a standard security measure to protect your account.
+
+Click here to confirm your payment: ${params.paymentUrl}
+
+Important: If you don't complete this step within 24 hours, your payment will be canceled and your subscription may be interrupted.
+
+If you didn't attempt to make a payment, please contact us immediately.
+
+Best regards,
+The upsurgeIQ Team
+
+---
+© 2025 upsurgeIQ. All rights reserved.
+  `;
+
+  return await sendEmail({
+    to: params.to,
+    subject,
+    html,
+    text,
+  });
+}
+
+/**
+ * Send media list purchase confirmation email
+ */
+export async function sendMediaListPurchaseEmail(params: {
+  to: string;
+  name: string;
+  mediaListName: string;
+  amount: number;
+  pressReleaseTitle?: string;
+}): Promise<boolean> {
+  const subject = `Purchase Confirmed - ${params.mediaListName}`;
+  
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: 'Inter', Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #008080 0%, #7FFF00 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+        .content { background: #ffffff; padding: 30px; border: 1px solid #e0e0e0; border-top: none; }
+        .purchase-box { background: #f9f9f9; padding: 20px; border-radius: 6px; margin: 20px 0; }
+        .button { display: inline-block; background: #008080; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 14px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1 style="margin: 0;">Purchase Confirmed!</h1>
+          <p style="margin: 10px 0 0 0;">Your media list is ready to use</p>
+        </div>
+        <div class="content">
+          <p>Hi ${params.name},</p>
+          
+          <p>Thank you for your purchase! You now have access to distribute your press release to <strong>${params.mediaListName}</strong>.</p>
+          
+          <div class="purchase-box">
+            <h3 style="margin-top: 0;">Purchase Details</h3>
+            <p><strong>Media List:</strong> ${params.mediaListName}</p>
+            <p><strong>Amount:</strong> £${(params.amount / 100).toFixed(2)}</p>
+            ${params.pressReleaseTitle ? `<p><strong>Press Release:</strong> ${params.pressReleaseTitle}</p>` : ""}
+            <p><strong>Status:</strong> Ready to distribute</p>
+          </div>
+          
+          <p>You can now distribute your press release to all journalists in this media list. Each contact will receive your professionally crafted press release directly in their inbox.</p>
+          
+          <div style="text-align: center;">
+            <a href="${ENV.frontendUrl || "https://upsurgeiq.com"}/media-lists" class="button">View Media Lists</a>
+          </div>
+          
+          <p><strong>Next steps:</strong></p>
+          <ul>
+            <li>Review the journalist contacts in your purchased list</li>
+            <li>Finalize your press release content</li>
+            <li>Schedule or send your distribution</li>
+            <li>Track opens and engagement in your analytics dashboard</li>
+          </ul>
+          
+          <p>Need help getting started? Our team is here to assist you. Just reply to this email!</p>
+          
+          <p>Best regards,<br>
+          The upsurgeIQ Team</p>
+        </div>
+        <div class="footer">
+          <p>© 2025 upsurgeIQ. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const text = `
+Hi ${params.name},
+
+Thank you for your purchase! You now have access to distribute your press release to ${params.mediaListName}.
+
+Purchase Details:
+- Media List: ${params.mediaListName}
+- Amount: £${(params.amount / 100).toFixed(2)}
+${params.pressReleaseTitle ? `- Press Release: ${params.pressReleaseTitle}` : ""}
+- Status: Ready to distribute
+
+You can now distribute your press release to all journalists in this media list.
+
+View your media lists: ${ENV.frontendUrl || "https://upsurgeiq.com"}/media-lists
+
+Next steps:
+- Review the journalist contacts in your purchased list
+- Finalize your press release content
+- Schedule or send your distribution
+- Track opens and engagement in your analytics dashboard
+
+Need help? Just reply to this email!
+
+Best regards,
+The upsurgeIQ Team
+
+---
+© 2025 upsurgeIQ. All rights reserved.
+  `;
+
+  return await sendEmail({
+    to: params.to,
+    subject,
+    html,
+    text,
+  });
+}
+
+/**
+ * Send press release to journalist
+ */
+export async function sendPressReleaseToJournalist(params: {
+  to: string;
+  pressReleaseTitle: string;
+  pressReleaseContent: string;
+  companyName: string;
+}): Promise<boolean> {
+  const subject = `Press Release: ${params.pressReleaseTitle}`;
+  
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: 'Inter', Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 700px; margin: 0 auto; padding: 20px; }
+        .header { background: #ffffff; padding: 20px; border-bottom: 3px solid #008080; }
+        .content { background: #ffffff; padding: 30px; }
+        .press-release { background: #f9f9f9; padding: 25px; border-left: 4px solid #008080; margin: 20px 0; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; border-top: 1px solid #e0e0e0; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <p style="margin: 0; color: #666; font-size: 14px;">PRESS RELEASE</p>
+          <h1 style="margin: 10px 0 0 0; color: #008080;">${params.pressReleaseTitle}</h1>
+          <p style="margin: 5px 0 0 0; color: #666;">${params.companyName}</p>
+        </div>
+        <div class="content">
+          <div class="press-release">
+            ${params.pressReleaseContent.replace(/\n/g, "<br>")}
+          </div>
+          
+          <p style="font-size: 14px; color: #666; margin-top: 30px;">
+            For media inquiries, please contact ${params.companyName}.
+          </p>
+        </div>
+        <div class="footer">
+          <p>This press release was distributed via upsurgeIQ</p>
+          <p>If you wish to unsubscribe from future press releases, please contact the sender directly.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const text = `
+PRESS RELEASE
+${params.pressReleaseTitle}
+${params.companyName}
+
+${params.pressReleaseContent}
+
+---
+For media inquiries, please contact ${params.companyName}.
+
+This press release was distributed via upsurgeIQ.
+If you wish to unsubscribe from future press releases, please contact the sender directly.
+  `;
+
+  return await sendEmail({
+    to: params.to,
+    subject,
+    html,
+    text,
+  });
+}

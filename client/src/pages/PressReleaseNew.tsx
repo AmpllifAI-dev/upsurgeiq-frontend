@@ -147,7 +147,12 @@ export default function PressReleaseNew() {
       </nav>
 
       <div className="container mx-auto py-8 max-w-6xl">
-        <div className="mb-8">
+        <Breadcrumb items={[
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "Press Releases", href: "/press-releases" },
+          { label: "New Press Release" }
+        ]} />
+        <div className="mb-8 mt-4">
           <Badge variant="secondary" className="mb-2">
             <FileText className="w-3 h-3 mr-1" />
             New Press Release
@@ -180,6 +185,7 @@ export default function PressReleaseNew() {
                   onChange={(e) => setTopic(e.target.value)}
                   disabled={isGenerating}
                 />
+                <CharacterCounter current={topic.length} max={150} />
               </div>
 
               <div className="space-y-2">
@@ -192,6 +198,7 @@ export default function PressReleaseNew() {
                   rows={4}
                   disabled={isGenerating}
                 />
+                <CharacterCounter current={keyPoints.length} max={500} />
                 <p className="text-xs text-muted-foreground">
                   Optional: Bullet points or key information to include
                 </p>
@@ -253,13 +260,20 @@ export default function PressReleaseNew() {
           {/* Preview/Output */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="w-5 h-5" />
-                Generated Content
-              </CardTitle>
-              <CardDescription>
-                AI-generated press release based on your inputs
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="w-5 h-5" />
+                    Generated Content
+                  </CardTitle>
+                  <CardDescription>
+                    AI-generated press release based on your inputs
+                  </CardDescription>
+                </div>
+                {generatedContent && (
+                  <CopyButton text={generatedContent} label="Copy content" />
+                )}
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               {!generatedContent && !isGenerating && (

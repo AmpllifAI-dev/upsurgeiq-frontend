@@ -56,6 +56,28 @@ export default function MediaLists() {
     },
   });
 
+  const purchaseMutation = trpc.stripe.purchaseMediaList.useMutation({
+    onSuccess: (data) => {
+      // Redirect to Stripe Checkout
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    },
+    onError: (error) => {
+      toast.error("Purchase failed", {
+        description: error.message || "Unable to start checkout process. Please try again."
+      });
+    },
+  });
+
+  const handlePurchaseList = (listId: number, listName: string) => {
+    purchaseMutation.mutate({
+      mediaListId: listId,
+      mediaListName: listName,
+      amount: 400, // £4 in pence
+    });
+  };
+
   if (loading || isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -345,10 +367,20 @@ export default function MediaLists() {
                       <span className="font-semibold">{list.contactCount}</span>
                     </div>
                     )}
-                    <Button variant="outline" size="sm" className="w-full" disabled>
-                      <Eye className="w-4 h-4 mr-2" />
-                      View Contacts (Coming Soon)
-                    </Button>
+                    <div className="space-y-2">
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        className="w-full"
+                        onClick={() => handlePurchaseList(Number(list.id), list.name)}
+                        disabled={purchaseMutation.isPending}
+                      >
+                        Purchase for £4
+                      </Button>
+                      <p className="text-xs text-muted-foreground text-center">
+                        One-time payment per press release
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
