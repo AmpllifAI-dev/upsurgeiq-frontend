@@ -132,7 +132,7 @@ export default function Onboarding() {
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm">
-        <div className="container mx-auto flex items-center justify-between py-4">
+        <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between py-4 gap-4">
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
               <Zap className="w-6 h-6 text-primary-foreground" />
@@ -145,9 +145,9 @@ export default function Onboarding() {
       <div className="container mx-auto py-12 max-w-4xl">
         {/* Progress */}
         <div className="mb-12">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4 overflow-x-auto">
             {steps.map((step, index) => (
-              <div key={step.id} className="flex flex-col items-center gap-2 flex-1">
+              <div key={step.id} className="flex flex-col items-center gap-2 flex-1 min-w-[80px]">
                 <div
                   className={`w-12 h-12 rounded-full flex items-center justify-center ${
                     index <= currentStepIndex

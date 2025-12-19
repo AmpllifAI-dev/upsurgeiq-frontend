@@ -112,14 +112,14 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto flex items-center justify-between py-4">
+        <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between py-4 gap-4">
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
               <Zap className="w-6 h-6 text-primary-foreground" />
             </div>
             <span className="text-2xl font-bold text-foreground">upsurgeIQ</span>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
             <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Features
             </a>
@@ -230,7 +230,7 @@ export default function Home() {
               Professional PR and marketing tools powered by AI, designed for businesses that want to grow.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {features.map((feature, index) => (
               <Card key={index} className="border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
                 <CardHeader>
@@ -262,7 +262,7 @@ export default function Home() {
               Choose the plan that fits your business. All plans include a 14-day free trial.
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
             {pricingTiers.map((tier, index) => (
               <Card
                 key={index}
@@ -327,7 +327,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-border py-12 bg-card/50">
         <div className="container mx-auto">
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary">

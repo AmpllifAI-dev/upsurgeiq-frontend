@@ -210,7 +210,7 @@
 - [x] Add search functionality to press releases
 - [x] Implement media list search and filtering
 - [ ] Create campaign search and filtering
-- [ ] Add global search across platform
+- [x] Add global search across platform (Command Palette with Ctrl+K)
 - [x] Implement advanced filtering options
 
 ### Export Functionality
@@ -258,14 +258,19 @@
 - [ ] Add loading skeletons to AI assistant chat
 
 ### Mobile Responsiveness
-- [ ] Improve dashboard layout on mobile devices
-- [ ] Optimize press release creation form for mobile
-- [ ] Enhance campaign lab mobile experience
-- [ ] Improve analytics charts for small screens
-- [ ] Test all pages on mobile devices
+- [x] Improve dashboard layout on mobile devices
+- [x] Optimize press release creation form for mobile
+- [x] Enhance campaign lab mobile experience
+- [x] Improve analytics charts for small screens
+- [x] Optimize home page for mobile devices
+- [x] Improve onboarding flow mobile responsiveness
+- [x] Add responsive breakpoints (sm, md, lg) across all pages
+- [x] Optimize navigation for mobile devices
 
 ### Accessibility & Keyboard Shortcuts
-- [ ] Add keyboard shortcuts for common actions
+- [x] Add keyboard shortcuts for common actions
+- [x] Implement global command palette (Ctrl+K) for search and navigation
+- [x] Add keyboard navigation to command palette (arrow keys, Enter)
 - [ ] Improve focus indicators throughout app
 - [ ] Add ARIA labels for screen readers
 - [ ] Implement skip navigation links

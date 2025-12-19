@@ -110,14 +110,14 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto flex items-center justify-between py-4">
+        <div className="container mx-auto flex flex-col md:flex-row items-start md:items-center justify-between py-4 gap-4">
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
               <Zap className="w-6 h-6 text-primary-foreground" />
             </div>
             <span className="text-2xl font-bold text-foreground">upsurgeIQ</span>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center gap-3 md:gap-6 text-sm">
             <a href="/dashboard" className="text-sm font-medium text-foreground">
               Dashboard
             </a>
@@ -162,7 +162,7 @@ export default function Dashboard() {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Press Releases</CardTitle>
@@ -216,7 +216,7 @@ export default function Dashboard() {
         {/* Quick Actions */}
         <div>
           <h2 className="text-2xl font-bold text-foreground mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {quickActions.map((action, index) => (
               <Card
                 key={index}
@@ -241,7 +241,7 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Activity */}
-        <div className="grid lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">

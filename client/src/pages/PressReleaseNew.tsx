@@ -105,7 +105,7 @@ export default function PressReleaseNew() {
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto flex items-center justify-between py-4">
+        <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between py-4 gap-4">
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
               <Zap className="w-6 h-6 text-primary-foreground" />
@@ -133,7 +133,7 @@ export default function PressReleaseNew() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
           {/* Input Form */}
           <Card>
             <CardHeader>

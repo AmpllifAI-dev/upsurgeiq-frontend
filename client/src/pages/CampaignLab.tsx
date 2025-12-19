@@ -60,7 +60,7 @@ export default function CampaignLab() {
     return (
       <div className="min-h-screen bg-background">
         <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container mx-auto flex items-center justify-between py-4">
+          <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between py-4 gap-4">
             <div className="flex items-center gap-2">
               <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
                 <Zap className="w-6 h-6 text-primary-foreground" />
@@ -77,7 +77,7 @@ export default function CampaignLab() {
           <div className="mb-6">
             <Skeleton className="h-10 w-full mb-4" />
           </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map((i) => (
               <div key={i} className="border rounded-lg p-6">
                 <Skeleton className="h-6 w-3/4 mb-4" />
@@ -119,7 +119,7 @@ export default function CampaignLab() {
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto flex items-center justify-between py-4">
+        <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between py-4 gap-4">
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
               <Zap className="w-6 h-6 text-primary-foreground" />
@@ -136,7 +136,7 @@ export default function CampaignLab() {
       </nav>
 
       <div className="container mx-auto py-8">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div>
             <Badge variant="secondary" className="mb-2">
               <Beaker className="w-3 h-3 mr-1" />

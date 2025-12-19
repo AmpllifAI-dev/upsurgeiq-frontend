@@ -17,6 +17,7 @@ interface Shortcut {
 }
 
 const shortcuts: Shortcut[] = [
+  { key: 'K', ctrl: true, description: 'Open Command Palette (Search)' },
   { key: 'D', ctrl: true, description: 'Go to Dashboard' },
   { key: 'N', ctrl: true, description: 'New Press Release' },
   { key: 'P', ctrl: true, shift: true, description: 'View Press Releases' },
