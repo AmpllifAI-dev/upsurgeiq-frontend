@@ -23,6 +23,7 @@ export default function MediaLists() {
   const [newListDescription, setNewListDescription] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [industryFilter, setIndustryFilter] = useState<string>("all");
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteListId, setDeleteListId] = useState<number | null>(null);
   
@@ -203,9 +204,12 @@ export default function MediaLists() {
         (typeFilter === "default" && list.isDefault) ||
         (typeFilter === "custom" && !list.isDefault);
       
-      return matchesSearch && matchesType;
+      const matchesIndustry = industryFilter === "all" || 
+        ('industry' in list && list.industry === industryFilter);
+      
+      return matchesSearch && matchesType && matchesIndustry;
     });
-  }, [allLists, searchQuery, typeFilter]);
+  }, [allLists, searchQuery, typeFilter, industryFilter]);
 
   const filteredDefaultLists = filteredLists.filter(list => list.isDefault);
   const filteredCustomLists = filteredLists.filter(list => !list.isDefault);

@@ -428,3 +428,39 @@ export const notificationPreferences = mysqlTable("notification_preferences", {
 
 export type NotificationPreferences = typeof notificationPreferences.$inferSelect;
 export type InsertNotificationPreferences = typeof notificationPreferences.$inferInsert;
+
+// Email Templates
+export const emailTemplates = mysqlTable("email_templates", {
+  id: int("id").autoincrement().primaryKey(),
+  businessId: int("businessId").notNull().references(() => businesses.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 255 }).notNull(),
+  subject: varchar("subject", { length: 500 }),
+  headerHtml: text("headerHtml"), // Custom header HTML
+  footerHtml: text("footerHtml"), // Custom footer HTML
+  primaryColor: varchar("primaryColor", { length: 7 }).default("#008080"), // Hex color
+  secondaryColor: varchar("secondaryColor", { length: 7 }).default("#7FFF00"), // Hex color
+  logoUrl: varchar("logoUrl", { length: 500 }),
+  isDefault: int("isDefault").default(0).notNull(), // Boolean as int
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EmailTemplate = typeof emailTemplates.$inferSelect;
+export type InsertEmailTemplate = typeof emailTemplates.$inferInsert;
+
+// Press Release Templates
+export const pressReleaseTemplates = mysqlTable("press_release_templates", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  category: varchar("category", { length: 100 }), // e.g., "Product Launch", "Company News", "Event Announcement"
+  description: text("description"),
+  titleTemplate: varchar("titleTemplate", { length: 500 }),
+  subtitleTemplate: varchar("subtitleTemplate", { length: 500 }),
+  bodyTemplate: text("bodyTemplate"),
+  isDefault: int("isDefault").default(1).notNull(), // Boolean as int
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PressReleaseTemplate = typeof pressReleaseTemplates.$inferSelect;
+export type InsertPressReleaseTemplate = typeof pressReleaseTemplates.$inferInsert;

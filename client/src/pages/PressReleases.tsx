@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
-import { exportPressReleaseToPDF } from "@/lib/pdfExport";
+import { exportPressReleaseToPDF, exportBulkPressReleasesToPDF } from "@/lib/pdfExport";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SearchFilter } from "@/components/SearchFilter";
 
@@ -20,6 +20,8 @@ export default function PressReleases() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"date" | "title" | "status">("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [bulkMode, setBulkMode] = useState(false);
 
   const statusOptions = [
     { label: "Draft", value: "draft" },
@@ -105,6 +107,42 @@ export default function PressReleases() {
     toast.success("PDF exported successfully");
   };
 
+  const handleBulkExport = () => {
+    if (selectedIds.length === 0) {
+      toast.error("Please select at least one press release");
+      return;
+    }
+
+    const selectedPRs = pressReleases?.filter((pr) => selectedIds.includes(pr.id));
+    if (!selectedPRs || selectedPRs.length === 0) return;
+
+    exportBulkPressReleasesToPDF(
+      selectedPRs.map((pr) => ({
+        title: pr.title,
+        subtitle: pr.subtitle || undefined,
+        body: pr.body,
+        date: new Date(pr.createdAt),
+      }))
+    );
+    toast.success(`Exported ${selectedPRs.length} press releases to PDF`);
+    setSelectedIds([]);
+    setBulkMode(false);
+  };
+
+  const toggleSelection = (id: number) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filteredPressReleases.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredPressReleases.map((pr) => pr.id));
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "outline"> = {
       draft: "secondary",
@@ -178,10 +216,33 @@ export default function PressReleases() {
             <h1 className="text-4xl font-bold text-foreground">Press Releases</h1>
             <p className="text-muted-foreground mt-2">Manage your press releases and announcements</p>
           </div>
-          <Button onClick={() => setLocation("/press-releases/new")}>
-            <Plus className="w-4 h-4 mr-2" />
-            New Press Release
-          </Button>
+          <div className="flex gap-2">
+            {bulkMode ? (
+              <>
+                <Button variant="outline" onClick={() => {
+                  setBulkMode(false);
+                  setSelectedIds([]);
+                }}>
+                  Cancel
+                </Button>
+                <Button onClick={handleBulkExport} disabled={selectedIds.length === 0}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Export {selectedIds.length > 0 && `(${selectedIds.length})`}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" onClick={() => setBulkMode(true)}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Bulk Export
+                </Button>
+                <Button onClick={() => setLocation("/press-releases/new")}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Press Release
+                </Button>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Search and Filters */}

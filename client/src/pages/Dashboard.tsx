@@ -109,6 +109,14 @@ export default function Dashboard() {
       bgColor: "bg-secondary/10",
       disabled: subscription.plan === "starter",
     },
+    {
+      icon: Calendar,
+      title: "Content Calendar",
+      description: "View scheduled content",
+      href: "/content-calendar",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
+    },
   ];
 
   return (

@@ -26,6 +26,7 @@ import Profile from "./pages/Profile";
 import PressReleaseDistribution from "./pages/PressReleaseDistribution";
 import DistributePressRelease from "./pages/DistributePressRelease";
 import Help from "./pages/Help";
+import ContentCalendar from "./pages/ContentCalendar";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -48,6 +49,7 @@ function Router() {
       <Route path="/error-logs" component={ErrorLogs} />
       <Route path="/analytics" component={Analytics} />
       <Route path="/profile" component={Profile} />
+      <Route path="/content-calendar" component={ContentCalendar} />
       <Route path="/help" component={Help} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
