@@ -557,3 +557,35 @@ export const contentVersions = mysqlTable("content_versions", {
 
 export type ContentVersion = typeof contentVersions.$inferSelect;
 export type InsertContentVersion = typeof contentVersions.$inferInsert;
+
+// Webhook Configurations (for Make.com / Airtable integration)
+export const webhookConfigs = mysqlTable("webhook_configs", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(), // e.g., "User Registration", "Onboarding Complete"
+  eventType: mysqlEnum("eventType", ["user.registered", "user.onboarded"]).notNull(),
+  webhookUrl: varchar("webhookUrl", { length: 1000 }).notNull(), // Make.com webhook URL
+  isActive: int("isActive").default(1).notNull(), // 1 = active, 0 = disabled
+  retryAttempts: int("retryAttempts").default(3).notNull(), // Number of retry attempts
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type WebhookConfig = typeof webhookConfigs.$inferSelect;
+export type InsertWebhookConfig = typeof webhookConfigs.$inferInsert;
+
+// Webhook Delivery Logs
+export const webhookDeliveryLogs = mysqlTable("webhook_delivery_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  webhookConfigId: int("webhookConfigId").notNull().references(() => webhookConfigs.id, { onDelete: "cascade" }),
+  eventType: varchar("eventType", { length: 50 }).notNull(),
+  payload: text("payload").notNull(), // JSON string of the webhook payload
+  success: int("success").notNull(), // 1 = success, 0 = failure
+  statusCode: int("statusCode"), // HTTP status code from webhook endpoint
+  errorMessage: text("errorMessage"), // Error message if delivery failed
+  attempts: int("attempts").default(1).notNull(), // Number of delivery attempts made
+  deliveredAt: timestamp("deliveredAt").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type WebhookDeliveryLog = typeof webhookDeliveryLogs.$inferSelect;
+export type InsertWebhookDeliveryLog = typeof webhookDeliveryLogs.$inferInsert;

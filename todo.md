@@ -959,3 +959,31 @@
 - [x] Include Product, Company, and Legal sections in hamburger menu
 - [x] Keep current minimal header design (Features, Pricing, CTA)
 - [x] Ensure mobile-responsive design
+
+
+## Visual Enhancement - Human-Centered Photography (Dec 19, 2025)
+
+- [ ] Analyze current Home page structure and identify image placement opportunities
+- [ ] Search and download royalty-free images from Unsplash
+- [ ] Add hero section background image (business professional on phone/computer)
+- [ ] Add feature section images showcasing real business scenarios
+- [ ] Add social proof section with team collaboration imagery
+- [ ] Add testimonial section with professional headshots
+- [ ] Optimize all images for web performance (compression, responsive sizing)
+- [ ] Ensure mobile responsiveness for all image sections
+- [ ] Test visual improvements across different screen sizes
+
+
+## Webhook Integration - Make.com & Airtable (Dec 19, 2025)
+
+- [x] Create webhook infrastructure and helper functions
+- [x] Design webhook payload structure for user registration
+- [x] Design webhook payload structure for onboarding completion
+- [x] Add webhook configuration to database schema (webhook_configs table)
+- [ ] Create webhook settings page in admin dashboard (UI pending)
+- [ ] Implement webhook trigger after user registration (pending)
+- [x] Implement webhook trigger after onboarding completion
+- [x] Add retry logic for failed webhook deliveries
+- [x] Create webhook delivery logging system
+- [ ] Test webhook with Make.com test endpoint (user will test)
+- [x] Document webhook payloads and integration guide

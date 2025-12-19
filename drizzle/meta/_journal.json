@@ -71,6 +71,13 @@
       "when": 1766147233060,
       "tag": "0009_red_mister_fear",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1766175153450,
+      "tag": "0010_worried_thor_girl",
+      "breakpoints": true
     }
   ]
 }

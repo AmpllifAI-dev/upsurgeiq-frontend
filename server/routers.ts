@@ -96,6 +96,9 @@ import {
 import { sendPressReleaseNotificationEmail } from "./_core/email";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { getActiveWebhooksByEvent } from "./webhookConfigs";
+import { buildUserOnboardedPayload, sendWebhookWithRetry } from "./webhooks";
+import { logWebhookDelivery } from "./webhookConfigs";
 
 const prLogger = createLogger("PressReleaseGeneration");
 const aiLogger = createLogger("AIAssistant");
@@ -158,6 +161,59 @@ export const appRouter = router({
           userId: ctx.user.id,
           ...input,
         });
+
+        // Trigger webhook for onboarding completion
+        const webhooks = await getActiveWebhooksByEvent("user.onboarded");
+        for (const webhook of webhooks) {
+          const subscription = await getUserSubscription(ctx.user.id);
+          const payload = buildUserOnboardedPayload({
+            user: {
+              id: ctx.user.id,
+              email: ctx.user.email || "",
+              name: ctx.user.name,
+            },
+            business: {
+              id: business.id,
+              companyName: business.name,
+              website: business.website,
+              industry: business.sicSection,
+              sicCode: business.sicCode,
+              sicDescription: business.sicGroup,
+              employeeCount: null,
+              targetAudience: business.targetAudience,
+              uniqueSellingPoints: null,
+              brandVoice: business.brandVoiceTone,
+              toneStyle: business.brandVoiceStyle,
+              keyMessages: null,
+              competitorInfo: null,
+              imageStyle: business.aiImageStyle,
+              colorPreferences: business.aiImageColorPalette,
+              logoUrl: null,
+              createdAt: business.createdAt,
+            },
+            subscription: subscription
+              ? {
+                  tier: subscription.plan,
+                  status: subscription.status,
+                  startDate: subscription.currentPeriodStart,
+                }
+              : null,
+          });
+
+          const result = await sendWebhookWithRetry(webhook.webhookUrl, payload, webhook.retryAttempts);
+
+          // Log delivery attempt
+          await logWebhookDelivery({
+            webhookConfigId: webhook.id,
+            eventType: "user.onboarded",
+            payload: JSON.stringify(payload),
+            success: result.success ? 1 : 0,
+            statusCode: result.statusCode || null,
+            errorMessage: result.error || null,
+            attempts: webhook.retryAttempts,
+            deliveredAt: new Date(result.deliveredAt),
+          });
+        }
 
         return business;
       }),
@@ -1912,6 +1968,116 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
         period: usage.period,
       };
     }),
+  }),
+
+  // Webhook Configuration (Admin only)
+  webhooks: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      // Admin only
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only admins can manage webhooks",
+        });
+      }
+
+      const { getWebhookConfigs } = await import("./webhookConfigs");
+      return await getWebhookConfigs();
+    }),
+
+    create: protectedProcedure
+      .input(
+        z.object({
+          name: z.string().min(1),
+          eventType: z.enum(["user.registered", "user.onboarded"]),
+          webhookUrl: z.string().url(),
+          isActive: z.boolean().default(true),
+          retryAttempts: z.number().min(1).max(5).default(3),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        // Admin only
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only admins can manage webhooks",
+          });
+        }
+
+        const { createWebhookConfig } = await import("./webhookConfigs");
+        return await createWebhookConfig({
+          name: input.name,
+          eventType: input.eventType,
+          webhookUrl: input.webhookUrl,
+          isActive: input.isActive ? 1 : 0,
+          retryAttempts: input.retryAttempts,
+        });
+      }),
+
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          name: z.string().min(1).optional(),
+          webhookUrl: z.string().url().optional(),
+          isActive: z.boolean().optional(),
+          retryAttempts: z.number().min(1).max(5).optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        // Admin only
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only admins can manage webhooks",
+          });
+        }
+
+        const { updateWebhookConfig } = await import("./webhookConfigs");
+        const { id, ...data } = input;
+        return await updateWebhookConfig(id, {
+          ...data,
+          isActive: data.isActive !== undefined ? (data.isActive ? 1 : 0) : undefined,
+        });
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        // Admin only
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only admins can manage webhooks",
+          });
+        }
+
+        const { deleteWebhookConfig } = await import("./webhookConfigs");
+        return await deleteWebhookConfig(input.id);
+      }),
+
+    logs: protectedProcedure
+      .input(
+        z.object({
+          webhookConfigId: z.number().optional(),
+          limit: z.number().min(1).max(200).default(50),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        // Admin only
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only admins can view webhook logs",
+          });
+        }
+
+        const { getWebhookDeliveryLogs, getRecentWebhookLogs } = await import("./webhookConfigs");
+        if (input.webhookConfigId) {
+          return await getWebhookDeliveryLogs(input.webhookConfigId, input.limit);
+        }
+        return await getRecentWebhookLogs(input.limit);
+      }),
   }),
 });
 
