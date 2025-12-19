@@ -952,3 +952,10 @@
 - [x] Fix "Go to Dashboard" button to check authentication first
 - [x] Debug and fix plan subscription errors (Stripe products created and configured)
 - [x] Ensure public menu is visible on all public pages
+
+## UI Enhancement (User Request - Dec 19, 2025)
+
+- [x] Add hamburger menu to Home page header with additional navigation items
+- [x] Include Product, Company, and Legal sections in hamburger menu
+- [x] Keep current minimal header design (Features, Pricing, CTA)
+- [x] Ensure mobile-responsive design
