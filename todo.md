@@ -945,3 +945,10 @@
 - [ ] Add version comparison UI
 - [ ] Add restore version functionality
 - [ ] Show who made changes and when
+
+## Bug Fixes (User Feedback - Dec 19, 2025)
+
+- [x] Fix logo to link to home page
+- [x] Fix "Go to Dashboard" button to check authentication first
+- [x] Debug and fix plan subscription errors (Stripe products created and configured)
+- [x] Ensure public menu is visible on all public pages

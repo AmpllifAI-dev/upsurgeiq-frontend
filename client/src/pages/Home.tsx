@@ -113,12 +113,12 @@ export default function Home() {
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between py-4 gap-4">
-          <div className="flex items-center gap-2">
+          <a href="/" className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
             <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
               <Zap className="w-6 h-6 text-primary-foreground" />
             </div>
             <span className="text-2xl font-bold text-foreground">UpsurgeIQ</span>
-          </div>
+          </a>
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
             <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Features
@@ -131,7 +131,7 @@ export default function Home() {
                 Go to Dashboard
               </Button>
             ) : (
-              <Button onClick={handleGetStarted} variant="default">
+              <Button onClick={() => window.location.href = getLoginUrl()} variant="default">
                 Get Started
               </Button>
             )}

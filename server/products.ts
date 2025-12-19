@@ -33,8 +33,8 @@ export const PRODUCTS: Record<PricingTier, ProductConfig> = {
       "Up to 10 press releases/month",
       "Email support",
     ],
-    stripeProductId: "prod_Td2pC4hUddBbAH",
-    stripePriceId: "price_1SfmjyAGfyqPBnQ9JPZoNoWl",
+    stripeProductId: "prod_TdNbUqVvxJJZw9",
+    stripePriceId: "price_1Sg6qKIEVr3V21Jeo9ce4tSk",
   },
   pro: {
     name: "Pro",
@@ -51,8 +51,8 @@ export const PRODUCTS: Record<PricingTier, ProductConfig> = {
       "Campaign Lab access",
       "Priority support",
     ],
-    stripeProductId: "prod_Td2sl51moqbe4C",
-    stripePriceId: "price_1SfmmWAGfyqPBnQ9LeAJ711i",
+    stripeProductId: "prod_TdNbapI0V8QDIh",
+    stripePriceId: "price_1Sg6qLIEVr3V21JevpkT16ff",
   },
   scale: {
     name: "Scale",
@@ -69,8 +69,8 @@ export const PRODUCTS: Record<PricingTier, ProductConfig> = {
       "API access",
       "Dedicated account manager",
     ],
-    stripeProductId: "prod_Td2tuhKJPQ41d8",
-    stripePriceId: "price_1SfmnuAGfyqPBnQ9U5P7KfF4",
+    stripeProductId: "prod_TdNbEsPcijWqXa",
+    stripePriceId: "price_1Sg6qLIEVr3V21JefGTcSmZj",
   },
 };
 
@@ -80,14 +80,14 @@ export const PRODUCTS: Record<PricingTier, ProductConfig> = {
 export const ADDITIONAL_PRODUCTS = {
   additionalMediaList: {
     name: "Additional Media List",
-    stripeProductId: "prod_Td2wLpX1A6exs9",
-    stripePriceId: "price_1Sfmq8AGfyqPBnQ9JJ8tsFHt",
+    stripeProductId: "prod_TdNbgdwBIB6Dbn",
+    stripePriceId: "price_1Sg6qMIEVr3V21Jeb8Yk1A0n",
     description: "Add extra media list to your subscription",
   },
   intelligentCampaignLab: {
     name: "Intelligent Campaign Lab",
-    stripeProductId: "prod_Td2yyQ1pFJWNoo",
-    stripePriceId: "price_1SfmsDAGfyqPBnQ9DTkBb5vw",
+    stripeProductId: "prod_TdNbuCSuRx3WLE",
+    stripePriceId: "price_1Sg6qMIEVr3V21JeyfLicP6y",
     description: "Advanced campaign optimization and A/B testing",
   },
 };
