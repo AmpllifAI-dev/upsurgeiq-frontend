@@ -1258,3 +1258,27 @@
 - [x] Add tRPC admin.getCreditStats endpoint with permission checking
 - [ ] Add credit logging to all AI service calls (requires integration at each call site)
 - [ ] Populate credit usage data from actual AI service usage
+
+## Credit Logging Integration
+- [x] Create credit logging helper function in server
+- [x] Add credit logging to press release generation (AI LLM calls)
+- [x] Add credit logging to campaign strategy generation (AI LLM calls)
+- [x] Add credit logging to AI assistant chat (AI LLM calls)
+- [x] Add credit logging to image generation calls
+- [x] Add token-based credit estimation formula (placeholder)
+- [x] Include metadata (model, prompt, response length) in logs
+- [ ] Add credit logging to voice transcription calls (if/when implemented)
+- [ ] Update credit estimation formulas with actual Manus pricing
+
+## Cost Alert System
+- [x] Create cost alert thresholds table in database
+- [x] Create cost alert history table for tracking triggered alerts
+- [x] Create background job to check credit usage against thresholds
+- [x] Implement email notification system for threshold breaches
+- [x] Add alert history tracking
+- [x] Create admin tRPC endpoints for alert management (CRUD)
+- [x] Add manual alert check trigger endpoint
+- [x] Initialize default alert thresholds function
+- [ ] Add admin UI page for configuring alert thresholds
+- [ ] Set up cron job to run checkCreditAlerts() periodically
+- [ ] Test alert system with threshold breaches

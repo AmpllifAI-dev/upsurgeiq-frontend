@@ -821,4 +821,33 @@ export const creditUsage = mysqlTable("credit_usage", {
 export type CreditUsage = typeof creditUsage.$inferSelect;
 export type InsertCreditUsage = typeof creditUsage.$inferInsert;
 
+// Cost Alert Thresholds (Admin-configured credit usage alerts)
+export const creditAlertThresholds = mysqlTable("credit_alert_thresholds", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(), // e.g., "Daily Limit", "Monthly Budget"
+  thresholdType: mysqlEnum("thresholdType", ["daily", "weekly", "monthly", "total"]).notNull(),
+  thresholdValue: decimal("thresholdValue", { precision: 10, scale: 2 }).notNull(), // Credit limit
+  isActive: int("isActive").default(1).notNull(), // 1 = active, 0 = disabled
+  notifyEmails: text("notifyEmails").notNull(), // Comma-separated email addresses
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CreditAlertThreshold = typeof creditAlertThresholds.$inferSelect;
+export type InsertCreditAlertThreshold = typeof creditAlertThresholds.$inferInsert;
+
+// Cost Alert History (Track when alerts were triggered)
+export const creditAlertHistory = mysqlTable("credit_alert_history", {
+  id: int("id").autoincrement().primaryKey(),
+  thresholdId: int("thresholdId").notNull().references(() => creditAlertThresholds.id, { onDelete: "cascade" }),
+  triggeredAt: timestamp("triggeredAt").defaultNow().notNull(),
+  creditsUsed: decimal("creditsUsed", { precision: 10, scale: 4 }).notNull(), // Credits at time of alert
+  thresholdValue: decimal("thresholdValue", { precision: 10, scale: 2 }).notNull(), // Threshold that was breached
+  emailSent: int("emailSent").default(0).notNull(), // 1 = sent, 0 = failed
+  metadata: json("metadata"), // Additional context
+});
+
+export type CreditAlertHistory = typeof creditAlertHistory.$inferSelect;
+export type InsertCreditAlertHistory = typeof creditAlertHistory.$inferInsert;
+
 // ========================================

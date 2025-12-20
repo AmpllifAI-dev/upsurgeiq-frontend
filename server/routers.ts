@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { sql, eq, and, isNotNull, gte } from "drizzle-orm";
 import { getDb } from "./db";
-import { pressReleases, campaigns, journalists, users, creditUsage } from "../drizzle/schema";
+import { pressReleases, campaigns, journalists, users, creditUsage, creditAlertThresholds, creditAlertHistory } from "../drizzle/schema";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { COOKIE_NAME } from "@shared/const";
 import { systemRouter } from "./_core/systemRouter";
@@ -141,6 +141,8 @@ import { createCheckoutSession, createPortalSession, createMediaListPurchaseSess
 import { getProductByTier } from "./products";
 import { invokeLLM } from "./_core/llm";
 import { generateImage } from "./_core/imageGeneration";
+import { logCreditUsage, estimateCreditsFromTokens } from "./creditLogger";
+import { checkCreditAlerts, initializeDefaultAlerts } from "./costAlertChecker";
 import { getErrorLogs, getErrorStats } from "./errorLogs";
 import { logActivity, getActivityLogs, getRecentActivity } from "./activityLog";
 import { checkLimit, incrementUsage, getCurrentUsage, TIER_LIMITS } from "./usageTracking";
@@ -463,13 +465,30 @@ Generate a complete, publication-ready press release.`;
           });
 
           const content = response.choices[0]?.message?.content || "";
+          const tokensUsed = response.usage?.total_tokens || 0;
+          const creditsUsed = estimateCreditsFromTokens(tokensUsed);
+
+          // Log credit usage
+          await logCreditUsage({
+            userId: ctx.user.id,
+            featureType: "press_release_generation",
+            creditsUsed,
+            tokensUsed,
+            metadata: {
+              topic: input.topic,
+              model: response.model,
+              wordCount: content.length,
+            },
+          });
 
           prLogger.info("Press release generated successfully", {
             userId: ctx.user.id,
             action: "generate",
             metadata: { 
               topic: input.topic,
-              wordCount: content.length 
+              wordCount: content.length,
+              tokensUsed,
+              creditsUsed,
             },
           });
 
@@ -816,6 +835,18 @@ Generate a complete, publication-ready press release.`;
 
         const result = await generateImage({ prompt: input.prompt });
 
+        // Log credit usage (fixed cost per image, update with actual Manus pricing)
+        await logCreditUsage({
+          userId: ctx.user.id,
+          featureType: "image_generation",
+          creditsUsed: 5, // TODO: Update with actual Manus credit cost per image
+          tokensUsed: 0,
+          metadata: {
+            prompt: input.prompt,
+            imageUrl: result.url,
+          },
+        });
+
         // Increment usage counter
         await incrementUsage(ctx.user.id, "aiImages");
 
@@ -897,12 +928,29 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
           });
 
           const message = response.choices[0]?.message?.content || "I apologize, but I couldn't generate a response. Please try again.";
+          const tokensUsed = response.usage?.total_tokens || 0;
+          const creditsUsed = estimateCreditsFromTokens(tokensUsed);
+
+          // Log credit usage
+          await logCreditUsage({
+            userId: ctx.user.id,
+            featureType: "ai_chat",
+            creditsUsed,
+            tokensUsed,
+            metadata: {
+              model: response.model,
+              messageLength: input.message.length,
+              responseLength: typeof message === 'string' ? message.length : 0,
+            },
+          });
 
           aiLogger.info("AI assistant response generated", {
             userId: ctx.user.id,
             action: "chat",
             metadata: { 
-              responseLength: typeof message === 'string' ? message.length : 0 
+              responseLength: typeof message === 'string' ? message.length : 0,
+              tokensUsed,
+              creditsUsed,
             },
           });
 
@@ -1020,6 +1068,21 @@ Generate a comprehensive campaign strategy that includes:
           }
 
           const result = JSON.parse(content);
+          const tokensUsed = response.usage?.total_tokens || 0;
+          const creditsUsed = estimateCreditsFromTokens(tokensUsed);
+
+          // Log credit usage
+          await logCreditUsage({
+            userId: ctx.user.id,
+            featureType: "campaign_strategy_generation",
+            creditsUsed,
+            tokensUsed,
+            metadata: {
+              model: response.model,
+              campaignName: input.campaignName,
+              budget: input.budget,
+            },
+          });
 
           // Increment usage counter
           await incrementUsage(ctx.user.id, "aiChatMessages");
@@ -3203,6 +3266,141 @@ Generate a comprehensive campaign strategy that includes:
             credits: Number(u.credits),
           })),
         };
+      }),
+
+    // Alert management endpoints
+    getAlertThresholds: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+
+        const db = await getDb();
+        if (!db) return [];
+
+        return await db.select().from(creditAlertThresholds).orderBy(creditAlertThresholds.createdAt);
+      }),
+
+    createAlertThreshold: protectedProcedure
+      .input(z.object({
+        name: z.string(),
+        thresholdType: z.enum(["daily", "weekly", "monthly", "total"]),
+        thresholdValue: z.number(),
+        notifyEmails: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        }
+
+        const [threshold] = await db.insert(creditAlertThresholds).values({
+          name: input.name,
+          thresholdType: input.thresholdType,
+          thresholdValue: input.thresholdValue.toString(),
+          isActive: 1,
+          notifyEmails: input.notifyEmails,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+
+        return { id: threshold.insertId };
+      }),
+
+    updateAlertThreshold: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().optional(),
+        thresholdValue: z.number().optional(),
+        isActive: z.boolean().optional(),
+        notifyEmails: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        }
+
+        const { id, ...updates } = input;
+        const updateData: any = { updatedAt: new Date() };
+
+        if (updates.name) updateData.name = updates.name;
+        if (updates.thresholdValue) updateData.thresholdValue = updates.thresholdValue.toString();
+        if (updates.isActive !== undefined) updateData.isActive = updates.isActive ? 1 : 0;
+        if (updates.notifyEmails) updateData.notifyEmails = updates.notifyEmails;
+
+        await db.update(creditAlertThresholds)
+          .set(updateData)
+          .where(eq(creditAlertThresholds.id, id));
+
+        return { success: true };
+      }),
+
+    deleteAlertThreshold: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        }
+
+        await db.delete(creditAlertThresholds).where(eq(creditAlertThresholds.id, input.id));
+        return { success: true };
+      }),
+
+    getAlertHistory: protectedProcedure
+      .input(z.object({
+        limit: z.number().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+
+        const db = await getDb();
+        if (!db) return [];
+
+        const query = db
+          .select({
+            id: creditAlertHistory.id,
+            thresholdId: creditAlertHistory.thresholdId,
+            triggeredAt: creditAlertHistory.triggeredAt,
+            creditsUsed: creditAlertHistory.creditsUsed,
+            thresholdValue: creditAlertHistory.thresholdValue,
+            emailSent: creditAlertHistory.emailSent,
+            thresholdName: creditAlertThresholds.name,
+          })
+          .from(creditAlertHistory)
+          .leftJoin(creditAlertThresholds, eq(creditAlertHistory.thresholdId, creditAlertThresholds.id))
+          .orderBy(sql`${creditAlertHistory.triggeredAt} DESC`);
+
+        if (input.limit) {
+          query.limit(input.limit);
+        }
+
+        return await query;
+      }),
+
+    triggerAlertCheck: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+
+        await checkCreditAlerts();
+        return { success: true, message: "Alert check triggered successfully" };
       }),
   }),
 });
