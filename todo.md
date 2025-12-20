@@ -1430,6 +1430,8 @@
 - [x] Add team roster and player management fields
 - [x] Build sports team CRUD tRPC procedures
 - [x] Create sports team management UI
+- [x] Add sports team route to App.tsx
+- [x] Add sports team navigation to DashboardLayout sidebar
 - [ ] Build match/game schedule integration
 - [ ] Create team statistics tracking
 - [ ] Add team-specific press release templates
@@ -1440,9 +1442,9 @@
 - [x] Create press release image generation backend service
 - [x] Implement AI-powered prompt generation from press release content
 - [x] Add style and mood presets (photorealistic, illustration, corporate, etc.)
-- [ ] Add tRPC procedures for image generation
-- [ ] Integrate image generation into press release creation UI
-- [ ] Build image preview and regeneration UI
+- [x] Add tRPC procedures for image generation (generateImage, regenerateImage, getImageStylePresets)
+- [x] Create PressReleaseImageGenerator component with preview and regeneration
+- [ ] Integrate image generator into PressReleaseNew page
 - [ ] Implement image attachment to press releases
 - [ ] Add image credit consumption tracking
 - [ ] Create image library for reuse

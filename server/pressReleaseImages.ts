@@ -98,63 +98,19 @@ export async function regenerateImage(
  */
 export function getImageStylePresets() {
   return {
-    photorealistic: {
-      name: "Photorealistic",
-      description: "Professional photography style with realistic lighting and details",
-      example: "High-quality professional photograph, sharp focus, natural lighting",
-    },
-    illustration: {
-      name: "Illustration",
-      description: "Clean, modern illustration style perfect for tech and innovation",
-      example: "Modern digital illustration, clean lines, vibrant colors",
-    },
-    abstract: {
-      name: "Abstract",
-      description: "Abstract and conceptual visuals for creative announcements",
-      example: "Abstract composition, geometric shapes, dynamic flow",
-    },
-    corporate: {
-      name: "Corporate",
-      description: "Professional business aesthetic with clean, polished look",
-      example: "Corporate photography, professional setting, business environment",
-    },
-    modern: {
-      name: "Modern",
-      description: "Contemporary and sleek visual style",
-      example: "Modern minimalist design, clean aesthetic, contemporary style",
-    },
-  };
-}
-
-/**
- * Get mood presets for image generation
- */
-export function getMoodPresets() {
-  return {
-    professional: {
-      name: "Professional",
-      description: "Serious, credible, and trustworthy",
-      keywords: "professional, polished, refined",
-    },
-    energetic: {
-      name: "Energetic",
-      description: "Dynamic, exciting, and vibrant",
-      keywords: "dynamic, energetic, vibrant, exciting",
-    },
-    calm: {
-      name: "Calm",
-      description: "Peaceful, serene, and reassuring",
-      keywords: "calm, serene, peaceful, soft lighting",
-    },
-    innovative: {
-      name: "Innovative",
-      description: "Cutting-edge, futuristic, and forward-thinking",
-      keywords: "innovative, futuristic, cutting-edge, tech-forward",
-    },
-    trustworthy: {
-      name: "Trustworthy",
-      description: "Reliable, stable, and dependable",
-      keywords: "trustworthy, reliable, stable, confident",
-    },
+    styles: [
+      { value: "photorealistic", label: "Photorealistic", description: "Professional photography style with realistic lighting and details" },
+      { value: "illustration", label: "Illustration", description: "Clean, modern illustration style perfect for tech and innovation" },
+      { value: "abstract", label: "Abstract", description: "Abstract and conceptual visuals for creative announcements" },
+      { value: "corporate", label: "Corporate", description: "Professional business aesthetic with clean, polished look" },
+      { value: "modern", label: "Modern", description: "Contemporary and sleek visual style" },
+    ],
+    moods: [
+      { value: "professional", label: "Professional", description: "Serious, credible, and trustworthy" },
+      { value: "energetic", label: "Energetic", description: "Dynamic, exciting, and vibrant" },
+      { value: "calm", label: "Calm", description: "Peaceful, serene, and reassuring" },
+      { value: "innovative", label: "Innovative", description: "Cutting-edge, futuristic, and forward-thinking" },
+      { value: "trustworthy", label: "Trustworthy", description: "Reliable, stable, and dependable" },
+    ],
   };
 }

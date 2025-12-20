@@ -41,6 +41,7 @@ import AdminAlertManagement from "./pages/AdminAlertManagement";
 import Purchases from "./pages/Purchases";
 import PurchaseSuccess from "./pages/PurchaseSuccess";
 import PurchaseCancel from "./pages/PurchaseCancel";
+import SportsTeams from "./pages/SportsTeams";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -81,6 +82,7 @@ function Router() {
       <Route path="/dashboard/purchases" component={Purchases} />
       <Route path="/dashboard/purchases/success" component={PurchaseSuccess} />
       <Route path="/dashboard/purchases/cancel" component={PurchaseCancel} />
+      <Route path="/dashboard/sports-teams" component={SportsTeams} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

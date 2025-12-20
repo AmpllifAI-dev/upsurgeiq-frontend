@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { sql, eq, and, isNotNull, gte } from "drizzle-orm";
 import { getDb } from "./db";
+import { generatePressReleaseImage, regenerateImage, getImageStylePresets } from "./pressReleaseImages";
 import { pressReleases, campaigns, journalists, users, creditUsage, creditAlertThresholds, creditAlertHistory, wordCountCredits, imageCredits } from "../drizzle/schema";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { COOKIE_NAME } from "@shared/const";
@@ -662,6 +663,36 @@ Generate a complete, publication-ready press release.`;
 
         return { success: true, count: affectedRows };
       }),
+
+    generateImage: protectedProcedure
+      .input(
+        z.object({
+          title: z.string(),
+          content: z.string(),
+          style: z.enum(["photorealistic", "illustration", "corporate", "abstract", "modern"]).optional(),
+          mood: z.enum(["professional", "energetic", "calm", "innovative", "trustworthy"]).optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const result = await generatePressReleaseImage({
+          pressReleaseTitle: input.title,
+          pressReleaseContent: input.content,
+          style: input.style,
+          mood: input.mood,
+        });
+        return result;
+      }),
+
+    regenerateImage: protectedProcedure
+      .input(z.object({ prompt: z.string() }))
+      .mutation(async ({ input }) => {
+        const result = await regenerateImage(input.prompt);
+        return result;
+      }),
+
+    getImageStylePresets: publicProcedure.query(() => {
+      return getImageStylePresets();
+    }),
   }),
 
   socialMedia: router({
