@@ -16,6 +16,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Sparkles, Target, Users, Calendar, DollarSign, CheckCircle2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { HelpTooltip } from "@/components/HelpTooltip";
 
 interface CampaignPlanningWizardProps {
   open: boolean;
@@ -205,9 +206,12 @@ export function CampaignPlanningWizard({
             </div>
 
             <div className="space-y-4">
-              <div className="space-y-2">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
                 <Label htmlFor="campaignName">Campaign Name *</Label>
-                <Input
+                <HelpTooltip content="Give your campaign a clear, descriptive name that reflects its purpose. This will help you identify it later." />
+              </div>
+              <Input
                   id="campaignName"
                   placeholder="e.g., Spring Product Launch 2025"
                   value={campaignName}
@@ -215,9 +219,12 @@ export function CampaignPlanningWizard({
                 />
               </div>
 
-              <div className="space-y-2">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
                 <Label htmlFor="campaignGoal">Campaign Goal *</Label>
-                <Textarea
+                <HelpTooltip content="Describe what you want to achieve with this campaign. Be specific about your objectives (e.g., increase brand awareness, drive sales, launch a product)." />
+              </div>
+              <Textarea
                   id="campaignGoal"
                   placeholder="What do you want to achieve? (e.g., Generate 500 qualified leads, Increase brand awareness by 30%, Launch new product line)"
                   value={campaignGoal}
@@ -245,9 +252,12 @@ export function CampaignPlanningWizard({
             </div>
 
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="targetAudience">Target Audience Description *</Label>
-                <Textarea
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="targetAudience">Target Audience *</Label>
+                <HelpTooltip content="Describe your ideal audience in detail. Include demographics (age, location), psychographics (interests, values), and behaviors. The more specific you are, the better the AI can tailor your strategy." />
+              </div>
+              <Textarea
                   id="targetAudience"
                   placeholder="Describe your ideal audience: demographics, interests, pain points, behaviors, etc. (e.g., Small business owners aged 30-50, interested in digital marketing, struggling with social media management)"
                   value={targetAudience}
@@ -294,9 +304,9 @@ export function CampaignPlanningWizard({
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="endDate">End Date *</Label>
-                <Input
+                 <div className="space-y-2">
+                <Label htmlFor="endDate">End Date</Label>
+              <Input
                   id="endDate"
                   type="date"
                   value={endDate}
@@ -306,10 +316,13 @@ export function CampaignPlanningWizard({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="budget" className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4" />
-                Campaign Budget (£) *
-              </Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="budget" className="flex items-center gap-2">
+                  <DollarSign className="w-4 h-4" />
+                  Campaign Budget (£) *
+                </Label>
+                <HelpTooltip content="Enter your total campaign budget in GBP. This will help the AI recommend appropriate strategies and tactics within your budget constraints." />
+              </div>
               <Input
                 id="budget"
                 type="number"

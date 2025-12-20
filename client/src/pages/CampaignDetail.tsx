@@ -42,6 +42,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CampaignAnalyticsCharts } from "@/components/CampaignAnalyticsCharts";
 
 export default function CampaignDetail() {
   const [, params] = useRoute("/dashboard/campaign/:id");
@@ -585,38 +586,7 @@ export default function CampaignDetail() {
           {analyticsLoading ? (
             <Skeleton className="h-64 w-full" />
           ) : analytics && analytics.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm font-medium">Total Impressions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {analytics.reduce((sum, a) => sum + (a.impressions || 0), 0).toLocaleString()}
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm font-medium">Total Clicks</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {analytics.reduce((sum, a) => sum + (a.clicks || 0), 0).toLocaleString()}
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm font-medium">Total Conversions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {analytics.reduce((sum, a) => sum + (a.conversions || 0), 0).toLocaleString()}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            <CampaignAnalyticsCharts analytics={analytics} />
           ) : (
             <Card>
               <CardContent className="py-12 text-center">
