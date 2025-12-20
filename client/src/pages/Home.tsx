@@ -27,10 +27,9 @@ export default function Home() {
       period: "/month",
       description: "Perfect for solopreneurs and small businesses",
       features: [
-        "2 press releases per month",
-        "5 campaigns per month",
+        "2 campaigns per month (AI-drafted copy + imagery)",
         "All 4 social media platforms",
-        "Unlimited social posts",
+        "Unlimited user-composed social posts",
         "3 media lists (default)",
         "Unlimited distributions",
         "Email support",
@@ -38,7 +37,7 @@ export default function Home() {
       addOns: [
         "AI Chat: £39/month",
         "AI Call-in: £59/month",
-        "Image Packs: £3.99-24.99",
+        "AI Generated Image Packs: £3.99-24.99",
       ],
       cta: "Start Free Trial",
       highlighted: false,
@@ -49,19 +48,17 @@ export default function Home() {
       period: "/month",
       description: "Most popular for growing businesses",
       features: [
-        "5 press releases per month",
-        "20 campaigns per month",
+        "5 campaigns per month (AI-drafted copy + imagery)",
         "All 4 social media platforms",
-        "Unlimited social posts",
+        "Unlimited user-composed social posts",
         "5 media lists (3 default + 2 optional)",
         "Unlimited distributions",
-        "Advanced analytics",
         "Priority support",
       ],
       addOns: [
         "AI Chat: £39/month",
         "AI Call-in: £59/month",
-        "Image Packs: £3.99-24.99",
+        "AI Generated Image Packs: £3.99-24.99",
       ],
       cta: "Start Free Trial",
       highlighted: true,
@@ -72,21 +69,18 @@ export default function Home() {
       period: "/month",
       description: "For agencies and high-growth companies",
       features: [
-        "15 press releases per month",
-        "Unlimited campaigns",
+        "15 campaigns per month (AI-drafted copy + imagery)",
         "All 4 social media platforms",
-        "Unlimited social posts",
+        "Unlimited user-composed social posts",
         "10 media lists (3 default + 7 optional)",
         "Unlimited distributions",
         "Intelligent Campaign Lab included",
-        "Advanced analytics & reporting",
-        "White-label options",
         "Priority support",
       ],
       addOns: [
         "AI Chat: £39/month",
         "AI Call-in: £59/month",
-        "Image Packs: £3.99-24.99",
+        "AI Generated Image Packs: £3.99-24.99",
       ],
       cta: "Start Free Trial",
       highlighted: false,
@@ -468,6 +462,73 @@ export default function Home() {
                 </CardFooter>
               </Card>
             ))}
+          </div>
+
+          {/* White Label Section */}
+          <div className="mt-16 max-w-4xl mx-auto">
+            <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5">
+              <CardHeader className="text-center pb-6">
+                <Badge variant="secondary" className="w-fit mx-auto mb-4">For Organizations</Badge>
+                <CardTitle className="text-3xl">White Label Solution</CardTitle>
+                <CardDescription className="text-base mt-2">
+                  Standalone product for agencies and organizations. Offer upsurgeIQ under your own brand.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-sm">What's Included:</h4>
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-muted-foreground">Full platform access under your brand</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-muted-foreground">Custom domain and branding</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-muted-foreground">Resell to your clients</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-muted-foreground">All features from Scale plan</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-sm">Pricing Structure:</h4>
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-muted-foreground">20% commission on all sales</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-muted-foreground">No setup charges</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-muted-foreground">Set your own pricing</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-muted-foreground">Dedicated partner support</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter className="flex flex-col gap-4">
+                <Button className="w-full" size="lg" onClick={() => window.location.href = 'mailto:partners@upsurgeiq.com?subject=White Label Inquiry'}>
+                  Contact Sales
+                </Button>
+                <p className="text-xs text-center text-muted-foreground">
+                  Perfect for agencies, consultancies, and organizations serving multiple clients
+                </p>
+              </CardFooter>
+            </Card>
           </div>
         </div>
       </section>

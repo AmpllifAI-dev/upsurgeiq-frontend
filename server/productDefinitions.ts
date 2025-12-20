@@ -127,7 +127,7 @@ export const PRODUCT_DEFINITIONS: ProductDefinition[] = [
   // ========================================
   {
     id: "image_single",
-    name: "Single Image Credit",
+    name: "AI Generated Image - Single Credit",
     description: "Generate 1 additional AI-powered professional image for your content.",
     price: 399, // £3.99
     currency: "gbp",
@@ -140,7 +140,7 @@ export const PRODUCT_DEFINITIONS: ProductDefinition[] = [
   },
   {
     id: "image_pack_5",
-    name: "5 Image Credits",
+    name: "AI Generated Image Pack - 5 Credits",
     description: "Generate 5 additional AI-powered professional images. Save £5 compared to buying individually.",
     price: 1499, // £14.99
     currency: "gbp",
@@ -154,7 +154,7 @@ export const PRODUCT_DEFINITIONS: ProductDefinition[] = [
   },
   {
     id: "image_pack_10",
-    name: "10 Image Credits",
+    name: "AI Generated Image Pack - 10 Credits",
     description: "Generate 10 additional AI-powered professional images. Save £15 compared to buying individually.",
     price: 2499, // £24.99
     currency: "gbp",

@@ -1562,3 +1562,19 @@
 - [ ] Store OAuth tokens securely in database
 - [ ] Test OAuth flows for all platforms
 - [ ] Update social media posting to use connected accounts
+
+
+## Terminology and Pricing Corrections (December 20, 2025 - Round 2)
+- [x] Remove separate "press releases" tracking - campaigns are the only limit
+- [x] Update pricing page to show campaigns (2/5/15) as the main feature
+- [x] Clarify that campaigns include AI-drafted copy with AI-generated imagery
+- [x] Clarify that unlimited social posts are user-composed (separate from campaigns)
+- [x] Remove "5/20/unlimited campaigns" line items from pricing cards
+- [x] Update image pack naming to "AI Generated Image Pack" everywhere
+- [x] Update White Label description (standalone product, 20% commission, no setup charge)
+- [x] Remove "Advanced Analytics" from Pro tier (pinned for later)
+- [x] Update image pack names in productDefinitions.ts
+- [x] Sync updated product names to Stripe
+- [ ] Update backend tracking to only enforce campaign limits (not separate press releases)
+- [ ] Update usage warnings to reflect campaign-only tracking
+- [ ] Update all user-facing text to use "campaign" terminology consistently
