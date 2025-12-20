@@ -1381,3 +1381,29 @@
 - [x] Integrate purchase CTA into press release flow
 - [x] Test end-to-end: exceed limit → see CTA → purchase → continue
 - [x] Create webhook setup documentation
+
+
+## Dynamic Landing Pages for Marketing Campaigns (December 20, 2025)
+- [ ] Design landing page template system with UTM parameter tracking
+- [ ] Create landing page variants for different marketing channels:
+  - [ ] Digital marketing tools landing page
+  - [ ] Press release distribution landing page
+  - [ ] Journalist database landing page
+  - [ ] Social media campaign landing page
+- [ ] Implement dynamic content based on referral source
+- [ ] Add "Our tool brought you here" messaging with social proof
+- [ ] Create conversion-focused CTAs tailored to each campaign type
+- [ ] Set up analytics tracking for landing page performance
+- [ ] A/B test different messaging and layouts
+- [ ] Document landing page creation process for future campaigns
+
+## Credit System Enhancements (December 20, 2025)
+- [x] Verify Stripe webhook endpoint is properly configured
+- [x] Create webhook setup verification script
+- [x] Add credit balance display to dashboard header
+- [x] Show word count credits and image credits separately
+- [x] Implement email notifications for successful purchases
+- [x] Send purchase confirmation with receipt details
+- [x] Include current credit balance in purchase emails
+- [x] Test webhook fulfillment end-to-end
+- [x] Document email notification templates

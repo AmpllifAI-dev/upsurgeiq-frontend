@@ -3559,6 +3559,26 @@ Generate a comprehensive campaign strategy that includes:
         };
       }),
 
+    getWordCountCredits: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getAvailableWordCountCredits } = await import("./addOnCredits");
+        const availableWords = await getAvailableWordCountCredits(ctx.user.id);
+        
+        return {
+          availableWords,
+        };
+      }),
+
+    getImageCredits: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getAvailableImageCredits } = await import("./addOnCredits");
+        const availableImages = await getAvailableImageCredits(ctx.user.id);
+        
+        return {
+          availableImages,
+        };
+      }),
+
     getPurchaseHistory: protectedProcedure
       .query(async ({ ctx }) => {
         const db = await getDb();

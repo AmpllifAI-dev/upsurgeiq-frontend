@@ -27,6 +27,7 @@ import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 import { HelpCenter } from "./HelpCenter";
+import { CreditBalanceDisplay } from "./CreditBalanceDisplay";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Page 1", path: "/" },
@@ -260,7 +261,8 @@ function DashboardLayoutContent({
           </div>
         )}
         {!isMobile && (
-          <div className="flex border-b h-14 items-center justify-end bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:backdrop-blur sticky top-0 z-40">
+          <div className="flex border-b h-14 items-center justify-between bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:backdrop-blur sticky top-0 z-40">
+            <CreditBalanceDisplay variant="compact" />
             <HelpCenter />
           </div>
         )}

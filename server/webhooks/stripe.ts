@@ -634,7 +634,11 @@ async function handleAddOnPurchase(session: Stripe.Checkout.Session) {
   }
 
   // Import add-on credit functions
-  const { addWordCountCredits, addImageCredits } = await import("../addOnCredits");
+  const { addWordCountCredits, addImageCredits, getAvailableWordCountCredits, getAvailableImageCredits } = await import("../addOnCredits");
+  const { sendPurchaseConfirmationEmail } = await import("../purchaseEmails");
+  const { getDb } = await import("../db");
+  const { users } = await import("../../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
 
   try {
     if (productType === "word_count") {
@@ -687,6 +691,49 @@ async function handleAddOnPurchase(session: Stripe.Checkout.Session) {
         userId,
         metadata: { images, productKey },
       });
+    }
+
+    // Send purchase confirmation email
+    try {
+      const db = await getDb();
+      if (db) {
+        const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+        
+        if (user.length > 0 && user[0].email && user[0].name) {
+          // Get current credit balance
+          const availableCredits: { words?: number; images?: number } = {};
+          
+          if (productType === "word_count") {
+            availableCredits.words = await getAvailableWordCountCredits(userId);
+          } else if (productType === "image_pack") {
+            availableCredits.images = await getAvailableImageCredits(userId);
+          }
+
+          await sendPurchaseConfirmationEmail({
+            to: user[0].email,
+            name: user[0].name,
+            productType: productType as "word_count" | "image_pack",
+            productKey: session.metadata?.productKey || "unknown",
+            amountPaid: session.amount_total || 0,
+            currency: session.currency || "gbp",
+            purchaseDate: new Date(),
+            availableCredits,
+          });
+
+          logger.info("Purchase confirmation email sent", {
+            action: "handleAddOnPurchase",
+            userId,
+            metadata: { productType },
+          });
+        }
+      }
+    } catch (emailError) {
+      logger.error("Failed to send purchase confirmation email", emailError as Error, {
+        action: "handleAddOnPurchase",
+        userId,
+        metadata: { productType },
+      });
+      // Don't throw - email failure shouldn't prevent credit fulfillment
     }
   } catch (error) {
     logger.error("Failed to add credits", error as Error, {
