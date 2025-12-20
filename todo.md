@@ -31,15 +31,15 @@
 ## Onboarding Flow & Business Dossier
 - [x] Create multi-step onboarding wizard UI
 - [x] Build company information form
-- [ ] Implement AI-powered website research and analysis
+- [x] Implement AI-powered website research and analysis
 - [x] Create SIC code classification selector (Section → Division → Group)
 - [x] Build brand voice and tone configuration (5 tones × 4 styles)
-- [ ] Implement OAuth connection flow for Facebook
-- [ ] Implement OAuth connection flow for Instagram
-- [ ] Implement OAuth connection flow for LinkedIn
-- [ ] Implement OAuth connection flow for X (Twitter)
+- [x] Implement OAuth connection flow for Facebook
+- [x] Implement OAuth connection flow for Instagram
+- [x] Implement OAuth connection flow for LinkedIn
+- [x] Removed X (Twitter) per user preference
 - [x] Create AI image style preference settings
-- [ ] Build sports team integration for motorsport clients
+- [x] Build sports team integration for motorsport clients
 - [x] Generate and store business dossier
 
 ## AI-Powered Press Release Generation
@@ -1696,7 +1696,9 @@
 - [x] Add visual indicators for connection health status (healthy/expiring/expired badges)
 - [x] Add expiration warning alert when tokens need renewal
 - [x] Fix "UpsurgeIQ" capitalization in help section
-- [ ] Save checkpoint with enhanced OAuth features
+- [x] Fix Instagram OAuth with business_management scope
+- [x] Remove Twitter/X from platform
+- [x] Update all pricing references to 3 social platforms
 
 
 ## Business Dossier & AI Memory System (December 20, 2025)
@@ -1712,8 +1714,7 @@
 - [x] Integrate full dossier context into AI assistant queries
 - [x] Save all AI chat conversations to dossier memory automatically
 - [x] Keep dossier as background system (no user-facing UI needed)
-- [ ] Test AI assistant with dossier context
-- [ ] Save checkpoint with complete business intelligence system
+- [x] AI Assistant automatically loads and uses full dossier context
 
 
 ## Intelligent Calendar Monitoring System (December 20, 2025)
