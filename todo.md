@@ -1577,9 +1577,8 @@
 - [x] Sync updated product names to Stripe
 - [ ] Update backend tracking to only enforce campaign limits (not separate press releases)
 - [ ] Update usage warnings to reflect campaign-only tracking
-- [ ] Update all user-facing text to use "campaign" terminology consistently
-
-
-## Final Pricing Corrections (December 20, 2025 - Round 3)
+- [ ] Update all user-facing text to use "campaign" terminology con## Final Pricing Corrections (December 20, 2025 - Round 3)
 - [x] Remove "Unlimited distributions" from all pricing tiers (redundant/confusing)
-- [x] Clarify campaigns include "AI-generated imagery" not user's own images
+- [x] Clarify campaigns include "own imagery" (user's uploaded images, NOT AI-generated)
+- [x] AI-generated images are separate add-on purchases (Image Packs)t AI-generated)
+- [x] AI-generated images are separate add-on purchases (Image Packs)
