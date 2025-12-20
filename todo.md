@@ -1809,3 +1809,8 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Fix placeholder replacement in press releases (dynamic text placeholders not being replaced with user data)
 - [x] Fix View button on press releases list (not working)
 - [x] Fix Edit button on press releases list (not working)
+
+## New Features (Current Session - Continued)
+- [x] Add AI generation warning dialog before generating content (shows credit usage, can be dismissed permanently with "don't show again" option)
+- [x] Integrate preferredLanguage field into AI generation prompts (use user's selected language for all AI-generated content)
+- [x] Add language preference to user settings/profile page (allow users to change preferred language after onboarding)

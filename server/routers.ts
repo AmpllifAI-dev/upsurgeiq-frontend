@@ -466,12 +466,36 @@ export const appRouter = router({
         
         const wordLimit = requestedWords;
 
+        // Language mapping for AI prompts
+        const languageNames: Record<string, string> = {
+          'en-GB': 'British English',
+          'en-US': 'American English',
+          'es': 'Spanish',
+          'fr': 'French',
+          'de': 'German',
+          'it': 'Italian',
+          'pt': 'Portuguese',
+          'nl': 'Dutch',
+          'pl': 'Polish',
+          'ru': 'Russian',
+          'zh': 'Chinese',
+          'ja': 'Japanese',
+          'ko': 'Korean',
+          'ar': 'Arabic',
+          'hi': 'Hindi',
+          'tr': 'Turkish',
+        };
+        
+        const preferredLanguage = business.preferredLanguage || 'en-GB';
+        const languageName = languageNames[preferredLanguage] || 'British English';
+
         const systemPrompt = `You are a professional press release writer. Generate a compelling, newsworthy press release based on the following information:
 
 Company: ${business.name}
 Brand Voice Tone: ${input.tone || business.brandVoiceTone || "formal"}
 Brand Voice Style: ${business.brandVoiceStyle || "detailed"}
 Target Audience: ${input.targetAudience || business.targetAudience || "general public"}
+Language: ${languageName} (write the entire press release in ${languageName})
 
 Company Dossier:
 ${business.dossier || "No additional context provided"}

@@ -19,6 +19,7 @@ import { CharacterCounter } from "@/components/CharacterCounter";
 import { PressReleaseImageGenerator } from "@/components/PressReleaseImageGenerator";
 import { WordCountPurchaseCTA } from "@/components/WordCountPurchaseCTA";
 import { ImageUpload } from "@/components/ImageUpload";
+import { AIGenerationWarning, shouldShowAIWarning } from "@/components/AIGenerationWarning";
 
 export default function PressReleaseNew() {
   const { user, loading } = useAuth();
@@ -44,6 +45,7 @@ export default function PressReleaseNew() {
     tierLimit: number;
     purchasedWords: number;
   } | null>(null);
+  const [showAIWarning, setShowAIWarning] = useState(false);
 
   const { data: business } = trpc.business.get.useQuery(undefined, {
     enabled: !!user,
@@ -128,6 +130,15 @@ export default function PressReleaseNew() {
       return;
     }
 
+    // Check if we should show the AI warning
+    if (shouldShowAIWarning()) {
+      setShowAIWarning(true);
+    } else {
+      proceedWithGeneration();
+    }
+  };
+
+  const proceedWithGeneration = () => {
     setIsGenerating(true);
     generateMutation.mutate({
       topic,
@@ -506,6 +517,15 @@ export default function PressReleaseNew() {
           </Card>
         </div>
       </div>
+
+      {/* AI Generation Warning Dialog */}
+      <AIGenerationWarning
+        open={showAIWarning}
+        onOpenChange={setShowAIWarning}
+        onConfirm={proceedWithGeneration}
+        creditsToUse={1}
+        actionDescription="You are about to generate a press release using AI. This will use 1 credit from your account."
+      />
     </div>
   );
 }

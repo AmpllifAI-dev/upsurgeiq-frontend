@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { SocialMediaConnections } from "@/components/SocialMediaConnections";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { User, Mail, Building, Calendar, Shield, Bell, Download } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -18,6 +19,7 @@ export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
+  const [preferredLanguage, setPreferredLanguage] = useState('en-GB');
 
   const { data: subscription, isLoading: subLoading } = trpc.subscription.get.useQuery();
   const { data: business, isLoading: businessLoading } = trpc.business.get.useQuery();
@@ -43,6 +45,13 @@ export default function Profile() {
     }
   }, [notificationPrefs]);
 
+  // Update language preference when business data loads
+  useEffect(() => {
+    if (business?.preferredLanguage) {
+      setPreferredLanguage(business.preferredLanguage);
+    }
+  }, [business]);
+
   const updateNotificationsMutation = trpc.notificationPreferences.update.useMutation({
     onSuccess: () => {
       toast.success("Notification preferences updated", {
@@ -51,6 +60,19 @@ export default function Profile() {
     },
     onError: (error) => {
       toast.error("Failed to update preferences", {
+        description: error.message,
+      });
+    },
+  });
+
+  const updateLanguageMutation = trpc.business.update.useMutation({
+    onSuccess: () => {
+      toast.success("Language preference updated", {
+        description: "Your preferred language for AI-generated content has been saved.",
+      });
+    },
+    onError: (error) => {
+      toast.error("Failed to update language", {
         description: error.message,
       });
     },
@@ -418,6 +440,48 @@ export default function Profile() {
                 <Button onClick={handleSaveNotifications} className="w-full mt-4" disabled={updateNotificationsMutation.isPending}>
                   Save Notification Preferences
                 </Button>
+              </CardContent>
+            </Card>
+
+            {/* Language Preference */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Language Preference</CardTitle>
+                <CardDescription>Choose your preferred language for AI-generated content</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="preferredLanguage">Preferred Language</Label>
+                  <Select value={preferredLanguage} onValueChange={(value) => {
+                    setPreferredLanguage(value);
+                    updateLanguageMutation.mutate({ preferredLanguage: value });
+                  }}>
+                    <SelectTrigger id="preferredLanguage">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="en-GB">English (British)</SelectItem>
+                      <SelectItem value="en-US">English (American)</SelectItem>
+                      <SelectItem value="es">Spanish (Español)</SelectItem>
+                      <SelectItem value="fr">French (Français)</SelectItem>
+                      <SelectItem value="de">German (Deutsch)</SelectItem>
+                      <SelectItem value="it">Italian (Italiano)</SelectItem>
+                      <SelectItem value="pt">Portuguese (Português)</SelectItem>
+                      <SelectItem value="nl">Dutch (Nederlands)</SelectItem>
+                      <SelectItem value="pl">Polish (Polski)</SelectItem>
+                      <SelectItem value="ru">Russian (Русский)</SelectItem>
+                      <SelectItem value="zh">Chinese (中文)</SelectItem>
+                      <SelectItem value="ja">Japanese (日本語)</SelectItem>
+                      <SelectItem value="ko">Korean (한국어)</SelectItem>
+                      <SelectItem value="ar">Arabic (العربية)</SelectItem>
+                      <SelectItem value="hi">Hindi (हिन्दी)</SelectItem>
+                      <SelectItem value="tr">Turkish (Türkçe)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-muted-foreground">
+                    This language will be used for all AI-generated press releases, social media posts, and other content.
+                  </p>
+                </div>
               </CardContent>
             </Card>
 
