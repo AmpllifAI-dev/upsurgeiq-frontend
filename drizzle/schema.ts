@@ -962,3 +962,149 @@ export const socialConnections = mysqlTable("social_connections", {
 
 export type SocialConnection = typeof socialConnections.$inferSelect;
 export type InsertSocialConnection = typeof socialConnections.$inferInsert;
+
+
+// Business Dossier - Comprehensive client intelligence
+export const businessDossiers = mysqlTable("business_dossiers", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Basic Company Info
+  companyName: varchar("companyName", { length: 255 }),
+  website: varchar("website", { length: 500 }),
+  industry: varchar("industry", { length: 255 }),
+  sicCode: varchar("sicCode", { length: 50 }),
+  
+  // Business Details (from website analysis)
+  businessDescription: text("businessDescription"),
+  services: text("services"), // JSON array of services
+  targetAudience: text("targetAudience"),
+  uniqueSellingPoints: text("uniqueSellingPoints"), // JSON array
+  competitors: text("competitors"), // JSON array of competitor names/URLs
+  
+  // Brand & Messaging
+  brandVoice: text("brandVoice"), // e.g., "professional", "casual", "technical"
+  brandTone: text("brandTone"), // e.g., "friendly", "authoritative", "innovative"
+  keyMessages: text("keyMessages"), // JSON array of key talking points
+  
+  // Team & Contacts
+  employees: text("employees"), // JSON array of {name, role, bio}
+  primaryContact: varchar("primaryContact", { length: 255 }),
+  contactEmail: varchar("contactEmail", { length: 255 }),
+  contactPhone: varchar("contactPhone", { length  : 50 }),
+  
+  // Social & Sports (for motorsport clients)
+  sportsTeamAffiliation: varchar("sportsTeamAffiliation", { length: 255 }),
+  
+  // Website Analysis Metadata
+  websiteAnalyzedAt: timestamp("websiteAnalyzedAt"),
+  websiteAnalysisData: text("websiteAnalysisData"), // JSON of raw analysis
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BusinessDossier = typeof businessDossiers.$inferSelect;
+export type InsertBusinessDossier = typeof businessDossiers.$inferInsert;
+
+// AI Conversation History - Memory for AI assistant
+export const aiConversations = mysqlTable("ai_conversations", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  dossierId: int("dossierId").references(() => businessDossiers.id, { onDelete: "cascade" }),
+  
+  // Conversation Type
+  conversationType: mysqlEnum("conversationType", ["chat", "phone_call", "email"]).notNull(),
+  
+  // Message Content
+  role: mysqlEnum("role", ["user", "assistant", "system"]).notNull(),
+  content: text("content").notNull(),
+  
+  // Phone Call Specific
+  callDuration: int("callDuration"), // seconds
+  transcriptUrl: varchar("transcriptUrl", { length: 500 }), // S3 URL to full transcript
+  
+  // Metadata
+  metadata: text("metadata"), // JSON for additional context
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AIConversation = typeof aiConversations.$inferSelect;
+export type InsertAIConversation = typeof aiConversations.$inferInsert;
+
+
+// Important Dates - Calendar monitoring for proactive notifications
+export const importantDates = mysqlTable("important_dates", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  dossierId: int("dossierId").references(() => businessDossiers.id, { onDelete: "cascade" }),
+  
+  // Event Details
+  eventType: mysqlEnum("eventType", [
+    "sports_event",
+    "earnings_date",
+    "company_milestone",
+    "industry_event",
+    "product_launch",
+    "custom"
+  ]).notNull(),
+  
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  eventDate: timestamp("eventDate").notNull(),
+  
+  // Event-Specific Data
+  location: varchar("location", { length: 255 }),
+  sportsTeamId: int("sportsTeamId").references(() => sportsTeams.id, { onDelete: "set null" }),
+  
+  // External Data
+  externalId: varchar("externalId", { length: 255 }), // ID from external API (e.g., race ID, earnings ID)
+  externalSource: varchar("externalSource", { length: 100 }), // API source name
+  
+  // Notification Settings
+  notifyDaysBefore: int("notifyDaysBefore").default(3), // Days before event to send notification
+  notifyAfterEvent: int("notifyAfterEvent").default(1), // 1 = yes, 0 = no
+  
+  // Status
+  isActive: int("isActive").default(1).notNull(),
+  lastNotifiedAt: timestamp("lastNotifiedAt"),
+  postEventNotifiedAt: timestamp("postEventNotifiedAt"),
+  
+  // Event Outcome (for post-event notifications)
+  eventOutcome: text("eventOutcome"), // JSON with results, placement, scores, etc.
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ImportantDate = typeof importantDates.$inferSelect;
+export type InsertImportantDate = typeof importantDates.$inferInsert;
+
+// Event Notifications - Track sent notifications
+export const eventNotifications = mysqlTable("event_notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  importantDateId: int("importantDateId").notNull().references(() => importantDates.id, { onDelete: "cascade" }),
+  
+  // Notification Details
+  notificationType: mysqlEnum("notificationType", ["pre_event", "post_event"]).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  
+  // AI-Generated Draft
+  suggestedDraft: text("suggestedDraft"), // AI-generated press release draft
+  
+  // User Action
+  userAction: mysqlEnum("userAction", ["pending", "accepted", "dismissed"]).default("pending").notNull(),
+  actionedAt: timestamp("actionedAt"),
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type EventNotification = typeof eventNotifications.$inferSelect;
+export type InsertEventNotification = typeof eventNotifications.$inferInsert;

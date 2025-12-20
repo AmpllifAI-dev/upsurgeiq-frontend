@@ -41,6 +41,12 @@ import {
   createContentVersion,
   getContentVersions,
   getContentVersion,
+  createBusinessDossier,
+  getBusinessDossier,
+  updateBusinessDossier,
+  saveAIConversation,
+  getAIConversations,
+  getAIConversationsByDossier,
 } from "./db";
 import {
   createJournalist,
@@ -946,33 +952,59 @@ Generate a complete, publication-ready press release.`;
           });
         }
 
+        // Load business dossier for comprehensive context
+        const dossier = await getBusinessDossier(ctx.user.id);
         const business = await getUserBusiness(ctx.user.id);
-        if (!business) {
-          aiLogger.error("Business profile not found", undefined, {
-            userId: ctx.user.id,
-            action: "chat",
-          });
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Business profile not found",
-          });
+        
+        // Build comprehensive context from dossier
+        let contextInfo = "";
+        if (dossier) {
+          contextInfo = `
+
+## Business Dossier
+
+**Company:** ${dossier.companyName || "Unknown"}
+**Website:** ${dossier.website || "N/A"}
+**Industry:** ${dossier.industry || "General"}
+**Business Description:** ${dossier.businessDescription || "N/A"}
+
+**Services:**
+${dossier.services && dossier.services.length > 0 ? dossier.services.map((s: string) => `- ${s}`).join('\n') : "- N/A"}
+
+**Target Audience:** ${dossier.targetAudience || "N/A"}
+
+**Unique Selling Points:**
+${dossier.uniqueSellingPoints && dossier.uniqueSellingPoints.length > 0 ? dossier.uniqueSellingPoints.map((usp: string) => `- ${usp}`).join('\n') : "- N/A"}
+
+**Competitors:**
+${dossier.competitors && dossier.competitors.length > 0 ? dossier.competitors.map((c: string) => `- ${c}`).join('\n') : "- N/A"}
+
+**Brand Voice:** ${dossier.brandVoice || "Professional"}
+**Brand Tone:** ${dossier.brandTone || "N/A"}
+
+**Key Messages:**
+${dossier.keyMessages && dossier.keyMessages.length > 0 ? dossier.keyMessages.map((msg: string) => `- ${msg}`).join('\n') : "- N/A"}
+
+**Team:**
+${dossier.employees && dossier.employees.length > 0 ? dossier.employees.map((emp: any) => `- ${emp.name} (${emp.role})${emp.bio ? ': ' + emp.bio : ''}`).join('\n') : "- N/A"}
+
+**Contact:** ${dossier.contactEmail || "N/A"} | ${dossier.contactPhone || "N/A"}
+${dossier.sportsTeamAffiliation ? `**Sports Affiliation:** ${dossier.sportsTeamAffiliation}` : ""}
+`;
         }
 
-        const systemPrompt = `You are an expert PR and marketing consultant for ${input.context?.businessName || "a business"}. 
+        const systemPrompt = `You are an expert PR and marketing consultant for ${dossier?.companyName || input.context?.businessName || "a business"}. 
 
-Business Context:
-- Name: ${input.context?.businessName || "Unknown"}
-- Industry: ${input.context?.industry || "General"}
-- Brand Voice: ${input.context?.brandVoice || "Professional"}
+You have access to comprehensive business intelligence about this client. Use this information to provide highly personalized, contextual advice that aligns with their brand, industry, and business goals.${contextInfo}
 
 Your role is to:
-- Provide strategic PR and marketing advice
-- Help with content creation and messaging
-- Offer insights on media outreach and journalist relations
-- Suggest campaign ideas and tactics
-- Answer questions about best practices
+- Provide strategic PR and marketing advice tailored to their specific business
+- Help with content creation that matches their brand voice and key messages
+- Offer insights on media outreach considering their industry and competitors
+- Suggest campaign ideas that leverage their unique selling points
+- Answer questions using knowledge of their team, services, and target audience
 
-Be concise, actionable, and professional. Use markdown formatting for clarity.`;
+Be concise, actionable, and professional. Use markdown formatting for clarity. Always consider their business context when providing advice.`;
 
         try {
           const response = await invokeLLM({
@@ -1021,6 +1053,27 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
             description: `AI chat: ${input.message.substring(0, 50)}...`,
             metadata: { messageLength: input.message.length },
           });
+
+          // Save conversation to dossier memory
+          if (dossier) {
+            // Save user message
+            await saveAIConversation({
+              userId: ctx.user.id,
+              dossierId: dossier.id,
+              conversationType: "chat",
+              role: "user",
+              content: input.message,
+            });
+
+            // Save assistant response
+            await saveAIConversation({
+              userId: ctx.user.id,
+              dossierId: dossier.id,
+              conversationType: "chat",
+              role: "assistant",
+              content: typeof message === 'string' ? message : JSON.stringify(message),
+            });
+          }
 
           return { message: typeof message === 'string' ? message : '' };
         } catch (error) {
@@ -3913,6 +3966,145 @@ Generate a comprehensive campaign strategy that includes:
           .where(eq(socialConnections.id, input.connectionId));
 
         return { success: true };
+      }),
+  }),
+
+  // Business Dossier & AI Memory
+  businessDossier: router({
+    // Get user's business dossier
+    get: protectedProcedure.query(async ({ ctx }) => {
+      const dossier = await getBusinessDossier(ctx.user.id);
+      return dossier;
+    }),
+
+    // Analyze website and create/update dossier
+    analyzeWebsite: protectedProcedure
+      .input(z.object({ websiteUrl: z.string().url() }))
+      .mutation(async ({ ctx, input }) => {
+        const { analyzeWebsite } = await import("./websiteAnalysis");
+        
+        // Run website analysis
+        const analysis = await analyzeWebsite(input.websiteUrl);
+        
+        // Check if dossier exists
+        const existingDossier = await getBusinessDossier(ctx.user.id);
+        
+        if (existingDossier) {
+          // Update existing dossier
+          await updateBusinessDossier(ctx.user.id, {
+            website: input.websiteUrl,
+            companyName: analysis.companyName,
+            industry: analysis.industry,
+            businessDescription: analysis.businessDescription,
+            services: analysis.services,
+            targetAudience: analysis.targetAudience,
+            uniqueSellingPoints: analysis.uniqueSellingPoints,
+            competitors: analysis.competitors,
+            brandVoice: analysis.brandVoice,
+            brandTone: analysis.brandTone,
+            keyMessages: analysis.keyMessages,
+            employees: analysis.employees,
+            contactEmail: analysis.contactEmail,
+            contactPhone: analysis.contactPhone,
+            websiteAnalyzedAt: new Date(),
+            websiteAnalysisData: analysis,
+          });
+        } else {
+          // Create new dossier
+          await createBusinessDossier({
+            userId: ctx.user.id,
+            website: input.websiteUrl,
+            companyName: analysis.companyName,
+            industry: analysis.industry,
+            businessDescription: analysis.businessDescription,
+            services: analysis.services,
+            targetAudience: analysis.targetAudience,
+            uniqueSellingPoints: analysis.uniqueSellingPoints,
+            competitors: analysis.competitors,
+            brandVoice: analysis.brandVoice,
+            brandTone: analysis.brandTone,
+            keyMessages: analysis.keyMessages,
+            employees: analysis.employees,
+            contactEmail: analysis.contactEmail,
+            contactPhone: analysis.contactPhone,
+            websiteAnalyzedAt: new Date(),
+            websiteAnalysisData: analysis,
+          });
+        }
+        
+        return { success: true, analysis };
+      }),
+
+    // Update dossier manually
+    update: protectedProcedure
+      .input(
+        z.object({
+          companyName: z.string().optional(),
+          website: z.string().url().optional(),
+          industry: z.string().optional(),
+          sicCode: z.string().optional(),
+          businessDescription: z.string().optional(),
+          services: z.array(z.string()).optional(),
+          targetAudience: z.string().optional(),
+          uniqueSellingPoints: z.array(z.string()).optional(),
+          competitors: z.array(z.string()).optional(),
+          brandVoice: z.string().optional(),
+          brandTone: z.string().optional(),
+          keyMessages: z.array(z.string()).optional(),
+          employees: z.array(
+            z.object({
+              name: z.string(),
+              role: z.string(),
+              bio: z.string().optional(),
+            })
+          ).optional(),
+          primaryContact: z.string().optional(),
+          contactEmail: z.string().email().optional(),
+          contactPhone: z.string().optional(),
+          sportsTeamAffiliation: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await updateBusinessDossier(ctx.user.id, input);
+        return { success: true };
+      }),
+
+    // Save AI conversation
+    saveConversation: protectedProcedure
+      .input(
+        z.object({
+          conversationType: z.enum(["chat", "phone_call", "email"]),
+          role: z.enum(["user", "assistant", "system"]),
+          content: z.string(),
+          callDuration: z.number().optional(),
+          transcriptUrl: z.string().optional(),
+          metadata: z.any().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        // Get dossier ID if exists
+        const dossier = await getBusinessDossier(ctx.user.id);
+        
+        await saveAIConversation({
+          userId: ctx.user.id,
+          dossierId: dossier?.id,
+          conversationType: input.conversationType,
+          role: input.role,
+          content: input.content,
+          callDuration: input.callDuration,
+          transcriptUrl: input.transcriptUrl,
+          metadata: input.metadata,
+        });
+        
+        return { success: true };
+      }),
+
+    // Get AI conversation history
+    getConversations: protectedProcedure
+      .input(z.object({ limit: z.number().default(50) }))
+      .query(async ({ ctx, input }) => {
+        const conversations = await getAIConversations(ctx.user.id, input.limit);
+        return conversations;
       }),
   }),
 });

@@ -1,4 +1,4 @@
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser,
@@ -706,4 +706,361 @@ export async function getContentVersion(id: number) {
     .limit(1);
 
   return versions[0] || null;
+}
+
+
+// ==================== Business Dossier ====================
+
+export async function createBusinessDossier(data: {
+  userId: number;
+  companyName?: string;
+  website?: string;
+  industry?: string;
+  sicCode?: string;
+  businessDescription?: string;
+  services?: string[];
+  targetAudience?: string;
+  uniqueSellingPoints?: string[];
+  competitors?: string[];
+  brandVoice?: string;
+  brandTone?: string;
+  keyMessages?: string[];
+  employees?: Array<{ name: string; role: string; bio?: string }>;
+  primaryContact?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  sportsTeamAffiliation?: string;
+  websiteAnalyzedAt?: Date;
+  websiteAnalysisData?: any;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { businessDossiers } = await import("../drizzle/schema");
+
+  const result = await db.insert(businessDossiers).values({
+    userId: data.userId,
+    companyName: data.companyName,
+    website: data.website,
+    industry: data.industry,
+    sicCode: data.sicCode,
+    businessDescription: data.businessDescription,
+    services: data.services ? JSON.stringify(data.services) : null,
+    targetAudience: data.targetAudience,
+    uniqueSellingPoints: data.uniqueSellingPoints ? JSON.stringify(data.uniqueSellingPoints) : null,
+    competitors: data.competitors ? JSON.stringify(data.competitors) : null,
+    brandVoice: data.brandVoice,
+    brandTone: data.brandTone,
+    keyMessages: data.keyMessages ? JSON.stringify(data.keyMessages) : null,
+    employees: data.employees ? JSON.stringify(data.employees) : null,
+    primaryContact: data.primaryContact,
+    contactEmail: data.contactEmail,
+    contactPhone: data.contactPhone,
+    sportsTeamAffiliation: data.sportsTeamAffiliation,
+    websiteAnalyzedAt: data.websiteAnalyzedAt,
+    websiteAnalysisData: data.websiteAnalysisData ? JSON.stringify(data.websiteAnalysisData) : null,
+  });
+
+  return result;
+}
+
+export async function getBusinessDossier(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { businessDossiers } = await import("../drizzle/schema");
+
+  const dossiers = await db
+    .select()
+    .from(businessDossiers)
+    .where(eq(businessDossiers.userId, userId))
+    .limit(1);
+
+  const dossier = dossiers[0];
+  if (!dossier) return null;
+
+  // Parse JSON fields
+  return {
+    ...dossier,
+    services: dossier.services ? JSON.parse(dossier.services) : [],
+    uniqueSellingPoints: dossier.uniqueSellingPoints ? JSON.parse(dossier.uniqueSellingPoints) : [],
+    competitors: dossier.competitors ? JSON.parse(dossier.competitors) : [],
+    keyMessages: dossier.keyMessages ? JSON.parse(dossier.keyMessages) : [],
+    employees: dossier.employees ? JSON.parse(dossier.employees) : [],
+    websiteAnalysisData: dossier.websiteAnalysisData ? JSON.parse(dossier.websiteAnalysisData) : null,
+  };
+}
+
+export async function updateBusinessDossier(
+  userId: number,
+  data: Partial<{
+    companyName: string;
+    website: string;
+    industry: string;
+    sicCode: string;
+    businessDescription: string;
+    services: string[];
+    targetAudience: string;
+    uniqueSellingPoints: string[];
+    competitors: string[];
+    brandVoice: string;
+    brandTone: string;
+    keyMessages: string[];
+    employees: Array<{ name: string; role: string; bio?: string }>;
+    primaryContact: string;
+    contactEmail: string;
+    contactPhone: string;
+    sportsTeamAffiliation: string;
+    websiteAnalyzedAt: Date;
+    websiteAnalysisData: any;
+  }>
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { businessDossiers } = await import("../drizzle/schema");
+
+  const updateData: any = {};
+  if (data.companyName !== undefined) updateData.companyName = data.companyName;
+  if (data.website !== undefined) updateData.website = data.website;
+  if (data.industry !== undefined) updateData.industry = data.industry;
+  if (data.sicCode !== undefined) updateData.sicCode = data.sicCode;
+  if (data.businessDescription !== undefined) updateData.businessDescription = data.businessDescription;
+  if (data.services !== undefined) updateData.services = JSON.stringify(data.services);
+  if (data.targetAudience !== undefined) updateData.targetAudience = data.targetAudience;
+  if (data.uniqueSellingPoints !== undefined) updateData.uniqueSellingPoints = JSON.stringify(data.uniqueSellingPoints);
+  if (data.competitors !== undefined) updateData.competitors = JSON.stringify(data.competitors);
+  if (data.brandVoice !== undefined) updateData.brandVoice = data.brandVoice;
+  if (data.brandTone !== undefined) updateData.brandTone = data.brandTone;
+  if (data.keyMessages !== undefined) updateData.keyMessages = JSON.stringify(data.keyMessages);
+  if (data.employees !== undefined) updateData.employees = JSON.stringify(data.employees);
+  if (data.primaryContact !== undefined) updateData.primaryContact = data.primaryContact;
+  if (data.contactEmail !== undefined) updateData.contactEmail = data.contactEmail;
+  if (data.contactPhone !== undefined) updateData.contactPhone = data.contactPhone;
+  if (data.sportsTeamAffiliation !== undefined) updateData.sportsTeamAffiliation = data.sportsTeamAffiliation;
+  if (data.websiteAnalyzedAt !== undefined) updateData.websiteAnalyzedAt = data.websiteAnalyzedAt;
+  if (data.websiteAnalysisData !== undefined) updateData.websiteAnalysisData = JSON.stringify(data.websiteAnalysisData);
+
+  const result = await db
+    .update(businessDossiers)
+    .set(updateData)
+    .where(eq(businessDossiers.userId, userId));
+
+  return result;
+}
+
+// ==================== AI Conversations ====================
+
+export async function saveAIConversation(data: {
+  userId: number;
+  dossierId?: number;
+  conversationType: "chat" | "phone_call" | "email";
+  role: "user" | "assistant" | "system";
+  content: string;
+  callDuration?: number;
+  transcriptUrl?: string;
+  metadata?: any;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { aiConversations } = await import("../drizzle/schema");
+
+  const result = await db.insert(aiConversations).values({
+    userId: data.userId,
+    dossierId: data.dossierId,
+    conversationType: data.conversationType,
+    role: data.role,
+    content: data.content,
+    callDuration: data.callDuration,
+    transcriptUrl: data.transcriptUrl,
+    metadata: data.metadata ? JSON.stringify(data.metadata) : null,
+  });
+
+  return result;
+}
+
+export async function getAIConversations(userId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { aiConversations } = await import("../drizzle/schema");
+
+  const conversations = await db
+    .select()
+    .from(aiConversations)
+    .where(eq(aiConversations.userId, userId))
+    .orderBy(desc(aiConversations.createdAt))
+    .limit(limit);
+
+  return conversations.map(conv => ({
+    ...conv,
+    metadata: conv.metadata ? JSON.parse(conv.metadata) : null,
+  }));
+}
+
+export async function getAIConversationsByDossier(dossierId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { aiConversations } = await import("../drizzle/schema");
+
+  const conversations = await db
+    .select()
+    .from(aiConversations)
+    .where(eq(aiConversations.dossierId, dossierId))
+    .orderBy(desc(aiConversations.createdAt))
+    .limit(limit);
+
+  return conversations.map(conv => ({
+    ...conv,
+    metadata: conv.metadata ? JSON.parse(conv.metadata) : null,
+  }));
+}
+
+
+// ==================== Important Dates ====================
+
+export async function createImportantDate(data: {
+  userId: number;
+  dossierId?: number;
+  eventType: "sports_event" | "earnings_date" | "company_milestone" | "industry_event" | "product_launch" | "custom";
+  title: string;
+  description?: string;
+  eventDate: Date;
+  location?: string;
+  sportsTeamId?: number;
+  externalId?: string;
+  externalSource?: string;
+  notifyDaysBefore?: number;
+  notifyAfterEvent?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { importantDates } = await import("../drizzle/schema");
+
+  const result = await db.insert(importantDates).values(data);
+  return result;
+}
+
+export async function getImportantDates(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { importantDates } = await import("../drizzle/schema");
+
+  return await db
+    .select()
+    .from(importantDates)
+    .where(eq(importantDates.userId, userId))
+    .orderBy(importantDates.eventDate);
+}
+
+export async function updateImportantDate(
+  id: number,
+  userId: number,
+  data: Partial<{
+    title: string;
+    description: string;
+    eventDate: Date;
+    location: string;
+    notifyDaysBefore: number;
+    notifyAfterEvent: number;
+    isActive: number;
+    lastNotifiedAt: Date;
+    postEventNotifiedAt: Date;
+    eventOutcome: any;
+  }>
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { importantDates } = await import("../drizzle/schema");
+
+  const updateData: any = {};
+  if (data.title !== undefined) updateData.title = data.title;
+  if (data.description !== undefined) updateData.description = data.description;
+  if (data.eventDate !== undefined) updateData.eventDate = data.eventDate;
+  if (data.location !== undefined) updateData.location = data.location;
+  if (data.notifyDaysBefore !== undefined) updateData.notifyDaysBefore = data.notifyDaysBefore;
+  if (data.notifyAfterEvent !== undefined) updateData.notifyAfterEvent = data.notifyAfterEvent;
+  if (data.isActive !== undefined) updateData.isActive = data.isActive;
+  if (data.lastNotifiedAt !== undefined) updateData.lastNotifiedAt = data.lastNotifiedAt;
+  if (data.postEventNotifiedAt !== undefined) updateData.postEventNotifiedAt = data.postEventNotifiedAt;
+  if (data.eventOutcome !== undefined) updateData.eventOutcome = JSON.stringify(data.eventOutcome);
+
+  const result = await db
+    .update(importantDates)
+    .set(updateData)
+    .where(and(eq(importantDates.id, id), eq(importantDates.userId, userId)));
+
+  return result;
+}
+
+export async function deleteImportantDate(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { importantDates } = await import("../drizzle/schema");
+
+  const result = await db
+    .delete(importantDates)
+    .where(and(eq(importantDates.id, id), eq(importantDates.userId, userId)));
+
+  return result;
+}
+
+// ==================== Event Notifications ====================
+
+export async function createEventNotification(data: {
+  userId: number;
+  importantDateId: number;
+  notificationType: "pre_event" | "post_event";
+  title: string;
+  message: string;
+  suggestedDraft?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { eventNotifications } = await import("../drizzle/schema");
+
+  const result = await db.insert(eventNotifications).values(data);
+  return result;
+}
+
+export async function getEventNotifications(userId: number, limit: number = 20) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { eventNotifications } = await import("../drizzle/schema");
+
+  return await db
+    .select()
+    .from(eventNotifications)
+    .where(eq(eventNotifications.userId, userId))
+    .orderBy(desc(eventNotifications.createdAt))
+    .limit(limit);
+}
+
+export async function updateEventNotificationAction(
+  id: number,
+  userId: number,
+  action: "accepted" | "dismissed"
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { eventNotifications } = await import("../drizzle/schema");
+
+  const result = await db
+    .update(eventNotifications)
+    .set({
+      userAction: action,
+      actionedAt: new Date(),
+    })
+    .where(and(eq(eventNotifications.id, id), eq(eventNotifications.userId, userId)));
+
+  return result;
 }

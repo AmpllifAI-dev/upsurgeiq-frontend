@@ -1695,4 +1695,38 @@
 - [x] Implement connection health monitoring with token expiration tracking
 - [x] Add visual indicators for connection health status (healthy/expiring/expired badges)
 - [x] Add expiration warning alert when tokens need renewal
+- [x] Fix "UpsurgeIQ" capitalization in help section
 - [ ] Save checkpoint with enhanced OAuth features
+
+
+## Business Dossier & AI Memory System (December 20, 2025)
+- [x] Design database schema for business dossier (company info, brand voice, competitors, employees)
+- [x] Design database schema for AI conversation history (chat + phone transcripts)
+- [x] Push database schema changes (business_dossiers and ai_conversations tables created)
+- [x] Create website analysis service with AI-powered content extraction
+- [x] Add database helpers for business dossier CRUD operations
+- [x] Create tRPC procedures for website analysis and dossier management
+- [x] Store analyzed website data in business dossier
+- [x] Build AI conversation memory storage (save chat messages and phone call transcripts)
+- [x] Create dossier retrieval system for AI assistant context
+- [x] Integrate full dossier context into AI assistant queries
+- [x] Save all AI chat conversations to dossier memory automatically
+- [x] Keep dossier as background system (no user-facing UI needed)
+- [ ] Test AI assistant with dossier context
+- [ ] Save checkpoint with complete business intelligence system
+
+
+## Intelligent Calendar Monitoring System (December 20, 2025)
+- [x] Design database schema for important dates (sports events, earnings, milestones)
+- [x] Add event types enum (sports_event, earnings_date, company_milestone, custom)
+- [x] Push schema changes (important_dates and event_notifications tables created)
+- [x] Create event monitoring service to check upcoming dates
+- [x] Add placeholders for external API integrations (sports results, earnings dates)
+- [x] Build AI notification generator for pre-event and post-event messages
+- [x] Add database helpers for important dates CRUD operations
+- [ ] Implement scheduled job to run daily calendar checks
+- [ ] Create tRPC procedures for managing important dates
+- [ ] Build UI for adding/editing important dates
+- [ ] Add notification system for proactive event alerts
+- [ ] Test calendar monitoring with sample events
+- [ ] Save checkpoint with intelligent calendar system
