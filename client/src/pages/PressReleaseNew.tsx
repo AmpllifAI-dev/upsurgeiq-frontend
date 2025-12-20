@@ -16,7 +16,7 @@ import { Streamdown } from "streamdown";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { CopyButton } from "@/components/CopyButton";
 import { CharacterCounter } from "@/components/CharacterCounter";
-import { AIImageGenerator } from "@/components/AIImageGenerator";
+import { PressReleaseImageGenerator } from "@/components/PressReleaseImageGenerator";
 import { WordCountPurchaseCTA } from "@/components/WordCountPurchaseCTA";
 
 export default function PressReleaseNew() {
@@ -386,25 +386,28 @@ export default function PressReleaseNew() {
                     rows={20}
                     className="font-mono text-sm"
                   />
-                  <div className="flex gap-2 flex-wrap">
-                    <AIImageGenerator
+                  <div className="space-y-4">
+                    <PressReleaseImageGenerator
+                      title={topic}
+                      content={generatedContent}
                       onImageGenerated={(url) => setGeneratedImageUrl(url)}
-                      suggestedPrompt={topic ? `Professional image for: ${topic}` : undefined}
                     />
-                    <Button
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() => setIsEditing(false)}
-                    >
-                      Preview
-                    </Button>
-                    <Button
-                      className="flex-1"
-                      onClick={handleSave}
-                      disabled={saveMutation.isPending}
-                    >
-                      Save Changes
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => setIsEditing(false)}
+                      >
+                        Preview
+                      </Button>
+                      <Button
+                        className="flex-1"
+                        onClick={handleSave}
+                        disabled={saveMutation.isPending}
+                      >
+                        Save Changes
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}

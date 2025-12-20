@@ -1444,7 +1444,7 @@
 - [x] Add style and mood presets (photorealistic, illustration, corporate, etc.)
 - [x] Add tRPC procedures for image generation (generateImage, regenerateImage, getImageStylePresets)
 - [x] Create PressReleaseImageGenerator component with preview and regeneration
-- [ ] Integrate image generator into PressReleaseNew page
+- [x] Integrate image generator into PressReleaseNew page
 - [ ] Implement image attachment to press releases
 - [ ] Add image credit consumption tracking
 - [ ] Create image library for reuse
@@ -1470,3 +1470,30 @@
 - [ ] Implement direct social media API integration (OAuth)
 - [ ] Replace Make.com dependency with native posting
 - [ ] Add multi-account management per user
+
+
+## Infrastructure Cost Analysis (December 20, 2025)
+- [x] Calculate Manus hosting costs per user/plan
+- [x] Analyze S3 storage costs for press releases, images, documents
+- [x] Calculate database storage and query costs (TiDB)
+- [x] Estimate email sending costs (SendGrid)
+- [x] Calculate LLM API costs per feature (press releases, campaigns, chat)
+- [x] Estimate image generation costs per plan
+- [x] Calculate social media API costs (if applicable)
+- [x] Project scaling costs at 100, 500, 1000, 5000 users
+- [x] Create cost per customer analysis by plan tier
+- [x] Document cost optimization opportunities
+- [x] Create living document for future product cost additions
+
+## Feature Implementation Continuation (December 20, 2025)
+- [x] Integrate PressReleaseImageGenerator into PressReleaseNew page
+- [ ] Add image attachment to press release database schema
+- [ ] Implement image credit consumption tracking on generation
+- [x] Build Twitter OAuth flow and token storage
+- [x] Build LinkedIn OAuth flow and token storage
+- [x] Build Facebook OAuth flow and token storage
+- [ ] Create social media account management UI
+- [ ] Implement direct posting to Twitter/LinkedIn/Facebook
+- [ ] Create press release scheduling UI with date/time picker
+- [ ] Build background job processor for scheduled releases
+- [ ] Add scheduled release management dashboard
