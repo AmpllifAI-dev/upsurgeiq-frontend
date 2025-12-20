@@ -1407,3 +1407,60 @@
 - [x] Include current credit balance in purchase emails
 - [x] Test webhook fulfillment end-to-end
 - [x] Document email notification templates
+
+
+## Future Enhancements (Pinned for Later)
+- [ ] Create dynamic landing pages for different marketing campaigns
+- [ ] Add purchase analytics tracking and reporting
+- [ ] Implement usage dashboard for users to view consumption history
+
+## AI-Powered Website Research & Analysis (December 20, 2025)
+- [x] Create website scraping and analysis backend service
+- [x] Implement AI-powered content extraction from URLs
+- [x] Build company information extraction (about, products, news)
+- [x] Add competitor analysis features
+- [x] Add website research database schema
+- [ ] Create website research UI component
+- [ ] Integrate research data into press release generation
+- [ ] Add research history and caching
+
+## Sports Team Integration (December 20, 2025)
+- [ ] Design sports team database schema (all sports, not just motorsports)
+- [ ] Create team profile management (name, sport, league, location)
+- [ ] Add team roster and player management
+- [ ] Build match/game schedule integration
+- [ ] Create team statistics tracking
+- [ ] Add team-specific press release templates
+- [ ] Integrate team data into campaign strategies
+- [ ] Build team selection and filtering UI
+
+## AI-Powered Image Generation for Press Releases (December 20, 2025)
+- [ ] Integrate image generation API into press release flow
+- [ ] Create image prompt generation from press release content
+- [ ] Add image style selection (photorealistic, illustration, abstract)
+- [ ] Build image preview and regeneration UI
+- [ ] Implement image attachment to press releases
+- [ ] Add image credit consumption tracking
+- [ ] Create image library for reuse
+
+## Press Release Scheduling (December 20, 2025)
+- [x] Design scheduled press release database schema
+- [ ] Create scheduling UI with date/time picker
+- [ ] Implement timezone handling
+- [ ] Build scheduled job processor
+- [ ] Add email notifications before scheduled release
+- [ ] Create schedule management dashboard
+- [ ] Implement schedule editing and cancellation
+- [ ] Add recurring schedule options
+
+## Platform-Specific Social Media Post Generation (December 20, 2025)
+- [ ] Design social media post database schema
+- [ ] Create platform-specific character limits (Twitter, LinkedIn, Facebook)
+- [ ] Implement AI-powered post adaptation from press releases
+- [ ] Add hashtag generation and optimization
+- [ ] Build platform-specific formatting (threads, carousels)
+- [ ] Create social media preview UI
+- [ ] Add post scheduling integration
+- [ ] Implement direct social media API integration (OAuth)
+- [ ] Replace Make.com dependency with native posting
+- [ ] Add multi-account management per user

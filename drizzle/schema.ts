@@ -881,3 +881,53 @@ export type ImageCredit = typeof imageCredits.$inferSelect;
 export type InsertImageCredit = typeof imageCredits.$inferInsert;
 
 // ========================================
+
+
+// Website Research (AI-powered company analysis)
+export const websiteResearch = mysqlTable("website_research", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  businessId: int("businessId").references(() => businesses.id, { onDelete: "cascade" }),
+  url: varchar("url", { length: 500 }).notNull(),
+  companyName: varchar("companyName", { length: 255 }),
+  industry: varchar("industry", { length: 255 }),
+  description: text("description"),
+  products: json("products"), // Array of strings
+  recentNews: json("recentNews"), // Array of strings
+  keyPeople: json("keyPeople"), // Array of {name, role}
+  contactInfo: json("contactInfo"), // {email, phone, address}
+  socialMedia: json("socialMedia"), // {twitter, linkedin, facebook}
+  competitors: json("competitors"), // Array of strings
+  keyMessages: json("keyMessages"), // Array of strings
+  brandTone: varchar("brandTone", { length: 255 }),
+  targetAudience: text("targetAudience"),
+  rawContent: text("rawContent"), // First 5000 chars of website
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type WebsiteResearch = typeof websiteResearch.$inferSelect;
+export type InsertWebsiteResearch = typeof websiteResearch.$inferInsert;
+
+// Scheduled Press Releases
+export const scheduledPressReleases = mysqlTable("scheduled_press_releases", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  businessId: int("businessId").references(() => businesses.id, { onDelete: "cascade" }),
+  pressReleaseId: int("pressReleaseId").references(() => pressReleases.id, { onDelete: "cascade" }),
+  title: varchar("title", { length: 500 }).notNull(),
+  content: text("content").notNull(),
+  scheduledDate: timestamp("scheduledDate").notNull(),
+  timezone: varchar("timezone", { length: 100 }).default("UTC"),
+  status: mysqlEnum("status", ["pending", "sent", "failed", "canceled"]).default("pending"),
+  distributionLists: json("distributionLists"), // Array of media list IDs
+  socialMediaPosts: json("socialMediaPosts"), // Array of platform-specific posts
+  sentAt: timestamp("sentAt"),
+  errorMessage: text("errorMessage"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ScheduledPressRelease = typeof scheduledPressReleases.$inferSelect;
+export type InsertScheduledPressRelease = typeof scheduledPressReleases.$inferInsert;
+
+// ========================================
