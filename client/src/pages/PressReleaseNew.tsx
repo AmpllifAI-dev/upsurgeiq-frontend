@@ -36,6 +36,9 @@ export default function PressReleaseNew() {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [showPurchaseCTA, setShowPurchaseCTA] = useState(false);
+  const [scheduledDate, setScheduledDate] = useState<string>("");
+  const [scheduledTime, setScheduledTime] = useState<string>("");
+  const [timezone, setTimezone] = useState<string>(Intl.DateTimeFormat().resolvedOptions().timeZone);
   const [wordCountError, setWordCountError] = useState<{
     requiredWords: number;
     tierLimit: number;
@@ -149,10 +152,18 @@ export default function PressReleaseNew() {
       return;
     }
 
+    // Combine date and time for scheduling
+    let scheduledFor: string | undefined;
+    if (scheduledDate && scheduledTime) {
+      scheduledFor = `${scheduledDate}T${scheduledTime}:00`;
+    }
+
     saveMutation.mutate({
       title: topic,
       content: generatedContent,
-      status: "draft",
+      imageUrl: generatedImageUrl || uploadedImageUrl || undefined,
+      status: scheduledFor ? "scheduled" : "draft",
+      scheduledFor,
     });
   };
 
@@ -420,6 +431,58 @@ export default function PressReleaseNew() {
                       content={generatedContent}
                       onImageGenerated={(url) => setGeneratedImageUrl(url)}
                     />
+                    {/* Scheduling Section */}
+                    <Card className="border-dashed">
+                      <CardHeader>
+                        <CardTitle className="text-sm">Schedule Publication (Optional)</CardTitle>
+                        <CardDescription className="text-xs">
+                          Leave blank to save as draft, or set a future date to schedule automatic publication
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-2">
+                            <Label htmlFor="scheduledDate" className="text-xs">Date</Label>
+                            <Input
+                              id="scheduledDate"
+                              type="date"
+                              value={scheduledDate}
+                              onChange={(e) => setScheduledDate(e.target.value)}
+                              min={new Date().toISOString().split('T')[0]}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="scheduledTime" className="text-xs">Time</Label>
+                            <Input
+                              id="scheduledTime"
+                              type="time"
+                              value={scheduledTime}
+                              onChange={(e) => setScheduledTime(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="timezone" className="text-xs">Timezone</Label>
+                          <Select value={timezone} onValueChange={setTimezone}>
+                            <SelectTrigger id="timezone">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="UTC">UTC</SelectItem>
+                              <SelectItem value="America/New_York">Eastern Time (US)</SelectItem>
+                              <SelectItem value="America/Chicago">Central Time (US)</SelectItem>
+                              <SelectItem value="America/Denver">Mountain Time (US)</SelectItem>
+                              <SelectItem value="America/Los_Angeles">Pacific Time (US)</SelectItem>
+                              <SelectItem value="Europe/London">London (GMT/BST)</SelectItem>
+                              <SelectItem value="Europe/Paris">Paris (CET/CEST)</SelectItem>
+                              <SelectItem value="Asia/Tokyo">Tokyo (JST)</SelectItem>
+                              <SelectItem value="Australia/Sydney">Sydney (AEDT/AEST)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </CardContent>
+                    </Card>
+
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
@@ -433,7 +496,7 @@ export default function PressReleaseNew() {
                         onClick={handleSave}
                         disabled={saveMutation.isPending}
                       >
-                        Save Changes
+                        {scheduledDate && scheduledTime ? "Schedule Release" : "Save as Draft"}
                       </Button>
                     </div>
                   </div>

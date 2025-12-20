@@ -148,6 +148,7 @@ import { createCheckoutSession, createPortalSession, createMediaListPurchaseSess
 import { getProductByTier } from "./products";
 import { invokeLLM } from "./_core/llm";
 import { generateImage } from "./_core/imageGeneration";
+import { generateSocialPostsFromPressRelease, generateSocialMediaImages } from "./socialPostGeneration";
 import { logCreditUsage, estimateCreditsFromTokens } from "./creditLogger";
 import { checkCreditAlerts, initializeDefaultAlerts } from "./costAlertChecker";
 import { getErrorLogs, getErrorStats } from "./errorLogs";
@@ -546,8 +547,11 @@ Generate a complete, publication-ready press release.`;
       .input(
         z.object({
           title: z.string(),
+          subtitle: z.string().optional(),
           content: z.string(),
+          imageUrl: z.string().optional(),
           status: z.enum(["draft", "scheduled", "published"]),
+          scheduledFor: z.string().optional(), // ISO date string
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -568,12 +572,18 @@ Generate a complete, publication-ready press release.`;
           });
         }
 
+        // If scheduledFor is provided, set status to scheduled
+        const status = input.scheduledFor ? "scheduled" : input.status;
+
         const pressRelease = await createPressRelease({
           userId: ctx.user.id,
           businessId: business.id,
           title: input.title,
+          subtitle: input.subtitle,
           body: input.content,
-          status: input.status,
+          imageUrl: input.imageUrl,
+          scheduledFor: input.scheduledFor ? new Date(input.scheduledFor) : undefined,
+          status: status,
         });
 
         // Increment usage counter
@@ -699,9 +709,104 @@ Generate a complete, publication-ready press release.`;
     getImageStylePresets: publicProcedure.query(() => {
       return getImageStylePresets();
     }),
+
+    generateSocialPosts: protectedProcedure
+      .input(
+        z.object({
+          pressReleaseId: z.number(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        // Get the press release
+        const pressRelease = await getPressReleaseById(input.pressReleaseId);
+        if (!pressRelease) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Press release not found",
+          });
+        }
+
+        // Get business for brand voice
+        const business = await getUserBusiness(ctx.user.id);
+        if (!business) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Business profile not found",
+          });
+        }
+
+        // Generate platform-specific posts
+        const posts = await generateSocialPostsFromPressRelease({
+          pressReleaseTitle: pressRelease.title,
+          pressReleaseContent: pressRelease.body,
+          pressReleaseImageUrl: pressRelease.imageUrl || undefined,
+          brandVoice: business.brandVoiceTone || "professional",
+          targetAudience: business.targetAudience || "general audience",
+          companyName: business.name,
+        });
+
+        // Save posts to database
+        const savedPosts = await Promise.all(
+          posts.map((post) =>
+            createSocialMediaPost({
+              businessId: business.id,
+              platform: post.platform,
+              content: post.content,
+              imageUrl: post.imageUrl,
+              status: "draft",
+              pressReleaseId: input.pressReleaseId,
+            })
+          )
+        );
+
+        // Log activity
+        await logActivity({
+          userId: ctx.user.id,
+          action: "social_posts_generated",
+          entityType: "press_release",
+          entityId: input.pressReleaseId,
+          description: `Generated ${posts.length} social media posts from press release`,
+          metadata: { platforms: posts.map((p) => p.platform) },
+        });
+
+        return savedPosts;
+      }),
   }),
 
   socialMedia: router({
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          content: z.string().optional(),
+          status: z.enum(["draft", "scheduled", "published", "failed"]).optional(),
+          scheduledFor: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { id, scheduledFor, ...rest } = input;
+        const updates: any = { ...rest };
+        if (scheduledFor) {
+          updates.scheduledFor = new Date(scheduledFor);
+        }
+        
+        // Update the post (need to implement updateSocialMediaPost in db.ts)
+        const { updateSocialMediaPost } = await import("./socialMediaPosts");
+        await updateSocialMediaPost(id, updates);
+
+        // Log activity
+        await logActivity({
+          userId: ctx.user.id,
+          action: "update",
+          entityType: "social_media_post",
+          entityId: id,
+          description: "Updated social media post",
+          metadata: updates,
+        });
+
+        return { success: true };
+      }),
+
     list: protectedProcedure.query(async ({ ctx }) => {
       const business = await getUserBusiness(ctx.user.id);
       if (!business) {

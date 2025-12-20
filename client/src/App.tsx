@@ -14,7 +14,11 @@ import Subscribe from "./pages/Subscribe";
 import Onboarding from "./pages/Onboarding";
 import PressReleaseNew from "./pages/PressReleaseNew";
 import PressReleases from "./pages/PressReleases";
+import CampaignReview from "./pages/CampaignReview";
 import SocialMediaNew from "./pages/SocialMediaNew";
+import SocialMedia from "./pages/SocialMedia";
+import Campaigns from "./pages/Campaigns";
+import Upgrade from "./pages/Upgrade";
 import MediaLists from "./pages/MediaLists";
 import AIAssistant from "./pages/AIAssistant";
 import CampaignLab from "./pages/CampaignLab";
@@ -56,9 +60,14 @@ function Router() {
       <Route path="/onboarding" component={Onboarding} />
       <Route path="/press-releases/new" component={PressReleaseNew} />
       <Route path="/press-releases" component={PressReleases} />
+      <Route path="/campaign-review/:id" component={CampaignReview} />
       <Route path="/press-release/:id/distribution" component={PressReleaseDistribution} />
       <Route path="/press-releases/:id/distribute" component={DistributePressRelease} />
       <Route path="/social-media/new" component={SocialMediaNew} />
+      <Route path="/social-media" component={SocialMedia} />
+      <Route path="/campaigns" component={Campaigns} />
+      <Route path="/upgrade" component={Upgrade} />
+      <Route path="/dashboard/upgrade" component={Upgrade} />
       <Route path="/media-lists" component={MediaLists} />
       <Route path="/journalists" component={JournalistList} />
       <Route path="/journalists/new" component={JournalistForm} />

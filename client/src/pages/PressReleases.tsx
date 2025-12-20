@@ -86,6 +86,40 @@ export default function PressReleases() {
     },
   });
 
+  // Filter and sort press releases - MUST be before early returns to avoid hooks error
+  const filteredPressReleases = useMemo(() => {
+    if (!pressReleases) return [];
+    
+    // Filter
+    let filtered = pressReleases.filter((pr) => {
+      const matchesSearch = searchQuery === "" || 
+        pr.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (pr.subtitle && pr.subtitle.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        pr.body.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesStatus = statusFilter === "all" || pr.status === statusFilter;
+      
+      return matchesSearch && matchesStatus;
+    });
+    
+    // Sort
+    filtered.sort((a, b) => {
+      let comparison = 0;
+      
+      if (sortBy === "date") {
+        comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      } else if (sortBy === "title") {
+        comparison = a.title.localeCompare(b.title);
+      } else if (sortBy === "status") {
+        comparison = a.status.localeCompare(b.status);
+      }
+      
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
+    
+    return filtered;
+  }, [pressReleases, searchQuery, statusFilter, sortBy, sortOrder]);
+
   if (loading || isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -194,40 +228,6 @@ export default function PressReleases() {
     };
     return variants[status] || "secondary";
   };
-
-  // Filter and sort press releases
-  const filteredPressReleases = useMemo(() => {
-    if (!pressReleases) return [];
-    
-    // Filter
-    let filtered = pressReleases.filter((pr) => {
-      const matchesSearch = searchQuery === "" || 
-        pr.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (pr.subtitle && pr.subtitle.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        pr.body.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      const matchesStatus = statusFilter === "all" || pr.status === statusFilter;
-      
-      return matchesSearch && matchesStatus;
-    });
-    
-    // Sort
-    filtered.sort((a, b) => {
-      let comparison = 0;
-      
-      if (sortBy === "date") {
-        comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-      } else if (sortBy === "title") {
-        comparison = a.title.localeCompare(b.title);
-      } else if (sortBy === "status") {
-        comparison = a.status.localeCompare(b.status);
-      }
-      
-      return sortOrder === "asc" ? comparison : -comparison;
-    });
-    
-    return filtered;
-  }, [pressReleases, searchQuery, statusFilter, sortBy, sortOrder]);
 
   return (
     <div className="min-h-screen bg-background">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,6 +34,21 @@ export default function Onboarding() {
   const [aiImageStyle, setAiImageStyle] = useState("");
   const [aiImageMood, setAiImageMood] = useState("");
 
+  // Check if user already has a business profile
+  const { data: existingBusiness, isLoading: checkingBusiness } = trpc.business.get.useQuery(undefined, {
+    enabled: !!user,
+  });
+
+  // Redirect to dashboard if business already exists
+  useEffect(() => {
+    if (existingBusiness) {
+      toast.info("You already have a business profile", {
+        description: "Redirecting to dashboard..."
+      });
+      setTimeout(() => setLocation("/dashboard"), 1000);
+    }
+  }, [existingBusiness, setLocation]);
+
   const createBusinessMutation = trpc.business.create.useMutation({
     onSuccess: () => {
       setCurrentStep("complete");
@@ -42,8 +57,16 @@ export default function Onboarding() {
         setLocation("/dashboard");
       }, 2000);
     },
-    onError: (error) => {
-      toast.error(error.message || "Failed to create business profile");
+    onError: (error: any) => {
+      setIsGeneratingDossier(false);
+      if (error.message?.includes("already has a business profile")) {
+        toast.info("You already have a business profile", {
+          description: "Redirecting to dashboard..."
+        });
+        setTimeout(() => setLocation("/dashboard"), 1000);
+      } else {
+        toast.error(error.message || "Failed to create business profile");
+      }
     },
   });
 
@@ -134,29 +157,58 @@ export default function Onboarding() {
     }
   };
 
+  const analyzeWebsiteMutation = trpc.businessDossier.analyzeWebsite.useMutation();
+
   const handleComplete = async () => {
     setIsGeneratingDossier(true);
     
-    // Simulate AI dossier generation
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      // Trigger AI-powered website analysis
+      toast.info("Analyzing your website...", { description: "This may take a moment" });
+      
+      const analysisResult = await analyzeWebsiteMutation.mutateAsync({ websiteUrl: website });
+      
+      toast.success("Website analyzed successfully!");
 
-    const dossier = `${companyName} is a ${sicGroup} company focused on ${targetAudience || "their target market"}. 
-    The brand communicates with a ${brandTone} tone and ${brandStyle} style, positioning itself as a professional 
-    and innovative player in the ${sicSection} sector.`;
+      // Create business profile with basic info
+      createBusinessMutation.mutate({
+        name: companyName,
+        website,
+        sicSection,
+        sicDivision,
+        sicGroup,
+        brandVoiceTone: brandTone as any,
+        brandVoiceStyle: brandStyle as any,
+        targetAudience,
+        dossier: analysisResult.analysis.businessDescription || `${companyName} - ${sicGroup}`,
+        aiImageStyle,
+        aiImageMood,
+      });
+    } catch (error: any) {
+      setIsGeneratingDossier(false);
+      toast.error("Website analysis failed", {
+        description: error.message || "We'll create your profile with the information you provided."
+      });
+      
+      // Fallback: create profile without website analysis
+      const fallbackDossier = `${companyName} is a ${sicGroup} company focused on ${targetAudience || "their target market"}. 
+      The brand communicates with a ${brandTone} tone and ${brandStyle} style, positioning itself as a professional 
+      and innovative player in the ${sicSection} sector.`;
 
-    createBusinessMutation.mutate({
-      name: companyName,
-      website,
-      sicSection,
-      sicDivision,
-      sicGroup,
-      brandVoiceTone: brandTone as any,
-      brandVoiceStyle: brandStyle as any,
-      targetAudience,
-      dossier,
-      aiImageStyle,
-      aiImageMood,
-    });
+      createBusinessMutation.mutate({
+        name: companyName,
+        website,
+        sicSection,
+        sicDivision,
+        sicGroup,
+        brandVoiceTone: brandTone as any,
+        brandVoiceStyle: brandStyle as any,
+        targetAudience,
+        dossier: fallbackDossier,
+        aiImageStyle,
+        aiImageMood,
+      });
+    }
   };
 
   const handleBack = () => {
@@ -408,28 +460,34 @@ export default function Onboarding() {
                   Connect your social media accounts to enable automatic posting. You can also do this later from your dashboard.
                 </p>
                 <div className="grid grid-cols-2 gap-4">
-                  <Button variant="outline" className="h-20" disabled>
+                  <Button 
+                    variant="outline" 
+                    className="h-20"
+                    onClick={() => window.location.href = '/api/oauth/facebook'}
+                  >
                     <div className="text-center">
                       <div className="font-semibold">Facebook</div>
-                      <div className="text-xs text-muted-foreground">Coming soon</div>
+                      <div className="text-xs text-muted-foreground">Click to connect</div>
                     </div>
                   </Button>
-                  <Button variant="outline" className="h-20" disabled>
+                  <Button 
+                    variant="outline" 
+                    className="h-20"
+                    onClick={() => window.location.href = '/api/oauth/instagram'}
+                  >
                     <div className="text-center">
                       <div className="font-semibold">Instagram</div>
-                      <div className="text-xs text-muted-foreground">Coming soon</div>
+                      <div className="text-xs text-muted-foreground">Click to connect</div>
                     </div>
                   </Button>
-                  <Button variant="outline" className="h-20" disabled>
+                  <Button 
+                    variant="outline" 
+                    className="h-20"
+                    onClick={() => window.location.href = '/api/oauth/linkedin'}
+                  >
                     <div className="text-center">
                       <div className="font-semibold">LinkedIn</div>
-                      <div className="text-xs text-muted-foreground">Coming soon</div>
-                    </div>
-                  </Button>
-                  <Button variant="outline" className="h-20" disabled>
-                    <div className="text-center">
-                      <div className="font-semibold">X (Twitter)</div>
-                      <div className="text-xs text-muted-foreground">Coming soon</div>
+                      <div className="text-xs text-muted-foreground">Click to connect</div>
                     </div>
                   </Button>
                 </div>

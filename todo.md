@@ -1731,3 +1731,74 @@
 - [ ] Add notification system for proactive event alerts
 - [ ] Test calendar monitoring with sample events
 - [ ] Save checkpoint with intelligent calendar system
+
+
+## Campaign Enhancements (December 20, 2025)
+Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
+
+### AI-Powered Image Generation
+- [x] Wire up existing PressReleaseImageGenerator component in creation flow
+- [x] Generate hero image for press release
+- [x] Store generated images (already handled by image generation service)
+- [x] Save image URLs to press_releases table
+- [ ] Generate platform-optimized images for social posts (Facebook, Instagram, LinkedIn)
+
+### Press Release Scheduling
+- [x] Add date/time picker to press release creation form
+- [x] Add timezone selector with user's local timezone as default
+- [x] Update press release status to "scheduled" when future date selected
+- [x] Update backend to accept imageUrl and scheduledFor fields
+- [ ] Create scheduled job (cron) to publish releases at scheduled time
+- [ ] Auto-publish associated social media posts when press release publishes
+
+### Platform-Specific Social Media Post Generation
+- [x] Build AI service to generate platform-specific posts from press release
+- [x] Auto-generate Facebook post (longer format, engaging, emojis)
+- [x] Auto-generate Instagram post (visual focus, hashtags, shorter)
+- [x] Auto-generate LinkedIn post (professional tone, industry keywords)
+- [x] Add tRPC procedure to generate and save social posts
+- [x] Link social posts to parent press release
+- [ ] Create UI to trigger social post generation from press release
+- [ ] Create UI to preview and edit generated social posts
+- [ ] Add character limit validation per platform in UI
+
+### Testing & Checkpoint
+- [ ] Test complete workflow: create press release → generate images → schedule → generate social posts
+- [ ] Verify scheduled publishing works correctly
+- [ ] Save checkpoint with enhanced campaign features
+
+
+## Campaign Approval Workflow (December 20, 2025)
+- [x] Add approval status to press releases and social posts (using existing status field)
+- [x] Create campaign review UI showing press release + all generated social posts
+- [x] Add individual checkboxes for each piece of content (press release, Facebook, Instagram, LinkedIn)
+- [x] Add "Select All" / "Deselect All" functionality
+- [x] Implement "Approve & Publish" button that only publishes checked items
+- [x] Add confirmation dialog before publishing
+- [x] Add edit functionality for social post content before publishing
+- [x] Create socialMedia.update tRPC procedure
+- [ ] Add "Review Campaign" button to press release list
+
+
+## Onboarding Flow Fixes (December 20, 2025)
+- [x] Integrate AI-powered website analysis into onboarding handleComplete
+- [x] Create business_dossiers entry with analyzed website data (happens automatically via backend)
+- [x] Replace "coming soon" with actual social media OAuth buttons (Facebook, Instagram, LinkedIn)
+- [x] Fix duplicate profile error (check if profile exists before creating)
+- [x] Add skip onboarding logic for users with existing profiles (auto-redirect to dashboard)
+- [ ] Test complete onboarding flow
+
+
+## UI Bug Fixes (December 20, 2025)
+- [x] Fix social media page 404 error (created /social-media page)
+- [x] Fix campaign page 404 error (created /campaigns page)
+- [x] Fix upgrade button 404 error (created /upgrade page)
+- [ ] Fix onboarding redirect - show modal to update profile instead
+- [ ] Fix dashboard cards routing (Press Releases, Social Media, Analytics going to 404)
+- [ ] Fix media lists hooks error (same as press releases)
+- [ ] Add header/menu to analytics page
+- [ ] Move error log to admin section (admin-only)
+- [ ] Remove Twitter/X from press releases page filters
+- [ ] Remove Twitter/X from all other UI locations
+- [ ] Remove Twitter/X from global platform options
+- [ ] Verify Twitter is hidden, not marked as upgrade feature
