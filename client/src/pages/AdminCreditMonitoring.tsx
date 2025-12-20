@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { trpc } from "@/lib/trpc";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { DollarSign, TrendingUp, AlertCircle, Download, Calendar } from "lucide-react";
+import { DollarSign, TrendingUp, AlertCircle, Download, Calendar, Bell } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLocation } from "wouter";
 
@@ -61,6 +61,13 @@ export default function AdminCreditMonitoring() {
           </div>
 
           <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setLocation("/admin/alerts")}
+            >
+              <Bell className="h-4 w-4 mr-2" />
+              Manage Alerts
+            </Button>
             <Button
               variant={timeRange === "7d" ? "default" : "outline"}
               onClick={() => setTimeRange("7d")}

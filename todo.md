@@ -1282,3 +1282,22 @@
 - [ ] Add admin UI page for configuring alert thresholds
 - [ ] Set up cron job to run checkCreditAlerts() periodically
 - [ ] Test alert system with threshold breaches
+
+## Alert Management UI
+- [x] Create admin alert management page at /admin/alerts
+- [x] Build threshold configuration form (create/edit)
+- [x] Display active thresholds in a table with status
+- [x] Add toggle to enable/disable thresholds
+- [x] Show alert history with triggered alerts
+- [x] Add manual alert check trigger button
+- [x] Integrate with all admin alert endpoints
+- [x] Add route to App.tsx
+- [x] Add navigation link from credit monitoring page
+
+## Periodic Alert Monitoring
+- [x] Install node-cron dependency
+- [x] Create alert scheduler service with hourly cron job
+- [x] Add alert check scheduler to server startup
+- [x] Add logging for scheduled alert checks
+- [x] Run initial check 30 seconds after startup
+- [x] Schedule runs every hour at minute 0
