@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { sql, eq, and, isNotNull, gte } from "drizzle-orm";
 import { getDb } from "./db";
-import { pressReleases, campaigns, journalists, users, creditUsage, creditAlertThresholds, creditAlertHistory } from "../drizzle/schema";
+import { pressReleases, campaigns, journalists, users, creditUsage, creditAlertThresholds, creditAlertHistory, wordCountCredits, imageCredits } from "../drizzle/schema";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { COOKIE_NAME } from "@shared/const";
 import { systemRouter } from "./_core/systemRouter";
@@ -3463,6 +3463,134 @@ Generate a comprehensive campaign strategy that includes:
 
         const { PRODUCT_DEFINITIONS } = await import("./productDefinitions");
         return PRODUCT_DEFINITIONS;
+      }),
+  }),
+
+  // Purchase flows for add-ons
+  purchases: router({
+    createWordCountCheckout: protectedProcedure
+      .input(z.object({
+        wordCountKey: z.enum(["words_300", "words_600", "words_900"]),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { createWordCountCheckoutSession } = await import("./stripeCheckout");
+        
+        const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+        
+        const session = await createWordCountCheckoutSession(input.wordCountKey, {
+          userId: ctx.user.id,
+          userEmail: ctx.user.email || "",
+          successUrl: `${frontendUrl}/dashboard/purchases/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: `${frontendUrl}/dashboard/purchases/cancel`,
+        });
+        
+        // Log activity
+        await logActivity({
+          userId: ctx.user.id,
+          action: "create_word_count_checkout",
+          entityType: "purchase",
+          entityId: 0,
+          description: `Created checkout session for ${input.wordCountKey}`,
+        });
+        
+        return session;
+      }),
+
+    createImagePackCheckout: protectedProcedure
+      .input(z.object({
+        imagePackKey: z.enum(["single", "pack_5", "pack_10"]),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { createImagePackCheckoutSession } = await import("./stripeCheckout");
+        
+        const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+        
+        const session = await createImagePackCheckoutSession(input.imagePackKey, {
+          userId: ctx.user.id,
+          userEmail: ctx.user.email || "",
+          successUrl: `${frontendUrl}/dashboard/purchases/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: `${frontendUrl}/dashboard/purchases/cancel`,
+        });
+        
+        // Log activity
+        await logActivity({
+          userId: ctx.user.id,
+          action: "create_image_pack_checkout",
+          entityType: "purchase",
+          entityId: 0,
+          description: `Created checkout session for ${input.imagePackKey}`,
+        });
+        
+        return session;
+      }),
+
+    verifyPurchase: protectedProcedure
+      .input(z.object({
+        sessionId: z.string(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const { getCheckoutSession } = await import("./stripeCheckout");
+        
+        const session = await getCheckoutSession(input.sessionId);
+        
+        // Verify this session belongs to the current user
+        if (session.client_reference_id !== ctx.user.id.toString()) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Session does not belong to user" });
+        }
+        
+        return {
+          sessionId: session.id,
+          paymentStatus: session.payment_status,
+          metadata: session.metadata,
+        };
+      }),
+
+    getPurchaseHistory: protectedProcedure
+      .query(async ({ ctx }) => {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        }
+
+        // Get word count purchases
+        const wordCountPurchases = await db
+          .select()
+          .from(wordCountCredits)
+          .where(eq(wordCountCredits.userId, ctx.user.id))
+          .orderBy(sql`${wordCountCredits.purchaseDate} DESC`);
+
+        // Get image pack purchases
+        const imagePurchases = await db
+          .select()
+          .from(imageCredits)
+          .where(eq(imageCredits.userId, ctx.user.id))
+          .orderBy(sql`${imageCredits.purchaseDate} DESC`);
+
+        return {
+          wordCountPurchases,
+          imagePurchases,
+        };
+      }),
+  }),
+
+  // Usage warnings
+  usage: router({
+    getWarnings: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getUserUsageWarnings } = await import("./usageWarnings");
+        return await getUserUsageWarnings(ctx.user.id);
+      }),
+
+    getSummary: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getUsageSummary } = await import("./usageWarnings");
+        return await getUsageSummary(ctx.user.id);
+      }),
+
+    checkLimits: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { hasExceededLimits } = await import("./usageWarnings");
+        return await hasExceededLimits(ctx.user.id);
       }),
   }),
 });

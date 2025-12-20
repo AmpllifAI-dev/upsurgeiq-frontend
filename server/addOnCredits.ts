@@ -139,11 +139,14 @@ export async function deductImageCredits(userId: number, images: number = 1): Pr
 /**
  * Add word count credits to user's account (after purchase)
  */
-export async function addWordCountCredits(
-  userId: number,
-  words: number,
-  stripePaymentIntentId?: string
-): Promise<void> {
+export async function addWordCountCredits(options: {
+  userId: number;
+  words: number;
+  stripeSessionId?: string | null;
+  stripePaymentIntentId?: string | null;
+  productKey?: string;
+}): Promise<void> {
+  const { userId, words, stripePaymentIntentId } = options;
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
@@ -162,11 +165,14 @@ export async function addWordCountCredits(
 /**
  * Add image credits to user's account (after purchase)
  */
-export async function addImageCredits(
-  userId: number,
-  images: number,
-  stripePaymentIntentId?: string
-): Promise<void> {
+export async function addImageCredits(options: {
+  userId: number;
+  images: number;
+  stripeSessionId?: string | null;
+  stripePaymentIntentId?: string | null;
+  productKey?: string;
+}): Promise<void> {
+  const { userId, images, stripePaymentIntentId } = options;
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 

@@ -38,6 +38,9 @@ import JournalistForm from "./pages/JournalistForm";
 import JournalistDetail from "./pages/JournalistDetail";
 import AdminCreditMonitoring from "./pages/AdminCreditMonitoring";
 import AdminAlertManagement from "./pages/AdminAlertManagement";
+import Purchases from "./pages/Purchases";
+import PurchaseSuccess from "./pages/PurchaseSuccess";
+import PurchaseCancel from "./pages/PurchaseCancel";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -75,6 +78,9 @@ function Router() {
       <Route path="/help" component={Help} />
       <Route path="/admin/credit-monitoring" component={AdminCreditMonitoring} />
       <Route path="/admin/alerts" component={AdminAlertManagement} />
+      <Route path="/dashboard/purchases" component={Purchases} />
+      <Route path="/dashboard/purchases/success" component={PurchaseSuccess} />
+      <Route path="/dashboard/purchases/cancel" component={PurchaseCancel} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

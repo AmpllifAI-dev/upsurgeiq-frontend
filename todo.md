@@ -1349,3 +1349,23 @@
 - [x] Create documentation for future product additions
 - [x] Verify all 6 products (word count + image packs) are created
 - [x] Test product updates and price changes
+
+
+## Purchase Flows & Usage Warnings (December 20, 2025)
+- [x] Create Stripe checkout session helper functions
+- [x] Build word count purchase tRPC procedure
+- [x] Build image pack purchase tRPC procedure
+- [x] Implement webhook handler for purchase fulfillment
+- [x] Add word count credits to user accounts after purchase
+- [x] Add image credits to user accounts after purchase
+- [x] Create 80% usage warning calculation functions
+- [x] Build usage warning tRPC procedures
+- [x] Create purchase UI components for word count add-ons
+- [x] Create purchase UI components for image packs
+- [x] Add usage warning banners to dashboard
+- [x] Display warnings at 80% of tier limits
+- [x] Add routes to App.tsx for purchase pages
+- [x] Test word count purchase flow end-to-end
+- [x] Test image pack purchase flow end-to-end
+- [x] Test usage warnings display correctly
+- [x] Create purchase flow documentation
