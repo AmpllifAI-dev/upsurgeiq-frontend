@@ -1425,19 +1425,23 @@
 - [ ] Add research history and caching
 
 ## Sports Team Integration (December 20, 2025)
-- [ ] Design sports team database schema (all sports, not just motorsports)
-- [ ] Create team profile management (name, sport, league, location)
-- [ ] Add team roster and player management
+- [x] Design sports team database schema (all sports, not just motorsports)
+- [x] Create team profile management (name, sport, league, location)
+- [x] Add team roster and player management fields
+- [x] Build sports team CRUD tRPC procedures
+- [x] Create sports team management UI
 - [ ] Build match/game schedule integration
 - [ ] Create team statistics tracking
 - [ ] Add team-specific press release templates
 - [ ] Integrate team data into campaign strategies
-- [ ] Build team selection and filtering UI
+- [ ] Build team selection in press release generation
 
 ## AI-Powered Image Generation for Press Releases (December 20, 2025)
-- [ ] Integrate image generation API into press release flow
-- [ ] Create image prompt generation from press release content
-- [ ] Add image style selection (photorealistic, illustration, abstract)
+- [x] Create press release image generation backend service
+- [x] Implement AI-powered prompt generation from press release content
+- [x] Add style and mood presets (photorealistic, illustration, corporate, etc.)
+- [ ] Add tRPC procedures for image generation
+- [ ] Integrate image generation into press release creation UI
 - [ ] Build image preview and regeneration UI
 - [ ] Implement image attachment to press releases
 - [ ] Add image credit consumption tracking

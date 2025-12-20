@@ -86,13 +86,25 @@ export const socialMediaAccounts = mysqlTable("social_media_accounts", {
 export type SocialMediaAccount = typeof socialMediaAccounts.$inferSelect;
 export type InsertSocialMediaAccount = typeof socialMediaAccounts.$inferInsert;
 
-// Sports Teams (for motorsport clients)
+// Sports Teams (all sports - football, basketball, motorsport, rugby, etc.)
 export const sportsTeams = mysqlTable("sports_teams", {
   id: int("id").autoincrement().primaryKey(),
   businessId: int("businessId").notNull().references(() => businesses.id, { onDelete: "cascade" }),
   teamName: varchar("teamName", { length: 255 }).notNull(),
-  series: varchar("series", { length: 255 }).notNull(),
-  schedule: text("schedule"),
+  sport: varchar("sport", { length: 100 }).notNull(), // football, basketball, motorsport, rugby, etc.
+  league: varchar("league", { length: 255 }), // Premier League, NBA, F1, etc. (renamed from series)
+  division: varchar("division", { length: 255 }), // Conference, tier, division
+  location: varchar("location", { length: 255 }), // City, country
+  founded: int("founded"), // Year founded
+  stadium: varchar("stadium", { length: 255 }), // Home venue
+  website: varchar("website", { length: 500 }),
+  logo: varchar("logo", { length: 500 }), // URL to logo image
+  primaryColor: varchar("primaryColor", { length: 50 }), // Hex color
+  secondaryColor: varchar("secondaryColor", { length: 50 }), // Hex color
+  description: text("description"),
+  achievements: json("achievements"), // Array of {year, title}
+  socialMedia: json("socialMedia"), // {twitter, instagram, facebook}
+  schedule: text("schedule"), // Keep for backward compatibility
   lastScheduleUpdate: timestamp("lastScheduleUpdate"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

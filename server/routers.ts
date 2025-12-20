@@ -3627,6 +3627,171 @@ Generate a comprehensive campaign strategy that includes:
         return await hasExceededLimits(ctx.user.id);
       }),
   }),
+
+  // Sports Teams
+  sportsTeams: router({
+    create: protectedProcedure
+      .input(
+        z.object({
+          teamName: z.string().min(1),
+          sport: z.string().min(1),
+          league: z.string().optional(),
+          division: z.string().optional(),
+          location: z.string().optional(),
+          founded: z.number().optional(),
+          stadium: z.string().optional(),
+          website: z.string().url().optional(),
+          logo: z.string().url().optional(),
+          primaryColor: z.string().optional(),
+          secondaryColor: z.string().optional(),
+          description: z.string().optional(),
+          achievements: z.array(z.object({ year: z.number(), title: z.string() })).optional(),
+          socialMedia: z.object({
+            twitter: z.string().optional(),
+            instagram: z.string().optional(),
+            facebook: z.string().optional(),
+          }).optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { createSportsTeam } = await import("./sportsTeams");
+        const business = await getUserBusiness(ctx.user.id);
+        
+        if (!business) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Business profile required to create teams",
+          });
+        }
+
+        return await createSportsTeam(business.id, input);
+      }),
+
+    list: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getBusinessTeams } = await import("./sportsTeams");
+        const business = await getUserBusiness(ctx.user.id);
+        
+        if (!business) {
+          return [];
+        }
+
+        return await getBusinessTeams(business.id);
+      }),
+
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const { getTeamById } = await import("./sportsTeams");
+        const business = await getUserBusiness(ctx.user.id);
+        
+        if (!business) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Business profile required",
+          });
+        }
+
+        return await getTeamById(input.id, business.id);
+      }),
+
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          teamName: z.string().min(1).optional(),
+          sport: z.string().min(1).optional(),
+          league: z.string().optional(),
+          division: z.string().optional(),
+          location: z.string().optional(),
+          founded: z.number().optional(),
+          stadium: z.string().optional(),
+          website: z.string().url().optional(),
+          logo: z.string().url().optional(),
+          primaryColor: z.string().optional(),
+          secondaryColor: z.string().optional(),
+          description: z.string().optional(),
+          achievements: z.array(z.object({ year: z.number(), title: z.string() })).optional(),
+          socialMedia: z.object({
+            twitter: z.string().optional(),
+            instagram: z.string().optional(),
+            facebook: z.string().optional(),
+          }).optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { updateSportsTeam } = await import("./sportsTeams");
+        const business = await getUserBusiness(ctx.user.id);
+        
+        if (!business) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Business profile required",
+          });
+        }
+
+        const { id, ...updates } = input;
+        return await updateSportsTeam(id, business.id, updates);
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const { deleteSportsTeam } = await import("./sportsTeams");
+        const business = await getUserBusiness(ctx.user.id);
+        
+        if (!business) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Business profile required",
+          });
+        }
+
+        return await deleteSportsTeam(input.id, business.id);
+      }),
+
+    search: protectedProcedure
+      .input(z.object({ query: z.string() }))
+      .query(async ({ ctx, input }) => {
+        const { searchTeams } = await import("./sportsTeams");
+        const business = await getUserBusiness(ctx.user.id);
+        
+        if (!business) {
+          return [];
+        }
+
+        return await searchTeams(business.id, input.query);
+      }),
+
+    getBySport: protectedProcedure
+      .input(z.object({ sport: z.string() }))
+      .query(async ({ ctx, input }) => {
+        const { getTeamsBySport } = await import("./sportsTeams");
+        const business = await getUserBusiness(ctx.user.id);
+        
+        if (!business) {
+          return [];
+        }
+
+        return await getTeamsBySport(business.id, input.sport);
+      }),
+
+    getPressReleaseAngles: protectedProcedure
+      .input(z.object({ teamId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const { generateTeamPressReleaseAngles } = await import("./sportsTeams");
+        const business = await getUserBusiness(ctx.user.id);
+        
+        if (!business) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Business profile required",
+          });
+        }
+
+        return await generateTeamPressReleaseAngles(input.teamId, business.id);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
