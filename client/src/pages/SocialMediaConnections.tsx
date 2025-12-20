@@ -3,12 +3,19 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Facebook, Instagram, Linkedin, Twitter, Check, X, Loader2, AlertCircle } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Twitter, Check, X, Loader2, AlertCircle, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast as showToast } from "sonner";
+import { useState } from "react";
 
 export default function SocialMediaConnections() {
   const { user } = useAuth();
+  const [disconnectDialog, setDisconnectDialog] = useState<{ open: boolean; connectionId: number | null; platform: string | null }>({ 
+    open: false, 
+    connectionId: null, 
+    platform: null 
+  });
   
   const { data: connections, isLoading } = trpc.socialConnections.getConnections.useQuery();
   const disconnectMutation = trpc.socialConnections.disconnect.useMutation({
@@ -33,8 +40,32 @@ export default function SocialMediaConnections() {
   };
 
   const handleDisconnect = (connectionId: number, platform: string) => {
-    if (confirm(`Are you sure you want to disconnect your ${platform} account?`)) {
-      disconnectMutation.mutate({ connectionId });
+    setDisconnectDialog({ open: true, connectionId, platform });
+  };
+
+  const confirmDisconnect = () => {
+    if (disconnectDialog.connectionId) {
+      disconnectMutation.mutate({ connectionId: disconnectDialog.connectionId });
+      setDisconnectDialog({ open: false, connectionId: null, platform: null });
+    }
+  };
+
+  // Check connection health based on token expiration
+  const getConnectionHealth = (connection: any) => {
+    if (!connection?.tokenExpiresAt) {
+      return { status: 'healthy', message: 'Connected', variant: 'default' as const };
+    }
+
+    const expiresAt = new Date(connection.tokenExpiresAt);
+    const now = new Date();
+    const daysUntilExpiry = Math.floor((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (daysUntilExpiry < 0) {
+      return { status: 'expired', message: 'Token Expired', variant: 'destructive' as const };
+    } else if (daysUntilExpiry <= 7) {
+      return { status: 'expiring', message: `Expires in ${daysUntilExpiry}d`, variant: 'secondary' as const };
+    } else {
+      return { status: 'healthy', message: 'Connected', variant: 'default' as const };
     }
   };
 
@@ -113,6 +144,21 @@ export default function SocialMediaConnections() {
         </AlertDescription>
       </Alert>
 
+      {/* Expiration Warning */}
+      {connections && connections.some(c => {
+        const health = getConnectionHealth(c);
+        return health.status === 'expiring' || health.status === 'expired';
+      }) && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Action Required: Token Expiration</AlertTitle>
+          <AlertDescription>
+            One or more of your social media connections has an expired or expiring access token. 
+            Please reconnect these accounts to continue posting. Click "Reconnect" on the affected platforms below.
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Platform Cards */}
       <div className="grid md:grid-cols-2 gap-6">
         {platforms.map((platform) => {
@@ -137,12 +183,17 @@ export default function SocialMediaConnections() {
                       </CardDescription>
                     </div>
                   </div>
-                  {isConnected && (
-                    <Badge variant="default" className="flex items-center gap-1">
-                      <Check className="w-3 h-3" />
-                      Connected
-                    </Badge>
-                  )}
+                  {isConnected && connection && (() => {
+                    const health = getConnectionHealth(connection);
+                    return (
+                      <Badge variant={health.variant} className="flex items-center gap-1">
+                        {health.status === 'healthy' && <Check className="w-3 h-3" />}
+                        {health.status === 'expiring' && <AlertCircle className="w-3 h-3" />}
+                        {health.status === 'expired' && <AlertTriangle className="w-3 h-3" />}
+                        {health.message}
+                      </Badge>
+                    );
+                  })()}
                 </div>
               </CardHeader>
 
@@ -252,7 +303,7 @@ export default function SocialMediaConnections() {
                 2
               </div>
               <div>
-                <h4 className="font-semibold text-sm">Authorize upsurgeIQ</h4>
+                <h4 className="font-semibold text-sm">Authorize UpsurgeIQ</h4>
                 <p className="text-sm text-muted-foreground mt-1">
                   Grant permissions to post on your behalf and read basic analytics
                 </p>
@@ -281,6 +332,47 @@ export default function SocialMediaConnections() {
           </Alert>
         </CardContent>
       </Card>
+
+      {/* Disconnect Confirmation Dialog */}
+      <Dialog open={disconnectDialog.open} onOpenChange={(open) => !open && setDisconnectDialog({ open: false, connectionId: null, platform: null })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-destructive" />
+              Disconnect {disconnectDialog.platform}?
+            </DialogTitle>
+            <DialogDescription className="space-y-3 pt-2">
+              <p>
+                Are you sure you want to disconnect your {disconnectDialog.platform} account? This will:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                <li>Remove access to post on this platform</li>
+                <li>Cancel any scheduled posts for this platform</li>
+                <li>Require re-authorization to connect again</li>
+              </ul>
+              <p className="text-sm font-medium">
+                You can reconnect this account anytime by clicking "Connect" again.
+              </p>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setDisconnectDialog({ open: false, connectionId: null, platform: null })}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDisconnect}
+              disabled={disconnectMutation.isPending}
+            >
+              {disconnectMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Disconnect
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

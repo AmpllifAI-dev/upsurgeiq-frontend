@@ -1683,8 +1683,16 @@
 - [ ] Remove Twitter/X OAuth configuration
 - [x] Fix Instagram OAuth scopes to include business_management permission
 - [x] Test Instagram connection after scope fix
-- [ ] Save checkpoint with Facebook, Instagram, and LinkedIn OAuth working
+- [x] Save checkpoint with Facebook, Instagram, and LinkedIn OAuth working
 
 - [x] Update pricing page to show 3 social media platforms instead of 4
 - [x] Update home page references to 3 platforms
 - [x] Update dashboard and other UI references to 3 platforms
+
+
+## Social Media OAuth Enhancements (December 20, 2025)
+- [x] Add disconnect confirmation dialog showing impact (scheduled posts, etc.)
+- [x] Implement connection health monitoring with token expiration tracking
+- [x] Add visual indicators for connection health status (healthy/expiring/expired badges)
+- [x] Add expiration warning alert when tokens need renewal
+- [ ] Save checkpoint with enhanced OAuth features
