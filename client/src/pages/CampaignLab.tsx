@@ -16,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { CampaignPlanningWizard } from "@/components/CampaignPlanningWizard";
 
 export default function CampaignLab() {
   const { user, loading } = useAuth();
@@ -201,69 +202,15 @@ export default function CampaignLab() {
               AI-powered A/B testing and campaign optimization
             </p>
           </div>
-          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                New Campaign
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create Campaign</DialogTitle>
-                <DialogDescription>
-                  Set up a new A/B testing campaign
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="campaignName">Campaign Name *</Label>
-                  <Input
-                    id="campaignName"
-                    placeholder="e.g., Summer Product Launch"
-                    value={campaignName}
-                    onChange={(e) => setCampaignName(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="campaignGoal">Campaign Goal</Label>
-                  <Textarea
-                    id="campaignGoal"
-                    placeholder="What do you want to achieve with this campaign?"
-                    value={campaignGoal}
-                    onChange={(e) => setCampaignGoal(e.target.value)}
-                    rows={3}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="campaignBudget">Budget (£)</Label>
-                  <Input
-                    id="campaignBudget"
-                    type="number"
-                    placeholder="1000"
-                    value={campaignBudget}
-                    onChange={(e) => setCampaignBudget(e.target.value)}
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    className="flex-1"
-                    onClick={handleCreateCampaign}
-                    disabled={createMutation.isPending}
-                  >
-                    Create Campaign
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => setIsCreateOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Button onClick={() => setIsCreateOpen(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            New Campaign
+          </Button>
+          <CampaignPlanningWizard
+            open={isCreateOpen}
+            onOpenChange={setIsCreateOpen}
+            onSuccess={refetch}
+          />
         </div>
 
         {/* Feature Overview */}
@@ -378,7 +325,11 @@ export default function CampaignLab() {
         ) : (
           <div className="grid gap-6">
             {filteredCampaigns.map((campaign) => (
-              <Card key={campaign.id} className="hover:border-primary/50 transition-colors">
+              <Card 
+                key={campaign.id} 
+                className="hover:border-primary/50 transition-colors cursor-pointer"
+                onClick={() => setLocation(`/dashboard/campaign/${campaign.id}`)}
+              >
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">

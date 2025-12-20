@@ -851,6 +851,124 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
           throw error;
         }
       }),
+
+    generateCampaignStrategy: protectedProcedure
+      .input(
+        z.object({
+          campaignName: z.string(),
+          goal: z.string(),
+          targetAudience: z.string(),
+          platforms: z.string(),
+          budget: z.string(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        aiLogger.info("AI campaign strategy generation request", {
+          userId: ctx.user.id,
+          action: "generateCampaignStrategy",
+          metadata: { campaignName: input.campaignName },
+        });
+
+        // Check usage limits
+        const { allowed } = await checkLimit(ctx.user.id, "aiChatMessages");
+        if (!allowed) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "AI usage limit reached for your subscription tier. Please upgrade to continue.",
+          });
+        }
+
+        const business = await getUserBusiness(ctx.user.id);
+        if (!business) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Business profile not found",
+          });
+        }
+
+        const systemPrompt = `You are an expert PR and marketing strategist. Generate a comprehensive campaign strategy based on the provided information. 
+
+Provide your response in the following JSON format:
+{
+  "strategy": "Detailed campaign strategy (3-4 paragraphs)",
+  "keyMessages": "3-5 key messages, each on a new line",
+  "successMetrics": "5-7 specific, measurable success metrics, each on a new line"
+}`;
+
+        const userPrompt = `Campaign Name: ${input.campaignName}
+Goal: ${input.goal}
+Target Audience: ${input.targetAudience}
+Platforms: ${input.platforms}
+Budget: £${input.budget}
+
+Business Context:
+- Name: ${business.name}
+- SIC Section: ${business.sicSection || "Not specified"}
+- Brand Voice: ${business.brandVoiceTone || "Professional"}
+
+Generate a comprehensive campaign strategy that includes:
+1. Overall strategy and approach
+2. Key messages tailored to the target audience
+3. Specific, measurable success metrics`;
+
+        try {
+          const response = await invokeLLM({
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+            response_format: {
+              type: "json_schema",
+              json_schema: {
+                name: "campaign_strategy",
+                strict: true,
+                schema: {
+                  type: "object",
+                  properties: {
+                    strategy: { type: "string", description: "Detailed campaign strategy" },
+                    keyMessages: { type: "string", description: "Key messages for the campaign" },
+                    successMetrics: { type: "string", description: "Success metrics for the campaign" },
+                  },
+                  required: ["strategy", "keyMessages", "successMetrics"],
+                  additionalProperties: false,
+                },
+              },
+            },
+          });
+
+          const message = response.choices[0]?.message;
+          const content = message?.content;
+          if (!content || typeof content !== 'string') {
+            throw new Error("No response from AI");
+          }
+
+          const result = JSON.parse(content);
+
+          // Increment usage counter
+          await incrementUsage(ctx.user.id, "aiChatMessages");
+
+          // Log activity
+          await logActivity({
+            userId: ctx.user.id,
+            action: "generate",
+            entityType: "campaign_strategy",
+            description: `Generated campaign strategy: ${input.campaignName}`,
+            metadata: { campaignName: input.campaignName },
+          });
+
+          return result;
+        } catch (error) {
+          aiLogger.error("AI campaign strategy generation failed", error as Error, {
+            userId: ctx.user.id,
+            action: "generateCampaignStrategy",
+            metadata: { campaignName: input.campaignName },
+          });
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to generate campaign strategy. Please try again.",
+          });
+        }
+      }),
   }),
 
   campaign: router({
@@ -879,6 +997,9 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
           targetAudience: z.string().optional(),
           startDate: z.string().optional(),
           endDate: z.string().optional(),
+          aiGeneratedStrategy: z.string().optional(),
+          keyMessages: z.string().optional(),
+          successMetrics: z.string().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -910,6 +1031,9 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
           targetAudience: input.targetAudience,
           startDate: input.startDate ? new Date(input.startDate) : undefined,
           endDate: input.endDate ? new Date(input.endDate) : undefined,
+          aiGeneratedStrategy: input.aiGeneratedStrategy,
+          keyMessages: input.keyMessages,
+          successMetrics: input.successMetrics,
         });
 
         // Increment usage counter

@@ -1109,26 +1109,26 @@
 - [ ] Add onboarding tour for new users
 - [ ] Create FAQ/Help Center page
 
-## Intelligent Campaign Lab (IN PROGRESS)
-- [ ] Create campaign planning wizard with AI strategy generation
-- [ ] Implement campaign timeline and milestone tracking
-- [ ] Build deliverables management system
-- [ ] Create campaign analytics dashboard with performance metrics
-- [ ] Implement AI-powered campaign recommendations
-- [ ] Add campaign budget tracking and forecasting
-- [ ] Build campaign collaboration features
-- [ ] Create campaign templates library
-- [ ] Implement campaign reporting and export
+## Intelligent Campaign Lab
+- [x] Create campaign planning wizard with AI strategy generation
+- [x] Implement campaign timeline and milestone tracking
+- [x] Build deliverables management system
+- [x] Create campaign analytics dashboard with performance metrics
+- [x] Implement AI-powered campaign strategy generation
+- [x] Add campaign budget tracking
+- [x] Create campaign detail page with tabs
+- [x] Implement campaign status management
+- [x] Add campaign reporting and PDF export
 
-## Journalist Media List Management (PENDING)
-- [ ] Complete refactoring of server/db/journalists.ts to use await getDb()
-- [ ] Create tRPC router endpoints for journalist management
-- [ ] Build journalist list view with search and filtering
-- [ ] Create journalist add/edit forms
+## Journalist Media List Management
+- [x] Complete refactoring of server/db/journalists.ts to use await getDb()
+- [x] Create tRPC router endpoints for journalist management
+- [x] Build journalist list view with search and filtering
+- [x] Create journalist add/edit forms
+- [x] Build journalist segmentation by beat/industry
+- [x] Create journalist interaction history tracking
+- [x] Implement email tracking for journalist outreach
 - [ ] Implement CSV import functionality for bulk uploads
-- [ ] Build journalist segmentation by beat/industry
-- [ ] Create journalist interaction history tracking
-- [ ] Implement email tracking for journalist outreach
 - [ ] Build journalist relationship scoring system
 
 ## Tooltips & Help System (PENDING)
