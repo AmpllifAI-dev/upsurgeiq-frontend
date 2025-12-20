@@ -44,6 +44,8 @@ import {
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CampaignAnalyticsCharts } from "@/components/CampaignAnalyticsCharts";
+import { CampaignTeamManagement } from "@/components/CampaignTeamManagement";
+import { CampaignActivityFeed } from "@/components/CampaignActivityFeed";
 
 export default function CampaignDetail() {
   const [, params] = useRoute("/dashboard/campaign/:id");
@@ -465,6 +467,8 @@ export default function CampaignDetail() {
           <TabsTrigger value="deliverables">Deliverables</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="strategy">Strategy</TabsTrigger>
+          <TabsTrigger value="team">Team</TabsTrigger>
+          <TabsTrigger value="activity">Activity</TabsTrigger>
         </TabsList>
 
         {/* Milestones Tab */}
@@ -783,6 +787,20 @@ export default function CampaignDetail() {
               </Card>
             )}
           </div>
+        </TabsContent>
+
+        {/* Team Tab */}
+        <TabsContent value="team" className="space-y-4">
+          <CampaignTeamManagement 
+            campaignId={campaignId!} 
+            isOwner={campaign.userId === campaign.userId} 
+          />
+        </TabsContent>
+
+        {/* Activity Tab */}
+        <TabsContent value="activity" className="space-y-4">
+          <h2 className="text-xl font-semibold">Campaign Activity</h2>
+          <CampaignActivityFeed campaignId={campaignId!} />
         </TabsContent>
       </Tabs>
     </div>

@@ -73,7 +73,7 @@ export default function Dashboard() {
   };
 
   const limits = planLimits[subscription.plan as keyof typeof planLimits];
-  const currentStats = stats || { pressReleases: 0, posts: 0, campaigns: 0, distributions: 0 };
+  const currentStats = stats || { pressReleases: 0, campaigns: 0, activeCampaigns: 0, journalists: 0, mediaOutlets: 0 };
 
   const quickActions = [
     {
@@ -209,12 +209,12 @@ export default function Dashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Social Posts</CardTitle>
-              <Share2 className="w-4 h-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-muted-foreground">Journalists</CardTitle>
+              <Users className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-foreground">{currentStats.posts}</div>
-              <p className="text-xs text-muted-foreground mt-1">Published this month</p>
+              <div className="text-3xl font-bold text-foreground">{currentStats.journalists}</div>
+              <p className="text-xs text-muted-foreground mt-1">In your database</p>
             </CardContent>
           </Card>
 
@@ -224,8 +224,8 @@ export default function Dashboard() {
               <Target className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-foreground">{currentStats.campaigns}</div>
-              <p className="text-xs text-muted-foreground mt-1">Running now</p>
+              <div className="text-3xl font-bold text-foreground">{currentStats.activeCampaigns}</div>
+              <p className="text-xs text-muted-foreground mt-1">Active campaigns</p>
             </CardContent>
           </Card>
 
@@ -236,9 +236,9 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-foreground">
-                {currentStats.distributions > 0 ? `${(currentStats.distributions * 150).toLocaleString()}+` : '0'}
+                {currentStats.mediaOutlets}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Estimated impressions</p>
+              <p className="text-xs text-muted-foreground mt-1">Media outlets</p>
             </CardContent>
           </Card>
         </div>

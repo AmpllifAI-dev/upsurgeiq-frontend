@@ -1208,3 +1208,27 @@
 - [x] Create save template dialog with category selection
 - [x] Serialize milestones and deliverables with relative offsets
 - [x] Calculate campaign duration automatically from dates
+
+## Campaign Collaboration & Team Management
+- [x] Add campaign_team_members table to database schema
+- [x] Add campaign_activity_log table for change tracking
+- [x] Implement role-based permissions (Owner, Editor, Viewer)
+- [x] Add activity log to campaign detail page
+- [x] Create team management UI in campaign detail
+- [x] Add team and activity tabs to campaign detail page
+- [x] Implement permission checking for all team operations
+- [x] Auto-log all campaign changes to activity feed
+- [ ] Add team member invitation system (email lookup)
+- [ ] Add @mention system for task assignment
+- [ ] Implement in-app notifications for updates
+
+## Main Dashboard with Basic Stats
+- [x] Create main dashboard page layout
+- [x] Add campaign summary stats (total, active campaigns)
+- [x] Add journalist database stats (total journalists, total outlets)
+- [x] Add press release stats (total created)
+- [x] Create simple stat cards with icons
+- [x] Implement real dashboard.stats endpoint with actual data
+- [x] Update Dashboard UI to display new stats
+- [ ] Add recent activity feed
+- [ ] Link stat cards to relevant pages

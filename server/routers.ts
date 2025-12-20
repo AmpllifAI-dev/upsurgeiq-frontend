@@ -1,5 +1,9 @@
-import { COOKIE_NAME } from "@shared/const";
+import { TRPCError } from "@trpc/server";
+import { sql, eq, and, isNotNull } from "drizzle-orm";
+import { getDb } from "./db";
+import { pressReleases, campaigns, journalists } from "../drizzle/schema";
 import { getSessionCookieOptions } from "./_core/cookies";
+import { COOKIE_NAME } from "@shared/const";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { 
@@ -118,6 +122,13 @@ import {
   updateCampaignTemplate,
   deleteCampaignTemplate,
   incrementTemplateUsage,
+  addCampaignTeamMember,
+  getCampaignTeamMembers,
+  removeCampaignTeamMember,
+  updateCampaignTeamMemberRole,
+  checkCampaignPermission,
+  logCampaignActivity,
+  getCampaignActivityLog,
 } from "./campaigns";
 import {
   createPartner,
@@ -144,7 +155,6 @@ import {
 } from "./distributions";
 import { sendPressReleaseNotificationEmail } from "./_core/email";
 import { z } from "zod";
-import { TRPCError } from "@trpc/server";
 import { getActiveWebhooksByEvent } from "./webhookConfigs";
 import { buildUserOnboardedPayload, sendWebhookWithRetry } from "./webhooks";
 import { logWebhookDelivery } from "./webhookConfigs";
@@ -302,13 +312,74 @@ export const appRouter = router({
 
   dashboard: router({
     stats: protectedProcedure.query(async ({ ctx }) => {
-      // TODO: Implement actual stats queries
-      // For now, return mock data
+      const business = await getUserBusiness(ctx.user.id);
+      if (!business) {
+        return {
+          pressReleases: 0,
+          campaigns: 0,
+          activeCampaigns: 0,
+          journalists: 0,
+          mediaOutlets: 0,
+        };
+      }
+
+      const db = await getDb();
+      if (!db) {
+        return {
+          pressReleases: 0,
+          campaigns: 0,
+          activeCampaigns: 0,
+          journalists: 0,
+          mediaOutlets: 0,
+        };
+      }
+
+      // Count press releases
+      const [prCount] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(pressReleases)
+        .where(eq(pressReleases.businessId, business.id));
+
+      // Count campaigns
+      const [campaignCount] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(campaigns)
+        .where(eq(campaigns.businessId, business.id));
+
+      // Count active campaigns
+      const [activeCampaignCount] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(campaigns)
+        .where(
+          and(
+            eq(campaigns.businessId, business.id),
+            eq(campaigns.status, "active")
+          )
+        );
+
+      // Count journalists
+      const [journalistCount] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(journalists)
+        .where(eq(journalists.userId, ctx.user.id));
+
+      // Count unique media outlets
+      const [outletCount] = await db
+        .select({ count: sql<number>`count(distinct ${journalists.mediaOutletId})` })
+        .from(journalists)
+        .where(
+          and(
+            eq(journalists.userId, ctx.user.id),
+            isNotNull(journalists.mediaOutletId)
+          )
+        );
+
       return {
-        pressReleases: 0,
-        posts: 0,
-        campaigns: 0,
-        distributions: 0,
+        pressReleases: Number(prCount?.count || 0),
+        campaigns: Number(campaignCount?.count || 0),
+        activeCampaigns: Number(activeCampaignCount?.count || 0),
+        journalists: Number(journalistCount?.count || 0),
+        mediaOutlets: Number(outletCount?.count || 0),
       };
     }),
   }),
@@ -1398,6 +1469,122 @@ Generate a comprehensive campaign strategy that includes:
         await incrementTemplateUsage(input.templateId);
         const template = await getCampaignTemplateById(input.templateId);
         return template;
+      }),
+
+    // Team collaboration
+    addTeamMember: protectedProcedure
+      .input(
+        z.object({
+          campaignId: z.number(),
+          userId: z.number(),
+          role: z.enum(["owner", "editor", "viewer"]),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        // Check if current user has permission to add team members
+        const permission = await checkCampaignPermission(input.campaignId, ctx.user.id);
+        if (permission !== "owner") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only campaign owners can add team members",
+          });
+        }
+
+        const member = await addCampaignTeamMember({
+          ...input,
+          addedBy: ctx.user.id,
+        });
+
+        // Log activity
+        await logCampaignActivity({
+          campaignId: input.campaignId,
+          userId: ctx.user.id,
+          action: "added_team_member",
+          entityType: "team_member",
+          changes: { userId: input.userId, role: input.role },
+        });
+
+        return member;
+      }),
+
+    getTeamMembers: protectedProcedure
+      .input(z.object({ campaignId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        // Check if user has access to this campaign
+        const permission = await checkCampaignPermission(input.campaignId, ctx.user.id);
+        if (!permission) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You do not have access to this campaign",
+          });
+        }
+
+        return await getCampaignTeamMembers(input.campaignId);
+      }),
+
+    removeTeamMember: protectedProcedure
+      .input(z.object({ id: z.number(), campaignId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const permission = await checkCampaignPermission(input.campaignId, ctx.user.id);
+        if (permission !== "owner") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only campaign owners can remove team members",
+          });
+        }
+
+        await removeCampaignTeamMember(input.id);
+
+        await logCampaignActivity({
+          campaignId: input.campaignId,
+          userId: ctx.user.id,
+          action: "removed_team_member",
+          entityType: "team_member",
+          entityId: input.id,
+        });
+      }),
+
+    updateTeamMemberRole: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          campaignId: z.number(),
+          role: z.enum(["owner", "editor", "viewer"]),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        const permission = await checkCampaignPermission(input.campaignId, ctx.user.id);
+        if (permission !== "owner") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only campaign owners can update team member roles",
+          });
+        }
+
+        await updateCampaignTeamMemberRole(input.id, input.role);
+
+        await logCampaignActivity({
+          campaignId: input.campaignId,
+          userId: ctx.user.id,
+          action: "updated_team_member_role",
+          entityType: "team_member",
+          entityId: input.id,
+          changes: { role: input.role },
+        });
+      }),
+
+    getActivityLog: protectedProcedure
+      .input(z.object({ campaignId: z.number(), limit: z.number().optional() }))
+      .query(async ({ input, ctx }) => {
+        const permission = await checkCampaignPermission(input.campaignId, ctx.user.id);
+        if (!permission) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You do not have access to this campaign",
+          });
+        }
+
+        return await getCampaignActivityLog(input.campaignId, input.limit);
       }),
   }),
 

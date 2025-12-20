@@ -452,3 +452,140 @@ export async function incrementTemplateUsage(id: number): Promise<void> {
     .set({ usageCount: (template.usageCount || 0) + 1 })
     .where(eq(campaignTemplates.id, id));
 }
+
+// ========================================
+// CAMPAIGN COLLABORATION
+// ========================================
+
+import {
+  campaignTeamMembers,
+  CampaignTeamMember,
+  InsertCampaignTeamMember,
+  campaignActivityLog,
+  CampaignActivityLog,
+  InsertCampaignActivityLog,
+  users,
+} from "../drizzle/schema";
+
+export async function addCampaignTeamMember(data: {
+  campaignId: number;
+  userId: number;
+  role: "owner" | "editor" | "viewer";
+  addedBy: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [member] = await db.insert(campaignTeamMembers).values(data);
+  return member;
+}
+
+export async function getCampaignTeamMembers(campaignId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const members = await db
+    .select({
+      id: campaignTeamMembers.id,
+      userId: campaignTeamMembers.userId,
+      role: campaignTeamMembers.role,
+      createdAt: campaignTeamMembers.createdAt,
+      userName: users.name,
+      userEmail: users.email,
+    })
+    .from(campaignTeamMembers)
+    .leftJoin(users, eq(campaignTeamMembers.userId, users.id))
+    .where(eq(campaignTeamMembers.campaignId, campaignId));
+  return members;
+}
+
+export async function removeCampaignTeamMember(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(campaignTeamMembers).where(eq(campaignTeamMembers.id, id));
+}
+
+export async function updateCampaignTeamMemberRole(id: number, role: "owner" | "editor" | "viewer") {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(campaignTeamMembers)
+    .set({ role })
+    .where(eq(campaignTeamMembers.id, id));
+}
+
+export async function checkCampaignPermission(campaignId: number, userId: number): Promise<"owner" | "editor" | "viewer" | null> {
+  const db = await getDb();
+  if (!db) return null;
+  
+  // Check if user is campaign creator
+  const [campaign] = await db
+    .select({ userId: campaigns.userId })
+    .from(campaigns)
+    .where(eq(campaigns.id, campaignId))
+    .limit(1);
+  
+  if (campaign && campaign.userId === userId) {
+    return "owner";
+  }
+  
+  // Check team member role
+  const [member] = await db
+    .select({ role: campaignTeamMembers.role })
+    .from(campaignTeamMembers)
+    .where(
+      and(
+        eq(campaignTeamMembers.campaignId, campaignId),
+        eq(campaignTeamMembers.userId, userId)
+      )
+    )
+    .limit(1);
+  
+  return member ? member.role : null;
+}
+
+export async function logCampaignActivity(data: {
+  campaignId: number;
+  userId: number;
+  action: string;
+  entityType?: string;
+  entityId?: number;
+  changes?: Record<string, any>;
+}) {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db.insert(campaignActivityLog).values({
+    ...data,
+    changes: data.changes ? JSON.stringify(data.changes) : undefined,
+  });
+}
+
+export async function getCampaignActivityLog(campaignId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const activities = await db
+    .select({
+      id: campaignActivityLog.id,
+      action: campaignActivityLog.action,
+      entityType: campaignActivityLog.entityType,
+      entityId: campaignActivityLog.entityId,
+      changes: campaignActivityLog.changes,
+      createdAt: campaignActivityLog.createdAt,
+      userName: users.name,
+      userEmail: users.email,
+    })
+    .from(campaignActivityLog)
+    .leftJoin(users, eq(campaignActivityLog.userId, users.id))
+    .where(eq(campaignActivityLog.campaignId, campaignId))
+    .orderBy(desc(campaignActivityLog.createdAt))
+    .limit(limit);
+  
+  return activities.map((a) => ({
+    ...a,
+    changes: a.changes ? JSON.parse(a.changes) : null,
+  }));
+}

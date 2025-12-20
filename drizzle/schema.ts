@@ -771,4 +771,32 @@ export const campaignTemplates = mysqlTable("campaign_templates", {
 export type CampaignTemplate = typeof campaignTemplates.$inferSelect;
 export type InsertCampaignTemplate = typeof campaignTemplates.$inferInsert;
 
+// Campaign Team Members (campaign-specific permissions)
+export const campaignTeamMembers = mysqlTable("campaign_team_members", {
+  id: int("id").autoincrement().primaryKey(),
+  campaignId: int("campaignId").notNull().references(() => campaigns.id, { onDelete: "cascade" }),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  role: mysqlEnum("role", ["owner", "editor", "viewer"]).default("viewer").notNull(),
+  addedBy: int("addedBy").references(() => users.id),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CampaignTeamMember = typeof campaignTeamMembers.$inferSelect;
+export type InsertCampaignTeamMember = typeof campaignTeamMembers.$inferInsert;
+
+// Campaign Activity Log
+export const campaignActivityLog = mysqlTable("campaign_activity_log", {
+  id: int("id").autoincrement().primaryKey(),
+  campaignId: int("campaignId").notNull().references(() => campaigns.id, { onDelete: "cascade" }),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  action: varchar("action", { length: 100 }).notNull(), // e.g., "created_campaign", "updated_milestone", "added_deliverable"
+  entityType: varchar("entityType", { length: 50 }), // e.g., "campaign", "milestone", "deliverable"
+  entityId: int("entityId"), // ID of the affected entity
+  changes: text("changes"), // JSON string of what changed
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CampaignActivityLog = typeof campaignActivityLog.$inferSelect;
+export type InsertCampaignActivityLog = typeof campaignActivityLog.$inferInsert;
+
 // ========================================
