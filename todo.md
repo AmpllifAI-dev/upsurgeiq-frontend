@@ -1578,3 +1578,8 @@
 - [ ] Update backend tracking to only enforce campaign limits (not separate press releases)
 - [ ] Update usage warnings to reflect campaign-only tracking
 - [ ] Update all user-facing text to use "campaign" terminology consistently
+
+
+## Final Pricing Corrections (December 20, 2025 - Round 3)
+- [x] Remove "Unlimited distributions" from all pricing tiers (redundant/confusing)
+- [x] Clarify campaigns include "AI-generated imagery" not user's own images

@@ -27,11 +27,10 @@ export default function Home() {
       period: "/month",
       description: "Perfect for solopreneurs and small businesses",
       features: [
-        "2 campaigns per month (AI-drafted copy + imagery)",
+        "2 campaigns per month (AI-drafted copy + AI-generated imagery)",
         "All 4 social media platforms",
         "Unlimited user-composed social posts",
         "3 media lists (default)",
-        "Unlimited distributions",
         "Email support",
       ],
       addOns: [
@@ -48,11 +47,10 @@ export default function Home() {
       period: "/month",
       description: "Most popular for growing businesses",
       features: [
-        "5 campaigns per month (AI-drafted copy + imagery)",
+        "5 campaigns per month (AI-drafted copy + AI-generated imagery)",
         "All 4 social media platforms",
         "Unlimited user-composed social posts",
         "5 media lists (3 default + 2 optional)",
-        "Unlimited distributions",
         "Priority support",
       ],
       addOns: [
@@ -69,11 +67,10 @@ export default function Home() {
       period: "/month",
       description: "For agencies and high-growth companies",
       features: [
-        "15 campaigns per month (AI-drafted copy + imagery)",
+        "15 campaigns per month (AI-drafted copy + AI-generated imagery)",
         "All 4 social media platforms",
         "Unlimited user-composed social posts",
         "10 media lists (3 default + 7 optional)",
-        "Unlimited distributions",
         "Intelligent Campaign Lab included",
         "Priority support",
       ],
