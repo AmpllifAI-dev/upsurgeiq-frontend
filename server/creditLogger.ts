@@ -20,7 +20,17 @@ interface CreditLogParams {
 
 /**
  * Log credit usage for AI service calls
- * This function should be called after every AI service invocation
+ * 
+ * IMPORTANT: Manus uses task-based pricing, not per-token or per-API-call pricing.
+ * Credits are consumed based on task complexity, duration, and resource usage.
+ * 
+ * The creditsUsed parameter should be set to 0 during development/testing.
+ * Actual credit consumption must be measured empirically by:
+ * 1. Running test scenarios for each feature
+ * 2. Checking Manus Settings > Usage to see actual credits consumed
+ * 3. Updating the creditsUsed value based on observed patterns
+ * 
+ * This function logs usage for internal tracking and admin monitoring.
  */
 export async function logCreditUsage(params: CreditLogParams): Promise<void> {
   const { userId, featureType, creditsUsed, tokensUsed = 0, metadata = {} } = params;
@@ -49,13 +59,17 @@ export async function logCreditUsage(params: CreditLogParams): Promise<void> {
 }
 
 /**
- * Calculate estimated credits from token count
- * Placeholder formula - update with actual Manus pricing once available
+ * Estimate credits from token count
+ * 
+ * NOTE: Manus does not provide per-token pricing. This function returns 0.
+ * Actual credit costs must be measured empirically through testing.
+ * 
+ * See the Credit Testing Plan document for measurement methodology.
  */
 export function estimateCreditsFromTokens(tokens: number): number {
-  // TODO: Update this formula based on actual Manus pricing
-  // Current assumption: 1 credit per 1000 tokens (placeholder)
-  return tokens / 1000;
+  // Manus pricing is task-based, not token-based
+  // Return 0 and measure actual costs through testing
+  return 0;
 }
 
 /**

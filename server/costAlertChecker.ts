@@ -251,28 +251,28 @@ export async function initializeDefaultThresholds(): Promise<boolean> {
       {
         name: "Daily Credit Limit",
         thresholdType: "daily" as const,
-        thresholdValue: "1000.00",
+        thresholdValue: "1000.00", // £7.90/day
         notifyEmails: adminEmail,
         isActive: 1,
       },
       {
         name: "Weekly Credit Limit",
         thresholdType: "weekly" as const,
-        thresholdValue: "5000.00",
+        thresholdValue: "6000.00", // £47.40/week
         notifyEmails: adminEmail,
         isActive: 1,
       },
       {
         name: "Monthly Credit Limit",
         thresholdType: "monthly" as const,
-        thresholdValue: "20000.00",
+        thresholdValue: "25000.00", // £197.50/month
         notifyEmails: adminEmail,
         isActive: 1,
       },
       {
         name: "Total Credit Warning",
         thresholdType: "total" as const,
-        thresholdValue: "50000.00",
+        thresholdValue: "50000.00", // £395.00 total
         notifyEmails: adminEmail,
         isActive: 1,
       },

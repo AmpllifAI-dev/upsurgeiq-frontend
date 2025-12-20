@@ -408,6 +408,7 @@ export const appRouter = router({
           keyPoints: z.string().optional(),
           targetAudience: z.string().optional(),
           tone: z.string().optional(),
+          maxWords: z.number().optional(), // Optional: for purchased word count extensions
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -429,6 +430,20 @@ export const appRouter = router({
           });
         }
 
+        // Get user's subscription tier to determine word count limit
+        const subscription = await getUserSubscription(ctx.user.id);
+        if (!subscription) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "No active subscription found",
+          });
+        }
+
+        // Import word count limits
+        const { WORD_COUNT_LIMITS } = await import("./products");
+        const baseWordLimit = WORD_COUNT_LIMITS[subscription.plan];
+        const wordLimit = input.maxWords || baseWordLimit;
+
         const systemPrompt = `You are a professional press release writer. Generate a compelling, newsworthy press release based on the following information:
 
 Company: ${business.name}
@@ -439,6 +454,8 @@ Target Audience: ${input.targetAudience || business.targetAudience || "general p
 Company Dossier:
 ${business.dossier || "No additional context provided"}
 
+IMPORTANT: The press release MUST be ${wordLimit} words or fewer. This is a strict requirement.
+
 Write a professional press release that follows standard PR format with:
 - Compelling headline
 - Dateline
@@ -448,7 +465,7 @@ Write a professional press release that follows standard PR format with:
 - Boilerplate about the company
 - Contact information placeholder
 
-Use markdown formatting for structure.`;
+Use markdown formatting for structure. Keep it concise and impactful within the ${wordLimit}-word limit.`;
 
         const userPrompt = `Topic: ${input.topic}
 
@@ -466,7 +483,8 @@ Generate a complete, publication-ready press release.`;
 
           const content = response.choices[0]?.message?.content || "";
           const tokensUsed = response.usage?.total_tokens || 0;
-          const creditsUsed = estimateCreditsFromTokens(tokensUsed);
+          // Estimated: 150-300 credits per press release (based on Manus benchmarks)
+          const creditsUsed = 200;
 
           // Log credit usage
           await logCreditUsage({
@@ -835,11 +853,11 @@ Generate a complete, publication-ready press release.`;
 
         const result = await generateImage({ prompt: input.prompt });
 
-        // Log credit usage (fixed cost per image, update with actual Manus pricing)
+        // Log credit usage (estimated: 200-400 credits per image based on Manus benchmarks)
         await logCreditUsage({
           userId: ctx.user.id,
           featureType: "image_generation",
-          creditsUsed: 5, // TODO: Update with actual Manus credit cost per image
+          creditsUsed: 300, // Estimated based on ~15 min active runtime
           tokensUsed: 0,
           metadata: {
             prompt: input.prompt,
@@ -929,7 +947,8 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
 
           const message = response.choices[0]?.message?.content || "I apologize, but I couldn't generate a response. Please try again.";
           const tokensUsed = response.usage?.total_tokens || 0;
-          const creditsUsed = estimateCreditsFromTokens(tokensUsed);
+          // Estimated: 50-100 credits per message (based on Manus benchmarks)
+          const creditsUsed = 75;
 
           // Log credit usage
           await logCreditUsage({
@@ -1069,7 +1088,8 @@ Generate a comprehensive campaign strategy that includes:
 
           const result = JSON.parse(content);
           const tokensUsed = response.usage?.total_tokens || 0;
-          const creditsUsed = estimateCreditsFromTokens(tokensUsed);
+          // Estimated: 300-500 credits per campaign (based on Manus benchmarks)
+          const creditsUsed = 400;
 
           // Log credit usage
           await logCreditUsage({

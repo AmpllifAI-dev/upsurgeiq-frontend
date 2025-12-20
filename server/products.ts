@@ -105,3 +105,80 @@ export function getProductByTier(tier: PricingTier): ProductConfig {
 export function getAllProducts(): ProductConfig[] {
   return Object.values(PRODUCTS);
 }
+
+/**
+ * Word Count Add-On Products (£4 per 300 words)
+ * For extending press releases beyond tier limits
+ */
+export const WORD_COUNT_PRODUCTS = {
+  words_300: {
+    name: "300 Extra Words",
+    words: 300,
+    price: 400, // £4.00 in pence
+    currency: "gbp",
+    stripeProductId: "", // TODO: Create in Stripe Dashboard
+    stripePriceId: "", // TODO: Create in Stripe Dashboard
+    description: "Add 300 words to your press release",
+  },
+  words_600: {
+    name: "600 Extra Words",
+    words: 600,
+    price: 800, // £8.00 in pence
+    currency: "gbp",
+    stripeProductId: "", // TODO: Create in Stripe Dashboard
+    stripePriceId: "", // TODO: Create in Stripe Dashboard
+    description: "Add 600 words to your press release (save £0)",
+  },
+  words_900: {
+    name: "900 Extra Words",
+    words: 900,
+    price: 1200, // £12.00 in pence
+    currency: "gbp",
+    stripeProductId: "", // TODO: Create in Stripe Dashboard
+    stripePriceId: "", // TODO: Create in Stripe Dashboard
+    description: "Add 900 words to your press release (save £0)",
+  },
+};
+
+/**
+ * Image Pack Add-On Products
+ * For additional AI-generated images beyond tier limits
+ */
+export const IMAGE_PACK_PRODUCTS = {
+  single: {
+    name: "Single Image Credit",
+    images: 1,
+    price: 399, // £3.99 in pence
+    currency: "gbp",
+    stripeProductId: "", // TODO: Create in Stripe Dashboard
+    stripePriceId: "", // TODO: Create in Stripe Dashboard
+    description: "Generate 1 additional AI image",
+  },
+  pack_5: {
+    name: "5 Image Credits",
+    images: 5,
+    price: 1499, // £14.99 in pence (save £5)
+    currency: "gbp",
+    stripeProductId: "", // TODO: Create in Stripe Dashboard
+    stripePriceId: "", // TODO: Create in Stripe Dashboard
+    description: "Generate 5 additional AI images (save £5)",
+  },
+  pack_10: {
+    name: "10 Image Credits",
+    images: 10,
+    price: 2499, // £24.99 in pence (save £15)
+    currency: "gbp",
+    stripeProductId: "", // TODO: Create in Stripe Dashboard
+    stripePriceId: "", // TODO: Create in Stripe Dashboard
+    description: "Generate 10 additional AI images (save £15)",
+  },
+};
+
+/**
+ * Tier-specific word count limits for press releases
+ */
+export const WORD_COUNT_LIMITS: Record<PricingTier, number> = {
+  starter: 400,  // Journalist best practice minimum
+  pro: 500,      // Standard press release length
+  scale: 800,    // Extended for enterprise needs
+};

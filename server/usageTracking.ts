@@ -3,6 +3,7 @@ import { usageTracking, subscriptions } from "../drizzle/schema";
 import { TRPCError } from "@trpc/server";
 
 // Tier limits
+// Note: AI chat limits reduced for fair usage policy (see fair usage documentation)
 export const TIER_LIMITS = {
   starter: {
     pressReleases: 10,
@@ -10,7 +11,7 @@ export const TIER_LIMITS = {
     campaigns: 5,
     distributions: 50,
     aiImages: 10,
-    aiChatMessages: 100,
+    aiChatMessages: 50, // Reduced from 100 for cost control
   },
   pro: {
     pressReleases: 50,
@@ -18,7 +19,7 @@ export const TIER_LIMITS = {
     campaigns: 20,
     distributions: 500,
     aiImages: 50,
-    aiChatMessages: 1000,
+    aiChatMessages: 200, // Reduced from 1000 for cost control
   },
   scale: {
     pressReleases: -1, // Unlimited
@@ -26,7 +27,7 @@ export const TIER_LIMITS = {
     campaigns: -1,
     distributions: -1,
     aiImages: -1,
-    aiChatMessages: -1,
+    aiChatMessages: 500, // Cap at 500 for fair usage (was unlimited)
   },
 };
 

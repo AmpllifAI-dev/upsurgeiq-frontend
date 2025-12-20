@@ -127,6 +127,13 @@
       "when": 1766227038656,
       "tag": "0017_premium_george_stacy",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1766232015390,
+      "tag": "0018_polite_shadowcat",
+      "breakpoints": true
     }
   ]
 }

@@ -851,3 +851,33 @@ export type CreditAlertHistory = typeof creditAlertHistory.$inferSelect;
 export type InsertCreditAlertHistory = typeof creditAlertHistory.$inferInsert;
 
 // ========================================
+
+// Word Count Credits (Add-on purchases for extended press releases)
+export const wordCountCredits = mysqlTable("word_count_credits", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  wordsRemaining: int("wordsRemaining").notNull().default(0), // Words available
+  purchaseDate: timestamp("purchaseDate").defaultNow().notNull(),
+  expiryDate: timestamp("expiryDate"), // Optional: credits expire after 12 months
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }), // Link to Stripe payment
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type WordCountCredit = typeof wordCountCredits.$inferSelect;
+export type InsertWordCountCredit = typeof wordCountCredits.$inferInsert;
+
+// Image Credits (Add-on purchases for additional AI images)
+export const imageCredits = mysqlTable("image_credits", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  creditsRemaining: int("creditsRemaining").notNull().default(0), // Images available
+  purchaseDate: timestamp("purchaseDate").defaultNow().notNull(),
+  expiryDate: timestamp("expiryDate"), // Optional: credits expire after 12 months
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }), // Link to Stripe payment
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ImageCredit = typeof imageCredits.$inferSelect;
+export type InsertImageCredit = typeof imageCredits.$inferInsert;
+
+// ========================================

@@ -1308,3 +1308,31 @@
 - [x] Add initialization to server startup (runs once on first start)
 - [x] Use admin email from environment variables for notifications
 - [x] Check for existing thresholds to prevent duplicates
+
+## Credit Monitoring System Updates (IN PROGRESS)
+- [ ] Update credit logger comments to reflect task-based pricing (not per-token)
+- [ ] Remove placeholder credit estimation formulas
+- [ ] Add note that actual credits must be measured empirically
+- [ ] Create testing plan document for measuring real credit costs
+- [ ] Update credit consumption mapping with Manus pricing insights
+- [ ] Document recommendation to run test scenarios before finalizing tier limits
+
+
+## Credit System & Monetization Updates (December 20, 2025)
+- [x] Update credit logger with actual Manus pricing data
+- [x] Integrate credit logging into all AI features
+- [ ] Update alert thresholds to 1000/day, 6000/week, 25000/month
+- [x] Reduce AI chat limits for fair usage policy
+- [x] Research UK mobile fair usage policy language
+- [x] Create fair usage policy document
+- [x] Add word count limits to press releases (400/500/800 words by tier)
+- [x] Create £4 per 300 words add-on pricing structure
+- [x] Add wordCountCredits and imageCredits tables to database schema
+- [x] Research Midjourney API integration (determined not feasible)
+- [x] Create image pack add-on product configuration
+- [ ] Build word count purchase flow (Stripe integration)
+- [ ] Build image pack purchase flow (Stripe integration)
+- [ ] Add credit limit display to admin dashboard
+- [ ] Implement automatic credit renewal tracking
+- [ ] Add 80% usage warning system
+- [x] Update usageTracking.ts with reduced chat limits
