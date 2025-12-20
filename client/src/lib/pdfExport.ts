@@ -145,9 +145,9 @@ export interface CampaignData {
   name: string;
   status: string;
   goal?: string;
-  budget?: number;
-  startDate?: Date;
-  endDate?: Date;
+  budget?: string; // Decimal from database
+  startDate?: string; // Date string from database
+  endDate?: string; // Date string from database
   createdAt: Date;
 }
 
@@ -237,7 +237,7 @@ export function exportCampaignToPDF(data: CampaignData) {
     doc.setFont("helvetica", "bold");
     doc.text("Budget:", margin, yPosition);
     doc.setFont("helvetica", "normal");
-    doc.text(`£${data.budget.toLocaleString()}`, margin + 30, yPosition);
+    doc.text(`£${parseFloat(data.budget).toLocaleString()}`, margin + 30, yPosition);
     yPosition += 8;
   }
   

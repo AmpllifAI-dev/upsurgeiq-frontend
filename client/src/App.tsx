@@ -31,6 +31,9 @@ import EmailTemplates from "./pages/EmailTemplates";
 import PressReleaseTemplates from "./pages/PressReleaseTemplates";
 import TeamManagement from "./pages/TeamManagement";
 import WebhookSettings from "./pages/WebhookSettings";
+import JournalistList from "./pages/JournalistList";
+import JournalistForm from "./pages/JournalistForm";
+import JournalistDetail from "./pages/JournalistDetail";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -46,6 +49,10 @@ function Router() {
       <Route path="/press-releases/:id/distribute" component={DistributePressRelease} />
       <Route path="/social-media/new" component={SocialMediaNew} />
       <Route path="/media-lists" component={MediaLists} />
+      <Route path="/journalists" component={JournalistList} />
+      <Route path="/journalists/new" component={JournalistForm} />
+      <Route path="/journalists/:id" component={JournalistDetail} />
+      <Route path="/journalists/:id/edit" component={JournalistForm} />
       <Route path="/ai-assistant" component={AIAssistant} />
       <Route path="/campaign-lab" component={CampaignLab} />
       <Route path="/partners" component={Partners} />

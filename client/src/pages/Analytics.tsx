@@ -339,7 +339,7 @@ export default function Analytics() {
                         <div className="flex-1">
                           <h4 className="font-medium text-gray-900">{campaign.name}</h4>
                           <p className="text-sm text-gray-500 mt-1">
-                            Budget: £{campaign.budget ? (campaign.budget / 100).toFixed(2) : '0.00'} • {campaign.platforms || 'No platforms'}
+                            Budget: £{campaign.budget ? parseFloat(campaign.budget).toFixed(2) : '0.00'} • {campaign.platforms || 'No platforms'}
                           </p>
                         </div>
                         <div className="text-right">

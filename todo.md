@@ -1070,3 +1070,73 @@
 - [x] Add router filters to blueprint for Facebook, Instagram, LinkedIn routes (already exists)
 - [x] Create comprehensive testing guide
 - [x] Create post deletion guide for all platforms
+
+
+## Priority 1: Journalist Media List Management (Dec 20, 2025)
+
+- [x] Design journalist database schema (contacts, outlets, beats, tags)
+- [x] Create database tables and relationships
+- [x] Build journalist CRUD backend (tRPC procedures)
+- [x] Implement journalist list UI with data table
+- [x] Add journalist detail view and edit form
+- [x] Implement filtering and search functionality
+- [ ] Add bulk import/export functionality
+- [ ] Create journalist segmentation by beat/outlet
+- [ ] Add outreach tracking (emails sent, responses)
+- [ ] Write vitest tests for journalist endpoints
+
+## Priority 2: Intelligent Campaign Lab (Dec 20, 2025)
+
+- [ ] Design campaign database schema (campaigns, goals, tactics, metrics)
+- [ ] Create database tables for campaign management
+- [ ] Build campaign CRUD backend (tRPC procedures)
+- [ ] Integrate LLM for AI campaign planning
+- [ ] Create campaign creation wizard UI
+- [ ] Build campaign dashboard with metrics
+- [ ] Implement AI-powered tactic suggestions
+- [ ] Add campaign timeline and milestones
+- [ ] Create campaign analytics and reporting
+- [ ] Write vitest tests for campaign endpoints
+
+## Priority 3: Tooltips & Help System (Dec 20, 2025)
+
+- [ ] Install tooltip library (e.g., @radix-ui/react-tooltip)
+- [ ] Create reusable Tooltip component
+- [ ] Add tooltips to all form fields
+- [ ] Add contextual help icons throughout UI
+- [ ] Create help text database/configuration
+- [ ] Implement keyboard shortcuts help modal
+- [ ] Add onboarding tour for new users
+- [ ] Create FAQ/Help Center page
+
+## Intelligent Campaign Lab (IN PROGRESS)
+- [ ] Create campaign planning wizard with AI strategy generation
+- [ ] Implement campaign timeline and milestone tracking
+- [ ] Build deliverables management system
+- [ ] Create campaign analytics dashboard with performance metrics
+- [ ] Implement AI-powered campaign recommendations
+- [ ] Add campaign budget tracking and forecasting
+- [ ] Build campaign collaboration features
+- [ ] Create campaign templates library
+- [ ] Implement campaign reporting and export
+
+## Journalist Media List Management (PENDING)
+- [ ] Complete refactoring of server/db/journalists.ts to use await getDb()
+- [ ] Create tRPC router endpoints for journalist management
+- [ ] Build journalist list view with search and filtering
+- [ ] Create journalist add/edit forms
+- [ ] Implement CSV import functionality for bulk uploads
+- [ ] Build journalist segmentation by beat/industry
+- [ ] Create journalist interaction history tracking
+- [ ] Implement email tracking for journalist outreach
+- [ ] Build journalist relationship scoring system
+
+## Tooltips & Help System (PENDING)
+- [ ] Create contextual help tooltip component
+- [ ] Add tooltips to all major features and forms
+- [ ] Build help center with FAQ articles
+- [ ] Create interactive feature tours
+- [ ] Implement in-app documentation
+- [ ] Add video tutorials for key workflows
+- [ ] Create searchable help documentation
+- [ ] Build feedback and support request system

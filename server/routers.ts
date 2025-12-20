@@ -37,6 +37,36 @@ import {
   getContentVersions,
   getContentVersion,
 } from "./db";
+import {
+  createJournalist,
+  getJournalistById,
+  getJournalistsByUserId,
+  updateJournalist,
+  deleteJournalist,
+  searchJournalists,
+  getJournalistsByOutlet,
+  getJournalistsByBeat,
+  getJournalistsByTag,
+  assignBeatToJournalist,
+  removeBeatFromJournalist,
+  assignTagToJournalist,
+  removeTagFromJournalist,
+  getBeatsByJournalist,
+  getTagsByJournalist,
+  createOutreach,
+  getOutreachByJournalist,
+  updateOutreachStatus,
+  getOutreachStats,
+  createMediaOutlet,
+  getAllMediaOutlets,
+  getMediaOutletById,
+  updateMediaOutlet,
+  deleteMediaOutlet,
+  createBeat,
+  getAllBeats,
+  createTag,
+  getAllTags,
+} from "./journalists";
 import { generateInvitationToken, getInvitationExpiry, hasPermission } from "./teamUtils";
 import {
   createPressRelease,
@@ -69,6 +99,19 @@ import {
   getVariantsByCampaign,
   bulkDeleteCampaigns,
   bulkUpdateCampaignStatus,
+  createMilestone,
+  getMilestonesByCampaign,
+  updateMilestone,
+  deleteMilestone,
+  createDeliverable,
+  getDeliverablesByCampaign,
+  getDeliverablesByMilestone,
+  updateDeliverable,
+  deleteDeliverable,
+  createAnalyticsEntry,
+  getAnalyticsByCampaign,
+  getAnalyticsByDateRange,
+  updateAnalyticsEntry,
 } from "./campaigns";
 import {
   createPartner,
@@ -830,9 +873,12 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
         z.object({
           name: z.string(),
           goal: z.string().optional(),
-          budget: z.number().optional(),
-          status: z.enum(["draft", "active", "paused", "completed"]).optional(),
+          budget: z.string().optional(), // Decimal string from database
+          status: z.enum(["draft", "planning", "active", "paused", "completed", "archived"]).optional(),
           platforms: z.string().optional(),
+          targetAudience: z.string().optional(),
+          startDate: z.string().optional(),
+          endDate: z.string().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -861,6 +907,9 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
           budget: input.budget,
           status: input.status || "draft",
           platforms: input.platforms,
+          targetAudience: input.targetAudience,
+          startDate: input.startDate ? new Date(input.startDate) : undefined,
+          endDate: input.endDate ? new Date(input.endDate) : undefined,
         });
 
         // Increment usage counter
@@ -884,13 +933,21 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
         z.object({
           id: z.number(),
           name: z.string().optional(),
-          status: z.enum(["draft", "active", "paused", "completed"]).optional(),
-
+          goal: z.string().optional(),
+          budget: z.string().optional(),
+          status: z.enum(["draft", "planning", "active", "paused", "completed", "archived"]).optional(),
+          platforms: z.string().optional(),
+          targetAudience: z.string().optional(),
+          startDate: z.string().optional(),
+          endDate: z.string().optional(),
         })
       )
       .mutation(async ({ input }) => {
-        const { id, ...updates } = input;
-        await updateCampaign(id, updates);
+        const { id, startDate, endDate, ...updates } = input;
+        const campaignUpdates: any = { ...updates };
+        if (startDate) campaignUpdates.startDate = new Date(startDate);
+        if (endDate) campaignUpdates.endDate = new Date(endDate);
+        await updateCampaign(id, campaignUpdates);
         return { success: true };
       }),
 
@@ -942,7 +999,7 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
       .input(
         z.object({
           ids: z.array(z.number()),
-          status: z.enum(["draft", "active", "paused", "completed"]),
+          status: z.enum(["draft", "planning", "active", "paused", "completed", "archived"]),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -958,6 +1015,181 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
         });
 
         return { success: true, count: affectedRows };
+      }),
+
+    // Milestones
+    createMilestone: protectedProcedure
+      .input(
+        z.object({
+          campaignId: z.number(),
+          title: z.string(),
+          description: z.string().optional(),
+          dueDate: z.string().optional(),
+          status: z.enum(["pending", "in_progress", "completed", "blocked"]).optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const milestone = await createMilestone({
+          ...input,
+          dueDate: input.dueDate ? new Date(input.dueDate) : undefined,
+        });
+        return milestone;
+      }),
+
+    getMilestones: protectedProcedure
+      .input(z.object({ campaignId: z.number() }))
+      .query(async ({ input }) => {
+        return await getMilestonesByCampaign(input.campaignId);
+      }),
+
+    updateMilestone: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          title: z.string().optional(),
+          description: z.string().optional(),
+          dueDate: z.string().optional(),
+          status: z.enum(["pending", "in_progress", "completed", "blocked"]).optional(),
+          completedAt: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { id, dueDate, completedAt, ...updates } = input;
+        const milestoneUpdates: any = { ...updates };
+        if (dueDate) milestoneUpdates.dueDate = new Date(dueDate);
+        if (completedAt) milestoneUpdates.completedAt = new Date(completedAt);
+        await updateMilestone(id, milestoneUpdates);
+        return { success: true };
+      }),
+
+    deleteMilestone: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteMilestone(input.id);
+        return { success: true };
+      }),
+
+    // Deliverables
+    createDeliverable: protectedProcedure
+      .input(
+        z.object({
+          campaignId: z.number(),
+          milestoneId: z.number().optional(),
+          title: z.string(),
+          type: z.enum(["press_release", "social_post", "email", "blog_post", "video", "infographic", "other"]),
+          status: z.enum(["draft", "in_review", "approved", "published"]).optional(),
+          contentId: z.number().optional(),
+          dueDate: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const deliverable = await createDeliverable({
+          ...input,
+          dueDate: input.dueDate ? new Date(input.dueDate) : undefined,
+        });
+        return deliverable;
+      }),
+
+    getDeliverables: protectedProcedure
+      .input(z.object({ campaignId: z.number() }))
+      .query(async ({ input }) => {
+        return await getDeliverablesByCampaign(input.campaignId);
+      }),
+
+    getDeliverablesByMilestone: protectedProcedure
+      .input(z.object({ milestoneId: z.number() }))
+      .query(async ({ input }) => {
+        return await getDeliverablesByMilestone(input.milestoneId);
+      }),
+
+    updateDeliverable: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          title: z.string().optional(),
+          type: z.enum(["press_release", "social_post", "email", "blog_post", "video", "infographic", "other"]).optional(),
+          status: z.enum(["draft", "in_review", "approved", "published"]).optional(),
+          contentId: z.number().optional(),
+          dueDate: z.string().optional(),
+          publishedAt: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { id, dueDate, publishedAt, ...updates } = input;
+        const deliverableUpdates: any = { ...updates };
+        if (dueDate) deliverableUpdates.dueDate = new Date(dueDate);
+        if (publishedAt) deliverableUpdates.publishedAt = new Date(publishedAt);
+        await updateDeliverable(id, deliverableUpdates);
+        return { success: true };
+      }),
+
+    deleteDeliverable: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteDeliverable(input.id);
+        return { success: true };
+      }),
+
+    // Analytics
+    createAnalytics: protectedProcedure
+      .input(
+        z.object({
+          campaignId: z.number(),
+          date: z.string(),
+          impressions: z.number().optional(),
+          clicks: z.number().optional(),
+          engagements: z.number().optional(),
+          conversions: z.number().optional(),
+          spend: z.number().optional(),
+          reach: z.number().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const analytics = await createAnalyticsEntry({
+          ...input,
+          date: new Date(input.date),
+        });
+        return analytics;
+      }),
+
+    getAnalytics: protectedProcedure
+      .input(z.object({ campaignId: z.number() }))
+      .query(async ({ input }) => {
+        return await getAnalyticsByCampaign(input.campaignId);
+      }),
+
+    getAnalyticsByDateRange: protectedProcedure
+      .input(
+        z.object({
+          campaignId: z.number(),
+          startDate: z.string(),
+          endDate: z.string(),
+        })
+      )
+      .query(async ({ input }) => {
+        return await getAnalyticsByDateRange(
+          input.campaignId,
+          new Date(input.startDate),
+          new Date(input.endDate)
+        );
+      }),
+
+    updateAnalytics: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          impressions: z.number().optional(),
+          clicks: z.number().optional(),
+          engagements: z.number().optional(),
+          conversions: z.number().optional(),
+          spend: z.number().optional(),
+          reach: z.number().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { id, ...updates } = input;
+        await updateAnalyticsEntry(id, updates);
+        return { success: true };
       }),
   }),
 
@@ -2158,6 +2390,305 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
           payload: testPayload,
         };
       }),
+  }),
+
+  // ========================================
+  // JOURNALIST MEDIA LIST MANAGEMENT
+  // ========================================
+  journalists: router({
+    // Create journalist
+    create: protectedProcedure
+      .input(z.object({
+        firstName: z.string().min(1),
+        lastName: z.string().min(1),
+        email: z.string().email(),
+        phone: z.string().optional(),
+        title: z.string().optional(),
+        mediaOutletId: z.number().optional(),
+        twitter: z.string().optional(),
+        linkedin: z.string().optional(),
+        website: z.string().optional(),
+        bio: z.string().optional(),
+        notes: z.string().optional(),
+        beatIds: z.array(z.number()).optional(),
+        tagIds: z.array(z.number()).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { beatIds, tagIds, ...journalistData } = input;
+        
+        const journalistId = await createJournalist({
+          ...journalistData,
+          userId: ctx.user.id,
+        });
+
+        // Assign beats
+        if (beatIds && beatIds.length > 0) {
+          for (const beatId of beatIds) {
+            await assignBeatToJournalist(journalistId, beatId);
+          }
+        }
+
+        // Assign tags
+        if (tagIds && tagIds.length > 0) {
+          for (const tagId of tagIds) {
+            await assignTagToJournalist(journalistId, tagId);
+          }
+        }
+
+        return { id: journalistId };
+      }),
+
+    // Get all journalists for current user
+    list: protectedProcedure.query(async ({ ctx }) => {
+      return getJournalistsByUserId(ctx.user.id);
+    }),
+
+    // Get journalist by ID
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return getJournalistById(input.id);
+      }),
+
+    // Update journalist
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        firstName: z.string().min(1).optional(),
+        lastName: z.string().min(1).optional(),
+        email: z.string().email().optional(),
+        phone: z.string().optional(),
+        title: z.string().optional(),
+        mediaOutletId: z.number().optional(),
+        twitter: z.string().optional(),
+        linkedin: z.string().optional(),
+        website: z.string().optional(),
+        bio: z.string().optional(),
+        notes: z.string().optional(),
+        status: z.enum(["active", "inactive", "bounced"]).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        await updateJournalist(id, data);
+        return { success: true };
+      }),
+
+    // Delete journalist
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteJournalist(input.id);
+        return { success: true };
+      }),
+
+    // Search journalists
+    search: protectedProcedure
+      .input(z.object({ query: z.string() }))
+      .query(async ({ ctx, input }) => {
+        return searchJournalists(ctx.user.id, input.query);
+      }),
+
+    // Get journalists by outlet
+    byOutlet: protectedProcedure
+      .input(z.object({ outletId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return getJournalistsByOutlet(ctx.user.id, input.outletId);
+      }),
+
+    // Get journalists by beat
+    byBeat: protectedProcedure
+      .input(z.object({ beatId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return getJournalistsByBeat(ctx.user.id, input.beatId);
+      }),
+
+    // Get journalists by tag
+    byTag: protectedProcedure
+      .input(z.object({ tagId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return getJournalistsByTag(ctx.user.id, input.tagId);
+      }),
+
+    // Assign beat to journalist
+    assignBeat: protectedProcedure
+      .input(z.object({
+        journalistId: z.number(),
+        beatId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        await assignBeatToJournalist(input.journalistId, input.beatId);
+        return { success: true };
+      }),
+
+    // Remove beat from journalist
+    removeBeat: protectedProcedure
+      .input(z.object({
+        journalistId: z.number(),
+        beatId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        await removeBeatFromJournalist(input.journalistId, input.beatId);
+        return { success: true };
+      }),
+
+    // Assign tag to journalist
+    assignTag: protectedProcedure
+      .input(z.object({
+        journalistId: z.number(),
+        tagId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        await assignTagToJournalist(input.journalistId, input.tagId);
+        return { success: true };
+      }),
+
+    // Remove tag from journalist
+    removeTag: protectedProcedure
+      .input(z.object({
+        journalistId: z.number(),
+        tagId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        await removeTagFromJournalist(input.journalistId, input.tagId);
+        return { success: true };
+      }),
+
+    // Get beats for journalist
+    getBeats: protectedProcedure
+      .input(z.object({ journalistId: z.number() }))
+      .query(async ({ input }) => {
+        return getBeatsByJournalist(input.journalistId);
+      }),
+
+    // Get tags for journalist
+    getTags: protectedProcedure
+      .input(z.object({ journalistId: z.number() }))
+      .query(async ({ input }) => {
+        return getTagsByJournalist(input.journalistId);
+      }),
+
+    // Create outreach record
+    createOutreach: protectedProcedure
+      .input(z.object({
+        journalistId: z.number(),
+        type: z.enum(["email", "phone", "social", "meeting"]),
+        subject: z.string().optional(),
+        message: z.string().optional(),
+        sentAt: z.date(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const outreachId = await createOutreach({
+          ...input,
+          userId: ctx.user.id,
+        });
+        return { id: outreachId };
+      }),
+
+    // Get outreach history
+    getOutreach: protectedProcedure
+      .input(z.object({ journalistId: z.number() }))
+      .query(async ({ input }) => {
+        return getOutreachByJournalist(input.journalistId);
+      }),
+
+    // Update outreach status
+    updateOutreachStatus: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.enum(["sent", "opened", "replied", "bounced", "no_response"]),
+        timestamp: z.date().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await updateOutreachStatus(input.id, input.status, input.timestamp);
+        return { success: true };
+      }),
+
+    // Get outreach statistics
+    getStats: protectedProcedure.query(async ({ ctx }) => {
+      return getOutreachStats(ctx.user.id);
+    }),
+  }),
+
+  // Media Outlets
+  mediaOutlets: router({
+    create: protectedProcedure
+      .input(z.object({
+        name: z.string().min(1),
+        website: z.string().optional(),
+        type: z.enum(["newspaper", "magazine", "online", "tv", "radio", "podcast", "blog"]),
+        reach: z.enum(["local", "regional", "national", "international"]).optional(),
+        description: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const outletId = await createMediaOutlet(input);
+        return { id: outletId };
+      }),
+
+    list: protectedProcedure.query(async () => {
+      return getAllMediaOutlets();
+    }),
+
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return getMediaOutletById(input.id);
+      }),
+
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().min(1).optional(),
+        website: z.string().optional(),
+        type: z.enum(["newspaper", "magazine", "online", "tv", "radio", "podcast", "blog"]).optional(),
+        reach: z.enum(["local", "regional", "national", "international"]).optional(),
+        description: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        await updateMediaOutlet(id, data);
+        return { success: true };
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteMediaOutlet(input.id);
+        return { success: true };
+      }),
+  }),
+
+  // Journalist Beats
+  journalistBeats: router({
+    create: protectedProcedure
+      .input(z.object({
+        name: z.string().min(1),
+        description: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const beatId = await createBeat(input);
+        return { id: beatId };
+      }),
+
+    list: protectedProcedure.query(async () => {
+      return getAllBeats();
+    }),
+  }),
+
+  // Journalist Tags
+  journalistTags: router({
+    create: protectedProcedure
+      .input(z.object({
+        name: z.string().min(1),
+        color: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const tagId = await createTag(input);
+        return { id: tagId };
+      }),
+
+    list: protectedProcedure.query(async () => {
+      return getAllTags();
+    }),
   }),
 });
 

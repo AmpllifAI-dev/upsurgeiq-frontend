@@ -1,4 +1,4 @@
-import { int, json, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { date, decimal, int, json, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -217,11 +217,15 @@ export const campaigns = mysqlTable("campaigns", {
   userId: int("userId").notNull().references(() => users.id),
   name: varchar("name", { length: 255 }).notNull(),
   goal: text("goal"),
-  status: mysqlEnum("status", ["draft", "active", "paused", "completed"]).default("draft").notNull(),
+  targetAudience: text("targetAudience"),
+  status: mysqlEnum("status", ["draft", "planning", "active", "paused", "completed", "archived"]).default("draft").notNull(),
   platforms: varchar("platforms", { length: 255 }),
-  budget: int("budget"),
-  startDate: timestamp("startDate"),
-  endDate: timestamp("endDate"),
+  budget: decimal("budget", { precision: 10, scale: 2 }),
+  startDate: date("startDate"),
+  endDate: date("endDate"),
+  aiGeneratedStrategy: text("aiGeneratedStrategy"),
+  keyMessages: text("keyMessages"),
+  successMetrics: text("successMetrics"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -589,3 +593,156 @@ export const webhookDeliveryLogs = mysqlTable("webhook_delivery_logs", {
 
 export type WebhookDeliveryLog = typeof webhookDeliveryLogs.$inferSelect;
 export type InsertWebhookDeliveryLog = typeof webhookDeliveryLogs.$inferInsert;
+
+// ========================================
+// JOURNALIST MEDIA LIST MANAGEMENT
+// ========================================
+
+// Media Outlets
+export const mediaOutlets = mysqlTable("media_outlets", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  website: varchar("website", { length: 500 }),
+  type: mysqlEnum("type", ["newspaper", "magazine", "online", "tv", "radio", "podcast", "blog"]).notNull(),
+  reach: mysqlEnum("reach", ["local", "regional", "national", "international"]),
+  description: text("description"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MediaOutlet = typeof mediaOutlets.$inferSelect;
+export type InsertMediaOutlet = typeof mediaOutlets.$inferInsert;
+
+// Journalist Beats/Topics
+export const journalistBeats = mysqlTable("journalist_beats", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull().unique(),
+  description: text("description"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type JournalistBeat = typeof journalistBeats.$inferSelect;
+export type InsertJournalistBeat = typeof journalistBeats.$inferInsert;
+
+// Journalists
+export const journalists = mysqlTable("journalists", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  firstName: varchar("firstName", { length: 100 }).notNull(),
+  lastName: varchar("lastName", { length: 100 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  phone: varchar("phone", { length: 50 }),
+  title: varchar("title", { length: 255 }), // e.g., "Senior Technology Reporter"
+  mediaOutletId: int("mediaOutletId").references(() => mediaOutlets.id, { onDelete: "set null" }),
+  twitter: varchar("twitter", { length: 100 }),
+  linkedin: varchar("linkedin", { length: 255 }),
+  website: varchar("website", { length: 500 }),
+  bio: text("bio"),
+  notes: text("notes"), // Internal notes about the journalist
+  status: mysqlEnum("status", ["active", "inactive", "bounced"]).default("active").notNull(),
+  lastContactedAt: timestamp("lastContactedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Journalist = typeof journalists.$inferSelect;
+export type InsertJournalist = typeof journalists.$inferInsert;
+
+// Junction table: Journalists to Beats (many-to-many)
+export const journalistBeatRelations = mysqlTable("journalist_beat_relations", {
+  id: int("id").autoincrement().primaryKey(),
+  journalistId: int("journalistId").notNull().references(() => journalists.id, { onDelete: "cascade" }),
+  beatId: int("beatId").notNull().references(() => journalistBeats.id, { onDelete: "cascade" }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+// Journalist Tags (for custom segmentation)
+export const journalistTags = mysqlTable("journalist_tags", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull().unique(),
+  color: varchar("color", { length: 7 }).default("#3b82f6"), // Hex color code
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type JournalistTag = typeof journalistTags.$inferSelect;
+export type InsertJournalistTag = typeof journalistTags.$inferInsert;
+
+// Junction table: Journalists to Tags (many-to-many)
+export const journalistTagRelations = mysqlTable("journalist_tag_relations", {
+  id: int("id").autoincrement().primaryKey(),
+  journalistId: int("journalistId").notNull().references(() => journalists.id, { onDelete: "cascade" }),
+  tagId: int("tagId").notNull().references(() => journalistTags.id, { onDelete: "cascade" }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+// Outreach History
+export const journalistOutreach = mysqlTable("journalist_outreach", {
+  id: int("id").autoincrement().primaryKey(),
+  journalistId: int("journalistId").notNull().references(() => journalists.id, { onDelete: "cascade" }),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  type: mysqlEnum("type", ["email", "phone", "social", "meeting"]).notNull(),
+  subject: varchar("subject", { length: 500 }),
+  message: text("message"),
+  status: mysqlEnum("status", ["sent", "opened", "replied", "bounced", "no_response"]).default("sent").notNull(),
+  sentAt: timestamp("sentAt").notNull(),
+  openedAt: timestamp("openedAt"),
+  repliedAt: timestamp("repliedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type JournalistOutreach = typeof journalistOutreach.$inferSelect;
+export type InsertJournalistOutreach = typeof journalistOutreach.$inferInsert;
+
+// ========================================
+// INTELLIGENT CAMPAIGN LAB - Campaign Milestones
+// ========================================
+
+export const campaignMilestones = mysqlTable("campaign_milestones", {
+  id: int("id").autoincrement().primaryKey(),
+  campaignId: int("campaignId").notNull().references(() => campaigns.id, { onDelete: "cascade" }),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  dueDate: timestamp("dueDate"),
+  status: mysqlEnum("status", ["pending", "in_progress", "completed", "blocked"]).default("pending").notNull(),
+  completedAt: timestamp("completedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CampaignMilestone = typeof campaignMilestones.$inferSelect;
+export type InsertCampaignMilestone = typeof campaignMilestones.$inferInsert;
+
+// Campaign Deliverables
+export const campaignDeliverables = mysqlTable("campaign_deliverables", {
+  id: int("id").autoincrement().primaryKey(),
+  campaignId: int("campaignId").notNull().references(() => campaigns.id, { onDelete: "cascade" }),
+  milestoneId: int("milestoneId").references(() => campaignMilestones.id, { onDelete: "set null" }),
+  title: varchar("title", { length: 255 }).notNull(),
+  type: mysqlEnum("type", ["press_release", "social_post", "email", "blog_post", "video", "infographic", "other"]).notNull(),
+  status: mysqlEnum("status", ["draft", "in_review", "approved", "published"]).default("draft").notNull(),
+  contentId: int("contentId"), // References press_releases.id or social_media_posts.id
+  dueDate: timestamp("dueDate"),
+  publishedAt: timestamp("publishedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CampaignDeliverable = typeof campaignDeliverables.$inferSelect;
+export type InsertCampaignDeliverable = typeof campaignDeliverables.$inferInsert;
+
+// Campaign Analytics
+export const campaignAnalytics = mysqlTable("campaign_analytics", {
+  id: int("id").autoincrement().primaryKey(),
+  campaignId: int("campaignId").notNull().references(() => campaigns.id, { onDelete: "cascade" }),
+  date: timestamp("date").notNull(),
+  impressions: int("impressions").default(0),
+  clicks: int("clicks").default(0),
+  engagements: int("engagements").default(0),
+  conversions: int("conversions").default(0),
+  spend: int("spend").default(0), // In cents
+  reach: int("reach").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CampaignAnalytics = typeof campaignAnalytics.$inferSelect;
+export type InsertCampaignAnalytics = typeof campaignAnalytics.$inferInsert;
+
+// ========================================

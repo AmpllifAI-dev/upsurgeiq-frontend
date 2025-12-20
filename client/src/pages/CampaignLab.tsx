@@ -73,7 +73,9 @@ export default function CampaignLab() {
       } else if (sortBy === "status") {
         comparison = a.status.localeCompare(b.status);
       } else if (sortBy === "budget") {
-        comparison = (a.budget || 0) - (b.budget || 0);
+        const budgetA = parseFloat(a.budget || "0");
+        const budgetB = parseFloat(b.budget || "0");
+        comparison = budgetA - budgetB;
       }
       
       return sortOrder === "asc" ? comparison : -comparison;
@@ -152,7 +154,7 @@ export default function CampaignLab() {
     createMutation.mutate({
       name: campaignName,
       goal: campaignGoal || undefined,
-      budget: campaignBudget ? parseFloat(campaignBudget) : undefined,
+      budget: campaignBudget || undefined,
       status: "draft",
     });
   };
@@ -429,8 +431,8 @@ export default function CampaignLab() {
                           ...campaign,
                           goal: campaign.goal || undefined,
                           budget: campaign.budget || undefined,
-                          startDate: campaign.startDate || undefined,
-                          endDate: campaign.endDate || undefined,
+                          startDate: campaign.startDate ? campaign.startDate.toString() : undefined,
+                          endDate: campaign.endDate ? campaign.endDate.toString() : undefined,
                         })}
                       >
                         <FileDown className="w-4 h-4 mr-2" />
