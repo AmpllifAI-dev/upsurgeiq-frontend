@@ -1369,3 +1369,15 @@
 - [x] Test image pack purchase flow end-to-end
 - [x] Test usage warnings display correctly
 - [x] Create purchase flow documentation
+
+
+## Stripe Webhook & Purchase CTA (December 20, 2025)
+- [x] Create Stripe webhook endpoint handler
+- [x] Configure webhook route in Express server (already exists)
+- [x] Add STRIPE_WEBHOOK_SECRET environment variable
+- [x] Test webhook with Stripe CLI (webhook integration tests passing)
+- [x] Implement word count limit check in press release generation
+- [x] Create inline purchase CTA component for word count limits
+- [x] Integrate purchase CTA into press release flow
+- [x] Test end-to-end: exceed limit → see CTA → purchase → continue
+- [x] Create webhook setup documentation

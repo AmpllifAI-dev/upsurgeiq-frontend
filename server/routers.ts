@@ -439,10 +439,24 @@ export const appRouter = router({
           });
         }
 
-        // Import word count limits
+        // Import word count limits and check purchased credits
         const { WORD_COUNT_LIMITS } = await import("./products");
+        const { getAvailableWordCountCredits, canGeneratePressRelease } = await import("./addOnCredits");
+        
         const baseWordLimit = WORD_COUNT_LIMITS[subscription.plan];
-        const wordLimit = input.maxWords || baseWordLimit;
+        const requestedWords = input.maxWords || baseWordLimit;
+        
+        // Check if user can generate press release with requested word count
+        const creditCheck = await canGeneratePressRelease(ctx.user.id, requestedWords);
+        
+        if (!creditCheck.allowed) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: `You need ${creditCheck.requiredPurchase} more words to generate this press release. Your tier allows ${baseWordLimit} words, and you have ${creditCheck.purchasedWords} purchased words remaining.`,
+          });
+        }
+        
+        const wordLimit = requestedWords;
 
         const systemPrompt = `You are a professional press release writer. Generate a compelling, newsworthy press release based on the following information:
 

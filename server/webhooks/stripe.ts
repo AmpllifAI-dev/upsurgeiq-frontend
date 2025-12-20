@@ -71,7 +71,24 @@ export async function handleStripeWebhook(req: Request, res: Response) {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
-        await handleCheckoutCompleted(session);
+        // Check if this is an add-on purchase (word count or image pack)
+        const productType = session.metadata?.productType;
+        if (productType === "word_count" || productType === "image_pack") {
+          await handleAddOnPurchase(session);
+        } else {
+          // Regular subscription checkout
+          await handleCheckoutCompleted(session);
+        }
+        break;
+      }
+
+      case "checkout.session.async_payment_succeeded": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        // Handle async payment success (e.g., bank transfers)
+        const productType = session.metadata?.productType;
+        if (productType === "word_count" || productType === "image_pack") {
+          await handleAddOnPurchase(session);
+        }
         break;
       }
 
@@ -592,5 +609,91 @@ async function handlePaymentActionRequired(invoice: Stripe.Invoice) {
       userId,
       metadata: { email: user[0].email },
     });
+  }
+}
+
+
+/**
+ * Handle add-on purchase (word count or image packs)
+ */
+async function handleAddOnPurchase(session: Stripe.Checkout.Session) {
+  logger.info("Add-on purchase completed", {
+    action: "handleAddOnPurchase",
+    metadata: { sessionId: session.id },
+  });
+
+  const userId = parseInt(session.client_reference_id || "0");
+  const productType = session.metadata?.productType;
+  
+  if (!userId || !productType) {
+    logger.error("Missing userId or productType in session metadata", undefined, {
+      action: "handleAddOnPurchase",
+      metadata: { sessionId: session.id },
+    });
+    return;
+  }
+
+  // Import add-on credit functions
+  const { addWordCountCredits, addImageCredits } = await import("../addOnCredits");
+
+  try {
+    if (productType === "word_count") {
+      const words = parseInt(session.metadata?.words || "0");
+      const productKey = session.metadata?.productKey || "unknown";
+      
+      if (!words) {
+        logger.error("Missing words in session metadata", undefined, {
+          action: "handleAddOnPurchase",
+          metadata: { sessionId: session.id },
+        });
+        return;
+      }
+
+      await addWordCountCredits({
+        userId,
+        words,
+        stripeSessionId: session.id,
+        stripePaymentIntentId: session.payment_intent as string || null,
+        productKey,
+      });
+
+      logger.info("Word count credits added successfully", {
+        action: "handleAddOnPurchase",
+        userId,
+        metadata: { words, productKey },
+      });
+    } else if (productType === "image_pack") {
+      const images = parseInt(session.metadata?.images || "0");
+      const productKey = session.metadata?.productKey || "unknown";
+      
+      if (!images) {
+        logger.error("Missing images in session metadata", undefined, {
+          action: "handleAddOnPurchase",
+          metadata: { sessionId: session.id },
+        });
+        return;
+      }
+
+      await addImageCredits({
+        userId,
+        images,
+        stripeSessionId: session.id,
+        stripePaymentIntentId: session.payment_intent as string || null,
+        productKey,
+      });
+
+      logger.info("Image credits added successfully", {
+        action: "handleAddOnPurchase",
+        userId,
+        metadata: { images, productKey },
+      });
+    }
+  } catch (error) {
+    logger.error("Failed to add credits", error as Error, {
+      action: "handleAddOnPurchase",
+      userId,
+      metadata: { productType },
+    });
+    throw error;
   }
 }

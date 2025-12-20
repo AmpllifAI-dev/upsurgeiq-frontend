@@ -17,6 +17,7 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { CopyButton } from "@/components/CopyButton";
 import { CharacterCounter } from "@/components/CharacterCounter";
 import { AIImageGenerator } from "@/components/AIImageGenerator";
+import { WordCountPurchaseCTA } from "@/components/WordCountPurchaseCTA";
 
 export default function PressReleaseNew() {
   const { user, loading } = useAuth();
@@ -31,6 +32,12 @@ export default function PressReleaseNew() {
   const [isEditing, setIsEditing] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
+  const [showPurchaseCTA, setShowPurchaseCTA] = useState(false);
+  const [wordCountError, setWordCountError] = useState<{
+    requiredWords: number;
+    tierLimit: number;
+    purchasedWords: number;
+  } | null>(null);
 
   const { data: business } = trpc.business.get.useQuery(undefined, {
     enabled: !!user,
@@ -45,7 +52,25 @@ export default function PressReleaseNew() {
     },
     onError: (error) => {
       setIsGenerating(false);
-      toast.error(error.message || "Failed to generate press release");
+      
+      // Check if error is about word count limits
+      if (error.message && error.message.includes("need") && error.message.includes("more words")) {
+        // Parse error message to extract numbers
+        const match = error.message.match(/need (\d+) more words.*allows (\d+) words.*have (\d+) purchased/);
+        if (match) {
+          const [, requiredWords, tierLimit, purchasedWords] = match;
+          setWordCountError({
+            requiredWords: parseInt(requiredWords),
+            tierLimit: parseInt(tierLimit),
+            purchasedWords: parseInt(purchasedWords),
+          });
+          setShowPurchaseCTA(true);
+        } else {
+          toast.error(error.message);
+        }
+      } else {
+        toast.error(error.message || "Failed to generate press release");
+      }
     },
   });
 
@@ -256,6 +281,22 @@ export default function PressReleaseNew() {
                   </>
                 )}
               </Button>
+
+              {/* Word Count Purchase CTA */}
+              {showPurchaseCTA && wordCountError && (
+                <div className="mt-6">
+                  <WordCountPurchaseCTA
+                    requiredWords={wordCountError.requiredWords}
+                    tierLimit={wordCountError.tierLimit}
+                    purchasedWords={wordCountError.purchasedWords}
+                    onPurchaseSuccess={() => {
+                      setShowPurchaseCTA(false);
+                      setWordCountError(null);
+                      toast.success("Purchase successful! You can now generate your press release.");
+                    }}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
 
