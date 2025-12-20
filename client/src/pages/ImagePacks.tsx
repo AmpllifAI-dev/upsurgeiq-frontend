@@ -19,8 +19,17 @@ export default function ImagePacks() {
     enabled: !!user,
   });
 
-  // TODO: Implement image pack purchase mutation
-  // const createCheckoutMutation = trpc.imagePacks.createCheckout.useMutation(...)
+  const createCheckoutMutation = trpc.imagePacks.createCheckout.useMutation({
+    onSuccess: (data) => {
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to create checkout session");
+      setPurchasingPack(null);
+    },
+  });
 
   if (loading || usageLoading) {
     return (
@@ -94,11 +103,9 @@ export default function ImagePacks() {
     },
   ];
 
-  const handlePurchase = (packId: string) => {
+  const handlePurchase = (packId: "single" | "pack_5" | "pack_10") => {
     setPurchasingPack(packId);
-    // TODO: Implement actual Stripe checkout for image packs
-    toast.info("Image pack purchase coming soon!");
-    setTimeout(() => setPurchasingPack(null), 2000);
+    createCheckoutMutation.mutate({ packId });
   };
 
   return (
@@ -202,7 +209,7 @@ export default function ImagePacks() {
                   <Button
                     className="w-full"
                     variant={pack.popular ? "default" : "outline"}
-                    onClick={() => handlePurchase(pack.id)}
+                    onClick={() => handlePurchase(pack.id as "single" | "pack_5" | "pack_10")}
                     disabled={purchasingPack === pack.id}
                   >
                     {purchasingPack === pack.id ? (

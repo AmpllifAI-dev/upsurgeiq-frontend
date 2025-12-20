@@ -3806,6 +3806,51 @@ Generate a comprehensive campaign strategy that includes:
         return await generateTeamPressReleaseAngles(input.teamId, business.id);
       }),
   }),
+
+  imagePacks: router({
+    createCheckout: protectedProcedure
+      .input(
+        z.object({
+          packId: z.enum(["single", "pack_5", "pack_10"]),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const Stripe = (await import("stripe")).default;
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+          apiVersion: "2025-12-15.clover",
+        });
+
+        const { IMAGE_PACK_PRODUCTS } = await import("./products");
+        const product = IMAGE_PACK_PRODUCTS[input.packId];
+
+        if (!product || !product.stripePriceId) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Product not found or not configured",
+          });
+        }
+
+        const session = await stripe.checkout.sessions.create({
+          customer_email: ctx.user.email || undefined,
+          line_items: [
+            {
+              price: product.stripePriceId!,
+              quantity: 1,
+            },
+          ],
+          mode: "payment",
+          success_url: `${process.env.FRONTEND_URL}/dashboard/image-packs?success=true`,
+          cancel_url: `${process.env.FRONTEND_URL}/dashboard/image-packs?canceled=true`,
+          metadata: {
+            userId: ctx.user.id.toString(),
+            packId: input.packId,
+            credits: product.images.toString(),
+          },
+        });
+
+        return { url: session.url };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

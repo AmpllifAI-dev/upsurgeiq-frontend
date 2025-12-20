@@ -943,3 +943,22 @@ export type ScheduledPressRelease = typeof scheduledPressReleases.$inferSelect;
 export type InsertScheduledPressRelease = typeof scheduledPressReleases.$inferInsert;
 
 // ========================================
+
+// Social Media Connections
+export const socialConnections = mysqlTable("social_connections", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  platform: mysqlEnum("platform", ["facebook", "instagram", "linkedin", "x"]).notNull(),
+  platformUserId: varchar("platformUserId", { length: 255 }).notNull(),
+  platformUsername: varchar("platformUsername", { length: 255 }),
+  accessToken: text("accessToken").notNull(),
+  refreshToken: text("refreshToken"),
+  tokenExpiresAt: timestamp("tokenExpiresAt"),
+  profilePictureUrl: text("profilePictureUrl"),
+  isActive: int("isActive").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SocialConnection = typeof socialConnections.$inferSelect;
+export type InsertSocialConnection = typeof socialConnections.$inferInsert;

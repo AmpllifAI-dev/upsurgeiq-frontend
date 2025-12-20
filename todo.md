@@ -1601,3 +1601,21 @@
 - [x] Shows current AI image credit usage and remaining credits
 - [x] Displays three purchase options: Single (£3.99), 5-Pack (£14.99), 10-Pack (£24.99)
 - [x] Includes "How It Works" section explaining the process
+
+
+## Dashboard Navigation & Backend Integration (December 20, 2025)
+- [x] Add "AI Add-ons" link to dashboard navigation
+- [x] Add "Image Packs" link to dashboard navigation
+- [x] Add "Social Connections" link to dashboard navigation
+- [x] Create Stripe products for image packs in productDefinitions.ts
+- [x] Synced image pack products to Stripe (single, 5-pack, 10-pack)
+- [x] Implement backend checkout endpoint for image packs
+- [x] Created imagePacks.createCheckout tRPC mutation
+- [x] Integrated Stripe checkout session creation
+- [ ] Create webhook handler to credit AI images after purchase (TODO: implement in Stripe webhook handler)
+- [x] Build OAuth handler for Facebook (with placeholder credentials)
+- [x] Build OAuth handler for Instagram (with placeholder credentials)
+- [x] Build OAuth handler for LinkedIn (with placeholder credentials)
+- [x] Build OAuth handler for X/Twitter (with placeholder credentials)
+- [x] Create database schema for storing OAuth tokens (social_connections table)
+- [x] Document where to add actual OAuth credentials (see server/socialOAuth.ts)
