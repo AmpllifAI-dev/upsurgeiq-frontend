@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
-import { Zap, Beaker, Plus, ArrowLeft, Play, Pause, TrendingUp, Eye, BarChart3, Search, Filter, FileDown } from "lucide-react";
+import { Zap, Beaker, Plus, ArrowLeft, Play, Pause, TrendingUp, Eye, BarChart3, Search, Filter, FileDown, Layout } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -202,10 +202,16 @@ export default function CampaignLab() {
               AI-powered A/B testing and campaign optimization
             </p>
           </div>
-          <Button onClick={() => setIsCreateOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            New Campaign
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setLocation("/dashboard/campaign-templates")}>
+              <Layout className="w-4 h-4 mr-2" />
+              Browse Templates
+            </Button>
+            <Button onClick={() => setIsCreateOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              New Campaign
+            </Button>
+          </div>
           <CampaignPlanningWizard
             open={isCreateOpen}
             onOpenChange={setIsCreateOpen}

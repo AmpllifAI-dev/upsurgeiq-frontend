@@ -1178,3 +1178,24 @@
 - [x] Implement import success/error reporting
 - [x] Add sample CSV download functionality
 - [x] Integrate CSV import button into JournalistList page
+
+## Analytics Export Functionality
+- [x] Create analytics export utility functions for CSV format
+- [x] Create analytics export utility functions for PDF format
+- [x] Add export buttons to CampaignAnalyticsCharts component
+- [x] Implement CSV export with filtered data
+- [x] Implement PDF export with charts and summary
+- [x] Add export date range to filename
+- [x] Export includes summary statistics and conversion metrics
+
+## Campaign Template Library
+- [x] Create campaign_templates database table
+- [x] Add campaign template CRUD functions to server/campaigns.ts
+- [x] Create campaign template tRPC endpoints (list, get, create, update, delete, useTemplate)
+- [x] Create campaign templates library page with search and filtering
+- [x] Implement template preview functionality
+- [x] Add "Use Template" feature to pre-fill campaign wizard
+- [x] Group templates by category with usage tracking
+- [x] Add Browse Templates button to Campaign Lab
+- [ ] Create default template library with common campaign types
+- [ ] Integrate template data into campaign wizard

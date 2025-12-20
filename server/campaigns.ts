@@ -7,6 +7,9 @@ import {
   campaignVariants,
   CampaignVariant,
   InsertCampaignVariant,
+  campaignTemplates,
+  CampaignTemplate,
+  InsertCampaignTemplate,
 } from "../drizzle/schema";
 
 export async function createCampaign(data: InsertCampaign): Promise<Campaign> {
@@ -331,4 +334,121 @@ export async function updateAnalyticsEntry(
   if (!db) throw new Error("Database not available");
 
   await db.update(campaignAnalytics).set(updates).where(eq(campaignAnalytics.id, id));
+}
+
+// ========================================
+// CAMPAIGN TEMPLATES
+// ========================================
+
+export async function createCampaignTemplate(data: InsertCampaignTemplate): Promise<CampaignTemplate> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(campaignTemplates).values(data);
+  const insertedId = Number(result[0].insertId);
+
+  const created = await db
+    .select()
+    .from(campaignTemplates)
+    .where(eq(campaignTemplates.id, insertedId))
+    .limit(1);
+
+  if (created.length === 0) throw new Error("Failed to create campaign template");
+  return created[0]!;
+}
+
+export async function getCampaignTemplateById(id: number): Promise<CampaignTemplate | null> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db
+    .select()
+    .from(campaignTemplates)
+    .where(eq(campaignTemplates.id, id))
+    .limit(1);
+
+  return result[0] || null;
+}
+
+export async function getCampaignTemplatesByUser(userId: number): Promise<CampaignTemplate[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return db
+    .select()
+    .from(campaignTemplates)
+    .where(eq(campaignTemplates.userId, userId))
+    .orderBy(desc(campaignTemplates.createdAt));
+}
+
+export async function getPublicCampaignTemplates(): Promise<CampaignTemplate[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return db
+    .select()
+    .from(campaignTemplates)
+    .where(eq(campaignTemplates.isPublic, 1))
+    .orderBy(desc(campaignTemplates.usageCount));
+}
+
+export async function getAllCampaignTemplates(userId: number): Promise<CampaignTemplate[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Get both public templates and user's private templates
+  const publicTemplates = await db
+    .select()
+    .from(campaignTemplates)
+    .where(eq(campaignTemplates.isPublic, 1));
+
+  const userTemplates = await db
+    .select()
+    .from(campaignTemplates)
+    .where(eq(campaignTemplates.userId, userId));
+
+  // Combine and sort by usage count for public, then by created date for user templates
+  return [...publicTemplates, ...userTemplates].sort((a, b) => {
+    if (a.isPublic && b.isPublic) {
+      return (b.usageCount || 0) - (a.usageCount || 0);
+    }
+    if (a.isPublic) return -1;
+    if (b.isPublic) return 1;
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+}
+
+export async function updateCampaignTemplate(
+  id: number,
+  data: Partial<InsertCampaignTemplate>
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(campaignTemplates)
+    .set(data)
+    .where(eq(campaignTemplates.id, id));
+}
+
+export async function deleteCampaignTemplate(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .delete(campaignTemplates)
+    .where(eq(campaignTemplates.id, id));
+}
+
+export async function incrementTemplateUsage(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const template = await getCampaignTemplateById(id);
+  if (!template) return;
+
+  await db
+    .update(campaignTemplates)
+    .set({ usageCount: (template.usageCount || 0) + 1 })
+    .where(eq(campaignTemplates.id, id));
 }

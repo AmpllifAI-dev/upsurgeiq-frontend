@@ -25,7 +25,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar } from "lucide-react";
+import { Calendar, Download, FileText, FileSpreadsheet } from "lucide-react";
+import { exportAnalyticsToCSV, exportAnalyticsToPDF } from "@/lib/analyticsExport";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface AnalyticsEntry {
   id: number;
@@ -42,6 +49,7 @@ interface AnalyticsEntry {
 
 interface CampaignAnalyticsChartsProps {
   analytics: AnalyticsEntry[];
+  campaignName: string;
 }
 
 const COLORS = {
@@ -55,7 +63,7 @@ const COLORS = {
 
 const PIE_COLORS = [COLORS.primary, COLORS.secondary, COLORS.accent, COLORS.success];
 
-export function CampaignAnalyticsCharts({ analytics }: CampaignAnalyticsChartsProps) {
+export function CampaignAnalyticsCharts({ analytics, campaignName }: CampaignAnalyticsChartsProps) {
   const [dateRange, setDateRange] = useState<string>("all");
   const [customStartDate, setCustomStartDate] = useState<string>("");
   const [customEndDate, setCustomEndDate] = useState<string>("");
@@ -158,15 +166,63 @@ export function CampaignAnalyticsCharts({ analytics }: CampaignAnalyticsChartsPr
     );
   }
 
+  const handleExportCSV = () => {
+    const dateRangeLabel = dateRange === "all" ? "All Time" : 
+      dateRange === "7d" ? "Last 7 Days" :
+      dateRange === "30d" ? "Last 30 Days" :
+      dateRange === "90d" ? "Last 90 Days" :
+      `${customStartDate} to ${customEndDate}`;
+
+    exportAnalyticsToCSV({
+      campaignName,
+      dateRange: dateRangeLabel,
+      analytics: filteredAnalytics,
+    });
+  };
+
+  const handleExportPDF = () => {
+    const dateRangeLabel = dateRange === "all" ? "All Time" : 
+      dateRange === "7d" ? "Last 7 Days" :
+      dateRange === "30d" ? "Last 30 Days" :
+      dateRange === "90d" ? "Last 90 Days" :
+      `${customStartDate} to ${customEndDate}`;
+
+    exportAnalyticsToPDF({
+      campaignName,
+      dateRange: dateRangeLabel,
+      analytics: filteredAnalytics,
+    });
+  };
+
   return (
     <div className="space-y-6">
       {/* Date Range Filter */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
-            Date Range Filter
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Date Range Filter
+            </CardTitle>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Download className="w-4 h-4 mr-2" />
+                  Export
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleExportCSV}>
+                  <FileSpreadsheet className="w-4 h-4 mr-2" />
+                  Export as CSV
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportPDF}>
+                  <FileText className="w-4 h-4 mr-2" />
+                  Export as PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-4 items-end">

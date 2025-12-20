@@ -586,7 +586,7 @@ export default function CampaignDetail() {
           {analyticsLoading ? (
             <Skeleton className="h-64 w-full" />
           ) : analytics && analytics.length > 0 ? (
-            <CampaignAnalyticsCharts analytics={analytics} />
+            <CampaignAnalyticsCharts analytics={analytics} campaignName={campaign.name} />
           ) : (
             <Card>
               <CardContent className="py-12 text-center">

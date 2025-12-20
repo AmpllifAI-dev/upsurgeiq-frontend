@@ -745,4 +745,30 @@ export const campaignAnalytics = mysqlTable("campaign_analytics", {
 export type CampaignAnalytics = typeof campaignAnalytics.$inferSelect;
 export type InsertCampaignAnalytics = typeof campaignAnalytics.$inferInsert;
 
+// Campaign Templates
+export const campaignTemplates = mysqlTable("campaign_templates", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").references(() => users.id, { onDelete: "cascade" }), // null for system templates
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  category: varchar("category", { length: 100 }), // e.g., "Product Launch", "Brand Awareness", "Lead Generation"
+  goal: text("goal"),
+  targetAudience: text("targetAudience"),
+  platforms: varchar("platforms", { length: 255 }),
+  suggestedBudget: decimal("suggestedBudget", { precision: 10, scale: 2 }),
+  suggestedDuration: int("suggestedDuration"), // in days
+  strategy: text("strategy"),
+  keyMessages: text("keyMessages"),
+  successMetrics: text("successMetrics"),
+  milestones: text("milestones"), // JSON array of milestone templates
+  deliverables: text("deliverables"), // JSON array of deliverable templates
+  isPublic: int("isPublic").default(0), // 0 = private, 1 = public (system templates)
+  usageCount: int("usageCount").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CampaignTemplate = typeof campaignTemplates.$inferSelect;
+export type InsertCampaignTemplate = typeof campaignTemplates.$inferInsert;
+
 // ========================================

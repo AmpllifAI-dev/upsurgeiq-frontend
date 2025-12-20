@@ -19,6 +19,7 @@ import MediaLists from "./pages/MediaLists";
 import AIAssistant from "./pages/AIAssistant";
 import CampaignLab from "./pages/CampaignLab";
 import CampaignDetail from "./pages/CampaignDetail";
+import CampaignTemplates from "./pages/CampaignTemplates";
 import Partners from "./pages/Partners";
 import WordPressSettings from "./pages/WordPressSettings";
 import ErrorLogs from "./pages/ErrorLogs";
@@ -58,6 +59,7 @@ function Router() {
       <Route path="/campaign-lab" component={CampaignLab} />
       <Route path="/dashboard/campaign/:id" component={CampaignDetail} />
       <Route path="/dashboard/campaign-lab" component={CampaignLab} />
+      <Route path="/dashboard/campaign-templates" component={CampaignTemplates} />
       <Route path="/partners" component={Partners} />
       <Route path="/wordpress-settings" component={WordPressSettings} />
       <Route path="/error-logs" component={ErrorLogs} />

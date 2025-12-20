@@ -112,6 +112,12 @@ import {
   getAnalyticsByCampaign,
   getAnalyticsByDateRange,
   updateAnalyticsEntry,
+  createCampaignTemplate,
+  getCampaignTemplateById,
+  getAllCampaignTemplates,
+  updateCampaignTemplate,
+  deleteCampaignTemplate,
+  incrementTemplateUsage,
 } from "./campaigns";
 import {
   createPartner,
@@ -1314,6 +1320,84 @@ Generate a comprehensive campaign strategy that includes:
         const { id, ...updates } = input;
         await updateAnalyticsEntry(id, updates);
         return { success: true };
+      }),
+
+    // Campaign Templates
+    listTemplates: protectedProcedure.query(async ({ ctx }) => {
+      return await getAllCampaignTemplates(ctx.user.id);
+    }),
+
+    getTemplate: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return await getCampaignTemplateById(input.id);
+      }),
+
+    createTemplate: protectedProcedure
+      .input(
+        z.object({
+          name: z.string().min(1),
+          description: z.string().optional(),
+          category: z.string().optional(),
+          goal: z.string().optional(),
+          targetAudience: z.string().optional(),
+          platforms: z.string().optional(),
+          suggestedBudget: z.string().optional(),
+          suggestedDuration: z.number().optional(),
+          strategy: z.string().optional(),
+          keyMessages: z.string().optional(),
+          successMetrics: z.string().optional(),
+          milestones: z.string().optional(), // JSON string
+          deliverables: z.string().optional(), // JSON string
+          isPublic: z.number().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const template = await createCampaignTemplate({
+          ...input,
+          userId: ctx.user.id,
+        });
+        return template;
+      }),
+
+    updateTemplate: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          name: z.string().optional(),
+          description: z.string().optional(),
+          category: z.string().optional(),
+          goal: z.string().optional(),
+          targetAudience: z.string().optional(),
+          platforms: z.string().optional(),
+          suggestedBudget: z.string().optional(),
+          suggestedDuration: z.number().optional(),
+          strategy: z.string().optional(),
+          keyMessages: z.string().optional(),
+          successMetrics: z.string().optional(),
+          milestones: z.string().optional(),
+          deliverables: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { id, ...updates } = input;
+        await updateCampaignTemplate(id, updates);
+        return { success: true };
+      }),
+
+    deleteTemplate: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteCampaignTemplate(input.id);
+        return { success: true };
+      }),
+
+    useTemplate: protectedProcedure
+      .input(z.object({ templateId: z.number() }))
+      .mutation(async ({ input }) => {
+        await incrementTemplateUsage(input.templateId);
+        const template = await getCampaignTemplateById(input.templateId);
+        return template;
       }),
   }),
 
