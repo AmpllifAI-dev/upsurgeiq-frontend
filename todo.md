@@ -1159,3 +1159,22 @@
 - [ ] Implement contextual help for press release forms
 - [ ] Add tooltips to journalist management features
 - [ ] Add onboarding tour for new users
+
+## Date Range Filtering for Campaign Analytics
+- [x] Add date range picker component to analytics dashboard
+- [x] Add preset date ranges (Last 7 days, Last 30 days, Last 90 days, Custom)
+- [x] Implement date range state management in CampaignAnalyticsCharts
+- [x] Update charts to reflect filtered data
+- [x] Add "Clear filters" functionality
+- [x] Display filtered vs total data points counter
+
+## CSV Import for Journalists
+- [x] Create CSV upload component with file input
+- [x] Build CSV parsing and validation logic
+- [x] Create field mapping interface for CSV columns (supports firstName/lastName or single Name field)
+- [x] Implement duplicate detection by email
+- [x] Create import preview with validation status (valid/duplicate/invalid)
+- [x] Add import progress indicator
+- [x] Implement import success/error reporting
+- [x] Add sample CSV download functionality
+- [x] Integrate CSV import button into JournalistList page

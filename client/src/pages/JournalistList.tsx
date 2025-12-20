@@ -27,6 +27,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Plus, Search, MoreVertical, Mail, Phone, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import { JournalistCSVImport } from "@/components/JournalistCSVImport";
 
 export default function JournalistList() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -72,12 +73,15 @@ export default function JournalistList() {
             Manage your journalist and media outlet relationships
           </p>
         </div>
-        <Link href="/journalists/new">
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Journalist
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          <JournalistCSVImport onImportComplete={() => utils.journalists.list.invalidate()} />
+          <Link href="/journalists/new">
+            <Button>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Journalist
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Search and Stats */}

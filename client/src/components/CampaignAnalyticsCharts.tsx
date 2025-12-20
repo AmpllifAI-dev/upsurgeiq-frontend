@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   LineChart,
   Line,
@@ -15,6 +15,17 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Calendar } from "lucide-react";
 
 interface AnalyticsEntry {
   id: number;
@@ -45,9 +56,47 @@ const COLORS = {
 const PIE_COLORS = [COLORS.primary, COLORS.secondary, COLORS.accent, COLORS.success];
 
 export function CampaignAnalyticsCharts({ analytics }: CampaignAnalyticsChartsProps) {
+  const [dateRange, setDateRange] = useState<string>("all");
+  const [customStartDate, setCustomStartDate] = useState<string>("");
+  const [customEndDate, setCustomEndDate] = useState<string>("");
+
+  // Filter analytics by date range
+  const filteredAnalytics = useMemo(() => {
+    if (dateRange === "all") return analytics;
+
+    const now = new Date();
+    let startDate: Date;
+
+    switch (dateRange) {
+      case "7d":
+        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
+      case "30d":
+        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        break;
+      case "90d":
+        startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+        break;
+      case "custom":
+        if (!customStartDate) return analytics;
+        startDate = new Date(customStartDate);
+        break;
+      default:
+        return analytics;
+    }
+
+    return analytics.filter((entry) => {
+      const entryDate = new Date(entry.date);
+      if (dateRange === "custom" && customEndDate) {
+        const endDate = new Date(customEndDate);
+        return entryDate >= startDate && entryDate <= endDate;
+      }
+      return entryDate >= startDate;
+    });
+  }, [analytics, dateRange, customStartDate, customEndDate]);
   // Prepare time series data
   const timeSeriesData = useMemo(() => {
-    return analytics
+    return filteredAnalytics
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .map((entry) => ({
         date: new Date(entry.date).toLocaleDateString("en-GB", {
@@ -58,11 +107,11 @@ export function CampaignAnalyticsCharts({ analytics }: CampaignAnalyticsChartsPr
         clicks: entry.clicks || 0,
         conversions: entry.conversions || 0,
       }));
-  }, [analytics]);
+  }, [filteredAnalytics]);
 
   // Calculate totals
   const totals = useMemo(() => {
-    return analytics.reduce(
+    return filteredAnalytics.reduce(
       (acc, entry) => ({
         impressions: acc.impressions + (entry.impressions || 0),
         clicks: acc.clicks + (entry.clicks || 0),
@@ -71,7 +120,7 @@ export function CampaignAnalyticsCharts({ analytics }: CampaignAnalyticsChartsPr
       }),
       { impressions: 0, clicks: 0, conversions: 0, spend: 0 }
     );
-  }, [analytics]);
+  }, [filteredAnalytics]);
 
   // Calculate funnel data
   const funnelData = useMemo(() => {
@@ -111,6 +160,74 @@ export function CampaignAnalyticsCharts({ analytics }: CampaignAnalyticsChartsPr
 
   return (
     <div className="space-y-6">
+      {/* Date Range Filter */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <Calendar className="w-4 h-4" />
+            Date Range Filter
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col md:flex-row gap-4 items-end">
+            <div className="flex-1">
+              <Label htmlFor="dateRange">Select Period</Label>
+              <Select value={dateRange} onValueChange={setDateRange}>
+                <SelectTrigger id="dateRange">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Time</SelectItem>
+                  <SelectItem value="7d">Last 7 Days</SelectItem>
+                  <SelectItem value="30d">Last 30 Days</SelectItem>
+                  <SelectItem value="90d">Last 90 Days</SelectItem>
+                  <SelectItem value="custom">Custom Range</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {dateRange === "custom" && (
+              <>
+                <div className="flex-1">
+                  <Label htmlFor="startDate">Start Date</Label>
+                  <Input
+                    id="startDate"
+                    type="date"
+                    value={customStartDate}
+                    onChange={(e) => setCustomStartDate(e.target.value)}
+                  />
+                </div>
+                <div className="flex-1">
+                  <Label htmlFor="endDate">End Date</Label>
+                  <Input
+                    id="endDate"
+                    type="date"
+                    value={customEndDate}
+                    onChange={(e) => setCustomEndDate(e.target.value)}
+                  />
+                </div>
+              </>
+            )}
+            {dateRange !== "all" && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setDateRange("all");
+                  setCustomStartDate("");
+                  setCustomEndDate("");
+                }}
+              >
+                Clear Filter
+              </Button>
+            )}
+          </div>
+          {filteredAnalytics.length < analytics.length && (
+            <p className="text-sm text-muted-foreground mt-3">
+              Showing {filteredAnalytics.length} of {analytics.length} data points
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Performance Trend Chart */}
       <Card>
         <CardHeader>
