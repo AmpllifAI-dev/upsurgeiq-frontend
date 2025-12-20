@@ -1301,3 +1301,10 @@
 - [x] Add logging for scheduled alert checks
 - [x] Run initial check 30 seconds after startup
 - [x] Schedule runs every hour at minute 0
+
+## Default Alert Threshold Initialization
+- [x] Create initializeDefaultThresholds function in costAlertChecker
+- [x] Set up reasonable starter thresholds (1000 daily, 5000 weekly, 20000 monthly, 50000 total)
+- [x] Add initialization to server startup (runs once on first start)
+- [x] Use admin email from environment variables for notifications
+- [x] Check for existing thresholds to prevent duplicates

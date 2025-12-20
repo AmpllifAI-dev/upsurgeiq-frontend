@@ -8,6 +8,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { initializeAlertScheduler } from "../alertScheduler";
+import { initializeDefaultThresholds } from "../costAlertChecker";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -71,6 +72,9 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
+    
+    // Initialize default alert thresholds (only runs once)
+    initializeDefaultThresholds().catch(console.error);
     
     // Initialize credit alert scheduler
     initializeAlertScheduler();

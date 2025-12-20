@@ -221,3 +221,72 @@ export async function initializeDefaultAlerts(adminEmail: string): Promise<void>
 
   console.log("[CostAlertChecker] Default alert thresholds created");
 }
+
+/**
+ * Initialize default alert thresholds for new installations
+ * Call this once to set up starter thresholds
+ */
+export async function initializeDefaultThresholds(): Promise<boolean> {
+  console.log("[CostAlertChecker] Initializing default alert thresholds...");
+
+  const db = await getDb();
+  if (!db) {
+    console.error("[CostAlertChecker] Database unavailable");
+    return false;
+  }
+
+  try {
+    // Check if thresholds already exist
+    const existing = await db.select().from(creditAlertThresholds).limit(1);
+    if (existing.length > 0) {
+      console.log("[CostAlertChecker] Thresholds already exist, skipping initialization");
+      return false;
+    }
+
+    // Get admin email from environment
+    const adminEmail = process.env.ADMIN_EMAIL || process.env.OWNER_EMAIL || "admin@example.com";
+
+    // Create default thresholds
+    const defaultThresholds = [
+      {
+        name: "Daily Credit Limit",
+        thresholdType: "daily" as const,
+        thresholdValue: "1000.00",
+        notifyEmails: adminEmail,
+        isActive: 1,
+      },
+      {
+        name: "Weekly Credit Limit",
+        thresholdType: "weekly" as const,
+        thresholdValue: "5000.00",
+        notifyEmails: adminEmail,
+        isActive: 1,
+      },
+      {
+        name: "Monthly Credit Limit",
+        thresholdType: "monthly" as const,
+        thresholdValue: "20000.00",
+        notifyEmails: adminEmail,
+        isActive: 1,
+      },
+      {
+        name: "Total Credit Warning",
+        thresholdType: "total" as const,
+        thresholdValue: "50000.00",
+        notifyEmails: adminEmail,
+        isActive: 1,
+      },
+    ];
+
+    for (const threshold of defaultThresholds) {
+      await db.insert(creditAlertThresholds).values(threshold);
+      console.log(`[CostAlertChecker] Created threshold: ${threshold.name}`);
+    }
+
+    console.log("[CostAlertChecker] Default thresholds initialized successfully");
+    return true;
+  } catch (error) {
+    console.error("[CostAlertChecker] Error initializing default thresholds:", error);
+    return false;
+  }
+}
