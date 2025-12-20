@@ -2097,29 +2097,54 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
 
         const { triggerWebhook } = await import("./webhooks");
         
-        // Create test payload
-        const testPayload = {
-          user: {
-            id: ctx.user.id,
-            email: ctx.user.email,
-            name: ctx.user.name || "Test User",
-            phone: "+1234567890",
-          },
-          business: {
-            name: "Test Business Corp",
-            industry: "Technology",
-            size: "11-50",
-            website: "https://testbusiness.com",
-            targetAudience: "B2B SaaS companies looking to scale their PR efforts",
-            marketingGoals: "Increase brand awareness and generate qualified leads",
-          },
-          subscription: {
-            plan: "Pro",
-            status: "active",
-          },
-          timestamp: new Date().toISOString(),
-          isTest: true,
-        };
+        // Create test payload based on event type
+        let testPayload: any;
+        
+        if (input.eventType === "social_media.post_created") {
+          // Social media post test payload
+          testPayload = {
+            post: {
+              id: 1,
+              content: "Test post from UpsurgeIQ! 🚀 This is a sample social media post to verify the webhook integration is working correctly.",
+              platforms: ["facebook", "instagram", "linkedin"],
+              scheduledFor: null,
+              imageUrl: "https://picsum.photos/1200/630",
+            },
+            user: {
+              id: ctx.user.id,
+              email: ctx.user.email,
+              name: ctx.user.name || "Test User",
+            },
+            business: {
+              name: "Test Business Corp",
+              brandVoice: "professional",
+            },
+          };
+        } else {
+          // User onboarding test payload
+          testPayload = {
+            user: {
+              id: ctx.user.id,
+              email: ctx.user.email,
+              name: ctx.user.name || "Test User",
+              phone: "+1234567890",
+            },
+            business: {
+              name: "Test Business Corp",
+              industry: "Technology",
+              size: "11-50",
+              website: "https://testbusiness.com",
+              targetAudience: "B2B SaaS companies looking to scale their PR efforts",
+              marketingGoals: "Increase brand awareness and generate qualified leads",
+            },
+            subscription: {
+              plan: "Pro",
+              status: "active",
+            },
+            timestamp: new Date().toISOString(),
+            isTest: true,
+          };
+        }
 
         await triggerWebhook(input.eventType, testPayload);
         

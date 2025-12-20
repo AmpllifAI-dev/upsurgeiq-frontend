@@ -62,6 +62,30 @@ export interface UserOnboardedPayload {
 }
 
 /**
+ * Social media post webhook payload
+ */
+export interface SocialMediaPostPayload {
+  event: "social_media.post_created";
+  timestamp: string;
+  post: {
+    id: number;
+    content: string;
+    platforms: string[]; // ["facebook", "instagram", "linkedin", "twitter"]
+    scheduledFor: string | null;
+    imageUrl: string | null;
+  };
+  user: {
+    id: number;
+    email: string;
+    name: string | null;
+  };
+  business: {
+    name: string;
+    brandVoice: string | null;
+  };
+}
+
+/**
  * Webhook delivery result
  */
 export interface WebhookDeliveryResult {
@@ -220,6 +244,39 @@ export function buildUserOnboardedPayload(data: {
           startDate: data.subscription.startDate?.toISOString() || null,
         }
       : null,
+  };
+}
+
+/**
+ * Build social media post webhook payload
+ */
+export function buildSocialMediaPostPayload(data: {
+  post: {
+    id: number;
+    content: string;
+    platforms: string[];
+    scheduledFor: Date | null;
+    imageUrl: string | null;
+  };
+  user: {
+    id: number;
+    email: string;
+    name: string | null;
+  };
+  business: {
+    name: string;
+    brandVoice: string | null;
+  };
+}): SocialMediaPostPayload {
+  return {
+    event: "social_media.post_created",
+    timestamp: new Date().toISOString(),
+    post: {
+      ...data.post,
+      scheduledFor: data.post.scheduledFor?.toISOString() || null,
+    },
+    user: data.user,
+    business: data.business,
   };
 }
 

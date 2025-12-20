@@ -1041,3 +1041,11 @@
 - [x] Insert social media webhook configuration to database
 - [x] Test webhook delivery with Make.com URL (ready for user testing)
 - [x] Verify webhook appears in admin dashboard
+
+
+## Fix Social Media Webhook Payload (Dec 19, 2025)
+
+- [x] Create SocialMediaPostPayload interface in webhooks.ts
+- [x] Add buildSocialMediaPostPayload function
+- [x] Update webhook test endpoint to send correct payload based on event type
+- [x] Test social media webhook sends post data (not onboarding data)
