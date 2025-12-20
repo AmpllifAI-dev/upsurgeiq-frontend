@@ -10,19 +10,32 @@ import { toast as showToast } from "sonner";
 export default function SocialMediaConnections() {
   const { user } = useAuth();
   
-  // TODO: Implement social media connections query
-  // const { data: connections, isLoading, refetch } = trpc.socialMedia.getConnections.useQuery();
+  const { data: connections, isLoading } = trpc.socialConnections.getConnections.useQuery();
+  const disconnectMutation = trpc.socialConnections.disconnect.useMutation({
+    onSuccess: () => {
+      trpc.useUtils().socialConnections.getConnections.invalidate();
+      showToast.success("Account disconnected successfully");
+    },
+    onError: (error) => {
+      showToast.error(error.message || "Failed to disconnect account");
+    },
+  });
 
   const handleConnect = (platform: string) => {
-    showToast("Coming Soon", {
-      description: `${platform} OAuth integration is being implemented. Please check back soon!`,
-    });
+    const userId = user?.id;
+    if (!userId) {
+      showToast.error("Please log in to connect accounts");
+      return;
+    }
+
+    showToast.info(`Redirecting to ${platform} for authorization...`);
+    window.location.href = `/api/oauth/${platform.toLowerCase()}/authorize?userId=${userId}`;
   };
 
-  const handleDisconnect = (platform: string) => {
-    showToast("Coming Soon", {
-      description: `Disconnect functionality is being implemented. Please check back soon!`,
-    });
+  const handleDisconnect = (connectionId: number, platform: string) => {
+    if (confirm(`Are you sure you want to disconnect your ${platform} account?`)) {
+      disconnectMutation.mutate({ connectionId });
+    }
   };
 
   const platforms = [
@@ -39,7 +52,7 @@ export default function SocialMediaConnections() {
         "Track engagement metrics",
         "Manage multiple pages",
       ],
-      connected: false, // TODO: Get from connections data
+      connected: false,
       accountName: null,
       accountImage: null,
     },
@@ -182,33 +195,41 @@ export default function SocialMediaConnections() {
 
                 {/* Action Buttons */}
                 <div className="pt-4 flex gap-2">
-                  {platform.connected ? (
-                    <>
-                      <Button
-                        variant="outline"
-                        className="flex-1"
-                        onClick={() => handleDisconnect(platform.name)}
-                      >
-                        <X className="w-4 h-4 mr-2" />
-                        Disconnect
-                      </Button>
+                  {(() => {
+                    const connection = connections?.find(
+                      (c) => c.platform === platform.id
+                    );
+                    const isConnected = !!connection;
+                    
+                    return isConnected ? (
+                      <>
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => handleDisconnect(connection.id, platform.name)}
+                          disabled={disconnectMutation.isPending}
+                        >
+                          <X className="w-4 h-4 mr-2" />
+                          Disconnect
+                        </Button>
+                        <Button
+                          variant="default"
+                          className="flex-1"
+                          onClick={() => handleConnect(platform.id)}
+                        >
+                          Reconnect
+                        </Button>
+                      </>
+                    ) : (
                       <Button
                         variant="default"
-                        className="flex-1"
-                        onClick={() => handleConnect(platform.name)}
+                        className="w-full"
+                        onClick={() => handleConnect(platform.id)}
                       >
-                        Reconnect
+                        Connect {platform.name}
                       </Button>
-                    </>
-                  ) : (
-                    <Button
-                      variant="default"
-                      className="w-full"
-                      onClick={() => handleConnect(platform.name)}
-                    >
-                      Connect {platform.name}
-                    </Button>
-                  )}
+                    );
+                  })()}
                 </div>
               </CardContent>
             </Card>

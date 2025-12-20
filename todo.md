@@ -1619,3 +1619,19 @@
 - [x] Build OAuth handler for X/Twitter (with placeholder credentials)
 - [x] Create database schema for storing OAuth tokens (social_connections table)
 - [x] Document where to add actual OAuth credentials (see server/socialOAuth.ts)
+
+
+## OAuth Setup Guide & Backend Implementation (December 20, 2025)
+- [x] Create detailed OAuth setup guide for Facebook
+- [x] Create detailed OAuth setup guide for Instagram
+- [x] Create detailed OAuth setup guide for LinkedIn
+- [x] Create detailed OAuth setup guide for X (Twitter)
+- [x] Implement Stripe webhook handler to credit AI image purchases
+- [x] Updated imagePacks.createCheckout to include proper metadata for webhook processing
+- [x] Build OAuth callback endpoint for Facebook
+- [x] Build OAuth callback endpoint for Instagram
+- [x] Build OAuth callback endpoint for LinkedIn
+- [x] Build OAuth callback endpoint for X (Twitter)
+- [x] Create tRPC procedures for connecting/disconnecting social accounts
+- [x] Update SocialMediaConnections page to use real backend data
+- [x] Register OAuth routes in Express server

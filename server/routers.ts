@@ -3841,14 +3841,78 @@ Generate a comprehensive campaign strategy that includes:
           mode: "payment",
           success_url: `${process.env.FRONTEND_URL}/dashboard/image-packs?success=true`,
           cancel_url: `${process.env.FRONTEND_URL}/dashboard/image-packs?canceled=true`,
+          client_reference_id: ctx.user.id.toString(),
           metadata: {
+            productType: "image_pack",
+            productKey: input.packId,
+            images: product.images.toString(),
             userId: ctx.user.id.toString(),
-            packId: input.packId,
-            credits: product.images.toString(),
           },
         });
 
         return { url: session.url };
+      }),
+  }),
+
+  // Social Media Connections
+  socialConnections: router({
+    // Get all connections for current user
+    getConnections: protectedProcedure.query(async ({ ctx }) => {
+      const { socialConnections } = await import("../drizzle/schema");
+      const { eq } = await import("drizzle-orm");
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      const connections = await db
+        .select()
+        .from(socialConnections)
+        .where(eq(socialConnections.userId, ctx.user.id));
+
+      // Don't expose access tokens to frontend
+      return connections.map((conn) => ({
+        id: conn.id,
+        platform: conn.platform,
+        platformUserId: conn.platformUserId,
+        platformUsername: conn.platformUsername,
+        profilePictureUrl: conn.profilePictureUrl,
+        isActive: conn.isActive,
+        createdAt: conn.createdAt,
+      }));
+    }),
+
+    // Disconnect a social account
+    disconnect: protectedProcedure
+      .input(z.object({ connectionId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const { socialConnections } = await import("../drizzle/schema");
+        const { eq, and } = await import("drizzle-orm");
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+        // Verify ownership before deleting
+        const connection = await db
+          .select()
+          .from(socialConnections)
+          .where(
+            and(
+              eq(socialConnections.id, input.connectionId),
+              eq(socialConnections.userId, ctx.user.id)
+            )
+          )
+          .limit(1);
+
+        if (connection.length === 0) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Connection not found",
+          });
+        }
+
+        await db
+          .delete(socialConnections)
+          .where(eq(socialConnections.id, input.connectionId));
+
+        return { success: true };
       }),
   }),
 });
