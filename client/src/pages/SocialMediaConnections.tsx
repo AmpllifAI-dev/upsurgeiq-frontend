@@ -90,23 +90,7 @@ export default function SocialMediaConnections() {
       accountName: null,
       accountImage: null,
     },
-    {
-      id: "twitter",
-      name: "X (Twitter)",
-      icon: Twitter,
-      color: "text-gray-900",
-      bgColor: "bg-gray-100",
-      description: "Connect your X account for real-time updates",
-      features: [
-        "Real-time posting",
-        "Thread creation",
-        "Trending topics",
-        "Retweet automation",
-      ],
-      connected: false,
-      accountName: null,
-      accountImage: null,
-    },
+    // Twitter/X removed per user request
   ];
 
   return (
@@ -125,7 +109,7 @@ export default function SocialMediaConnections() {
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>All Platforms Included</AlertTitle>
         <AlertDescription>
-          Your subscription includes access to all 4 social media platforms with unlimited posts. Connect the accounts you want to use.
+          Your subscription includes access to 3 social media platforms (Facebook, Instagram, LinkedIn) with unlimited posts. Connect the accounts you want to use.
         </AlertDescription>
       </Alert>
 
@@ -133,6 +117,10 @@ export default function SocialMediaConnections() {
       <div className="grid md:grid-cols-2 gap-6">
         {platforms.map((platform) => {
           const Icon = platform.icon;
+          
+          // Get connection data from backend
+          const connection = connections?.find((c) => c.platform === platform.id);
+          const isConnected = !!connection;
           
           return (
             <Card key={platform.id} className="relative">
@@ -149,7 +137,7 @@ export default function SocialMediaConnections() {
                       </CardDescription>
                     </div>
                   </div>
-                  {platform.connected && (
+                  {isConnected && (
                     <Badge variant="default" className="flex items-center gap-1">
                       <Check className="w-3 h-3" />
                       Connected
@@ -160,12 +148,12 @@ export default function SocialMediaConnections() {
 
               <CardContent className="space-y-4">
                 {/* Connected Account Info */}
-                {platform.connected && platform.accountName && (
+                {isConnected && connection && (
                   <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                    {platform.accountImage ? (
+                    {connection.profilePictureUrl ? (
                       <img
-                        src={platform.accountImage}
-                        alt={platform.accountName}
+                        src={connection.profilePictureUrl}
+                        alt={connection.platformUsername || ''}
                         className="w-10 h-10 rounded-full"
                       />
                     ) : (
@@ -174,7 +162,7 @@ export default function SocialMediaConnections() {
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{platform.accountName}</p>
+                      <p className="font-medium text-sm truncate">{connection.platformUsername}</p>
                       <p className="text-xs text-muted-foreground">Connected account</p>
                     </div>
                   </div>

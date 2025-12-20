@@ -211,7 +211,9 @@ async function fetchUserProfile(
       url = "https://graph.facebook.com/v18.0/me?fields=id,name,picture";
       break;
     case "instagram":
-      url = "https://graph.instagram.com/me?fields=id,username,profile_picture_url";
+      // Instagram uses Facebook Graph API for OAuth
+      // First get the user's Facebook pages, then get Instagram Business Account
+      url = "https://graph.facebook.com/v18.0/me/accounts?fields=id,name,instagram_business_account{id,username,profile_picture_url}";
       break;
     case "linkedin":
       url = "https://api.linkedin.com/v2/userinfo";
@@ -227,10 +229,19 @@ async function fetchUserProfile(
 
   if (!response.ok) {
     const error = await response.text();
+    logger.error(`Failed to fetch ${platform} profile`, undefined, {
+      action: "fetchUserProfile",
+      metadata: { platform, statusCode: response.status, error },
+    });
     throw new Error(`Failed to fetch profile: ${error}`);
   }
 
   const data = await response.json();
+  
+  logger.info(`Successfully fetched ${platform} profile`, {
+    action: "fetchUserProfile",
+    metadata: { platform, hasData: !!data },
+  });
 
   // Normalize response across platforms
   switch (platform) {
@@ -241,10 +252,29 @@ async function fetchUserProfile(
         profilePicture: data.picture?.data?.url,
       };
     case "instagram":
+      // Find the first page with an Instagram Business Account
+      const pageWithInstagram = data.data?.find((page: any) => page.instagram_business_account);
+      if (!pageWithInstagram?.instagram_business_account) {
+        logger.error("No Instagram Business Account found", undefined, {
+          action: "fetchUserProfile",
+          metadata: { 
+            platform: "instagram", 
+            pagesFound: data.data?.length || 0,
+            pageNames: data.data?.map((p: any) => p.name) || [],
+          },
+        });
+        throw new Error(
+          "No Instagram Business Account found linked to your Facebook Pages. " +
+          "Please: 1) Convert your Instagram to a Business or Creator account, " +
+          "2) Link it to one of your Facebook Pages in Instagram settings, " +
+          "3) Make sure you grant access to that Facebook Page when authorizing."
+        );
+      }
+      const igAccount = pageWithInstagram.instagram_business_account;
       return {
-        id: data.id,
-        username: data.username,
-        profilePicture: data.profile_picture_url,
+        id: igAccount.id,
+        username: igAccount.username,
+        profilePicture: igAccount.profile_picture_url,
       };
     case "linkedin":
       return {

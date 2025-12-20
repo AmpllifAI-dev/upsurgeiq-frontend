@@ -1635,3 +1635,56 @@
 - [x] Create tRPC procedures for connecting/disconnecting social accounts
 - [x] Update SocialMediaConnections page to use real backend data
 - [x] Register OAuth routes in Express server
+
+
+## OAuth Setup Guide Update (December 20, 2025)
+- [x] Update Facebook section to reflect new Use Cases system
+- [x] Replace old permission model with "Manage everything on your page" use case
+- [x] Clarify Business Portfolio is not needed for basic posting
+- [x] Update required permissions list for new system
+- [x] Add Development vs Live mode explanation
+- [x] Clarify App Review is only needed for public access
+
+
+## Facebook OAuth Testing (December 20, 2025)
+- [x] Add Facebook App ID and App Secret to environment variables
+- [x] Debug "www.facebook.com refused to connect" error
+- [x] Fix OAuth URL generation to use correct redirect URI
+- [ ] Fix X-Frame-Options error (Facebook blocks iframe display)
+- [ ] Ensure OAuth uses full page redirect, not iframe/popup
+- [ ] Test Facebook OAuth connection flow
+- [ ] Verify token storage in database
+
+
+## Instagram OAuth Fix (December 20, 2025)
+- [ ] Update Instagram OAuth to use Facebook Graph API endpoints
+- [ ] Fix "Invalid platform app" error
+- [ ] Test Instagram connection
+- [ ] Save checkpoint with working Facebook and Instagram OAuth
+
+
+## Instagram UI Display Fix (December 20, 2025)
+- [ ] Verify Instagram connection is stored in database
+- [ ] Fix UI not showing Instagram as connected after OAuth
+- [ ] Ensure query invalidation/refresh after OAuth callback
+- [ ] Save checkpoint with working Facebook, Instagram, and LinkedIn OAuth
+
+
+## Instagram UI Display Fix (December 20, 2025)
+- [x] Verify Instagram connection is stored in database
+- [x] Fix UI not showing Instagram as connected after OAuth (fixed backend to use Facebook Graph API)
+- [x] Ensure query invalidation/refresh after OAuth callback (frontend now reads connection data properly)
+- [ ] Save checkpoint with working Facebook, Instagram, and LinkedIn OAuth (pending user test)
+
+
+## Database & Twitter Removal (December 20, 2025)
+- [x] Complete database migration to create social_connections table
+- [x] Remove Twitter/X from social media connections UI
+- [ ] Remove Twitter/X OAuth configuration
+- [x] Fix Instagram OAuth scopes to include business_management permission
+- [x] Test Instagram connection after scope fix
+- [ ] Save checkpoint with Facebook, Instagram, and LinkedIn OAuth working
+
+- [x] Update pricing page to show 3 social media platforms instead of 4
+- [x] Update home page references to 3 platforms
+- [x] Update dashboard and other UI references to 3 platforms

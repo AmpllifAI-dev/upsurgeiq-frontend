@@ -1,0 +1,20 @@
+{
+  "query": "SELECT platform, platformUsername, isActive FROM social_connections WHERE userId = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute SELECT platform, platformUsername, isActive FROM social_connections WHERE userId = 1;",
+  "rows": [
+    {
+      "platform": "facebook",
+      "platformUsername": "Christopher Lembke",
+      "isActive": "1"
+    },
+    {
+      "platform": "linkedin",
+      "platformUsername": "Christopher Lembke",
+      "isActive": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "platform\tplatformUsername\tisActive\nfacebook\tChristopher Lembke\t1\nlinkedin\tChristopher Lembke\t1\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}

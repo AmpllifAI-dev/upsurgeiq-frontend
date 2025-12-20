@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, userId, platform, platformUserId, platformUsername, isActive, createdAt FROM socialConnections ORDER BY createdAt DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute SELECT id, userId, platform, platformUserId, platformUsername, isActive, createdAt FROM socialConnections ORDER BY createdAt DESC LIMIT 10;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 1: Table 'grcyd6miftzvx8axben7th.socialConnections' doesn't exist"
+  ]
+}

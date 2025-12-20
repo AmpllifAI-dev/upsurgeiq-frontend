@@ -33,7 +33,7 @@ export default function Home() {
       description: "Perfect for solopreneurs and small businesses",
       features: [
         "2 campaigns per month (AI-drafted copy + own imagery)",
-        "All 4 social media platforms",
+        "3 social media platforms (Facebook, Instagram, LinkedIn)",
         "Unlimited user-composed social posts",
         "3 media lists (default)",
         "Email support",
@@ -53,7 +53,7 @@ export default function Home() {
       description: "Most popular for growing businesses",
       features: [
         "5 campaigns per month (AI-drafted copy + own imagery)",
-        "All 4 social media platforms",
+        "3 social media platforms (Facebook, Instagram, LinkedIn)",
         "Unlimited user-composed social posts",
         "5 media lists (3 default + 2 optional)",
         "Priority support",
@@ -73,7 +73,7 @@ export default function Home() {
       description: "For agencies and high-growth companies",
       features: [
         "15 campaigns per month (AI-drafted copy + own imagery)",
-        "All 4 social media platforms",
+        "3 social media platforms (Facebook, Instagram, LinkedIn)",
         "Unlimited user-composed social posts",
         "10 media lists (3 default + 7 optional)",
         "Intelligent Campaign Lab included",
