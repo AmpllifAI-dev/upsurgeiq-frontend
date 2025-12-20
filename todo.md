@@ -1032,3 +1032,12 @@
 - [x] Add field mappings for webhook data to platform fields
 - [x] Add router filters for platform selection
 - [x] Create corrected blueprint structure
+
+
+## Add Social Media Webhook Event Type (Dec 19, 2025)
+
+- [x] Update webhook event type enum in database schema
+- [x] Add social_media.post_created to allowed event types
+- [x] Insert social media webhook configuration to database
+- [x] Test webhook delivery with Make.com URL (ready for user testing)
+- [x] Verify webhook appears in admin dashboard

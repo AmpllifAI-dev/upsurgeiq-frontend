@@ -28,7 +28,7 @@ export async function getWebhookConfigs(): Promise<WebhookConfig[]> {
  * Get active webhook configurations by event type
  */
 export async function getActiveWebhooksByEvent(
-  eventType: "user.registered" | "user.onboarded"
+  eventType: "user.registered" | "user.onboarded" | "social_media.post_created"
 ): Promise<WebhookConfig[]> {
   const db = await getDb();
   if (!db) return [];

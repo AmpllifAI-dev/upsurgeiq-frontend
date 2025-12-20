@@ -1989,7 +1989,7 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
       .input(
         z.object({
           name: z.string().min(1),
-          eventType: z.enum(["user.registered", "user.onboarded"]),
+          eventType: z.enum(["user.registered", "user.onboarded", "social_media.post_created"]),
           webhookUrl: z.string().url(),
           isActive: z.boolean().default(true),
           retryAttempts: z.number().min(1).max(5).default(3),
@@ -2083,7 +2083,7 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
     test: protectedProcedure
       .input(
         z.object({
-          eventType: z.enum(["user.registered", "user.onboarded"]),
+          eventType: z.enum(["user.registered", "user.onboarded", "social_media.post_created"]),
         })
       )
       .mutation(async ({ ctx, input }) => {

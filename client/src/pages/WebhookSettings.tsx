@@ -31,7 +31,7 @@ export default function WebhookSettings() {
   // Form state
   const [formData, setFormData] = useState({
     name: "",
-    eventType: "user.onboarded" as "user.registered" | "user.onboarded",
+    eventType: "user.onboarded" as "user.registered" | "user.onboarded" | "social_media.post_created",
     webhookUrl: "",
     isActive: true,
     retryAttempts: 3,
@@ -141,7 +141,7 @@ export default function WebhookSettings() {
     }
   };
 
-  const handleTest = (eventType: "user.registered" | "user.onboarded") => {
+  const handleTest = (eventType: "user.registered" | "user.onboarded" | "social_media.post_created") => {
     testMutation.mutate({ eventType });
   };
 

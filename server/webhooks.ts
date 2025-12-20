@@ -8,7 +8,7 @@
 /**
  * Webhook event types
  */
-export type WebhookEventType = "user.registered" | "user.onboarded";
+export type WebhookEventType = "user.registered" | "user.onboarded" | "social_media.post_created";
 
 /**
  * User registration webhook payload

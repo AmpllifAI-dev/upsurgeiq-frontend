@@ -562,7 +562,7 @@ export type InsertContentVersion = typeof contentVersions.$inferInsert;
 export const webhookConfigs = mysqlTable("webhook_configs", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(), // e.g., "User Registration", "Onboarding Complete"
-  eventType: mysqlEnum("eventType", ["user.registered", "user.onboarded"]).notNull(),
+  eventType: mysqlEnum("eventType", ["user.registered", "user.onboarded", "social_media.post_created"]).notNull(),
   webhookUrl: varchar("webhookUrl", { length: 1000 }).notNull(), // Make.com webhook URL
   isActive: int("isActive").default(1).notNull(), // 1 = active, 0 = disabled
   retryAttempts: int("retryAttempts").default(3).notNull(), // Number of retry attempts
