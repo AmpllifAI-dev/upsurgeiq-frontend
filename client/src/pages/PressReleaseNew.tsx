@@ -18,6 +18,7 @@ import { CopyButton } from "@/components/CopyButton";
 import { CharacterCounter } from "@/components/CharacterCounter";
 import { PressReleaseImageGenerator } from "@/components/PressReleaseImageGenerator";
 import { WordCountPurchaseCTA } from "@/components/WordCountPurchaseCTA";
+import { ImageUpload } from "@/components/ImageUpload";
 
 export default function PressReleaseNew() {
   const { user, loading } = useAuth();
@@ -32,6 +33,8 @@ export default function PressReleaseNew() {
   const [isEditing, setIsEditing] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
+  const [uploadedImage, setUploadedImage] = useState<File | null>(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [showPurchaseCTA, setShowPurchaseCTA] = useState(false);
   const [wordCountError, setWordCountError] = useState<{
     requiredWords: number;
@@ -386,7 +389,32 @@ export default function PressReleaseNew() {
                     rows={20}
                     className="font-mono text-sm"
                   />
-                  <div className="space-y-4">
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-semibold">Upload Your Own Image</h3>
+                      <p className="text-xs text-muted-foreground">
+                        Add your own image to accompany this press release (included in campaign)
+                      </p>
+                      <ImageUpload
+                        onImageSelect={(file, url) => {
+                          setUploadedImage(file);
+                          setUploadedImageUrl(url);
+                        }}
+                        currentImage={uploadedImageUrl}
+                        onRemove={() => {
+                          setUploadedImage(null);
+                          setUploadedImageUrl(null);
+                        }}
+                      />
+                    </div>
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-2 text-muted-foreground">Or generate with AI (costs extra)</span>
+                      </div>
+                    </div>
                     <PressReleaseImageGenerator
                       title={topic}
                       content={generatedContent}

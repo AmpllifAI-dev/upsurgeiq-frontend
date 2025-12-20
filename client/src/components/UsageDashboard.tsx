@@ -64,32 +64,18 @@ export function UsageDashboard() {
 
   const usageItems: UsageItem[] = [
     {
-      feature: "pressReleases",
-      label: "Press Releases",
-      current: usage.pressReleases || 0,
-      limit: usage.limits.pressReleases,
-      unlimited: usage.limits.pressReleases === -1,
-    },
-    {
-      feature: "socialMediaPosts",
-      label: "Social Media Posts",
-      current: usage.socialMediaPosts || 0,
-      limit: usage.limits.socialMediaPosts,
-      unlimited: usage.limits.socialMediaPosts === -1,
-    },
-    {
       feature: "campaigns",
-      label: "Campaigns",
+      label: "Campaigns (AI-drafted copy + own imagery)",
       current: usage.campaigns || 0,
       limit: usage.limits.campaigns,
       unlimited: usage.limits.campaigns === -1,
     },
     {
-      feature: "distributions",
-      label: "Distributions",
-      current: usage.distributions || 0,
-      limit: usage.limits.distributions,
-      unlimited: usage.limits.distributions === -1,
+      feature: "socialMediaPosts",
+      label: "User-Composed Social Posts",
+      current: usage.socialMediaPosts || 0,
+      limit: usage.limits.socialMediaPosts,
+      unlimited: usage.limits.socialMediaPosts === -1,
     },
     {
       feature: "aiImages",

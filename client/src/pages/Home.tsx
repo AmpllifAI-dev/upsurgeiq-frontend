@@ -3,14 +3,19 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Check, Sparkles, TrendingUp, Users, Zap, MessageSquare, BarChart3, Globe, Menu, X } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
+import { featureContent, addOnContent } from "@/data/featureContent";
+import { getFeatureKey, getAddOnKey } from "@/utils/featureMapping";
+import { Info } from "lucide-react";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeModal, setActiveModal] = useState<string | null>(null);
 
   const handleGetStarted = () => {
     if (isAuthenticated) {
@@ -427,24 +432,44 @@ export default function Home() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-3 pb-4">
-                    {tier.features.map((feature, featureIndex) => (
-                      <div key={featureIndex} className="flex items-start gap-3">
-                        <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                        <span className="text-sm text-muted-foreground">{feature}</span>
-                      </div>
-                    ))}
+                    {tier.features.map((feature, featureIndex) => {
+                      const featureKey = getFeatureKey(feature);
+                      const isClickable = featureKey && featureContent[featureKey];
+                      
+                      return (
+                        <div 
+                          key={featureIndex} 
+                          className={`flex items-start gap-3 ${isClickable ? 'cursor-pointer hover:bg-muted/50 -mx-2 px-2 py-1 rounded-md transition-colors' : ''}`}
+                          onClick={() => isClickable && setActiveModal(featureKey)}
+                        >
+                          <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                          <span className="text-sm text-muted-foreground flex-1">{feature}</span>
+                          {isClickable && <Info className="w-4 h-4 text-muted-foreground/50 flex-shrink-0" />}
+                        </div>
+                      );
+                    })}
                   </div>
                   {tier.addOns && tier.addOns.length > 0 && (
                     <div className="pt-4 border-t border-border space-y-3">
                       <div className="flex items-center gap-2 mb-2">
                         <Badge variant="outline" className="text-xs">Optional Add-ons</Badge>
                       </div>
-                      {tier.addOns.map((addOn, addOnIndex) => (
-                        <div key={addOnIndex} className="flex items-start gap-3">
-                          <span className="text-xs text-muted-foreground">•</span>
-                          <span className="text-xs text-muted-foreground">{addOn}</span>
-                        </div>
-                      ))}
+                      {tier.addOns.map((addOn, addOnIndex) => {
+                        const addOnKey = getAddOnKey(addOn);
+                        const isClickable = addOnKey && addOnContent[addOnKey];
+                        
+                        return (
+                          <div 
+                            key={addOnIndex} 
+                            className={`flex items-start gap-3 ${isClickable ? 'cursor-pointer hover:bg-muted/50 -mx-2 px-2 py-1 rounded-md transition-colors' : ''}`}
+                            onClick={() => isClickable && setActiveModal(`addon_${addOnKey}`)}
+                          >
+                            <span className="text-xs text-muted-foreground">•</span>
+                            <span className="text-xs text-muted-foreground flex-1">{addOn}</span>
+                            {isClickable && <Info className="w-3 h-3 text-muted-foreground/50 flex-shrink-0 mt-0.5" />}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </CardContent>
@@ -591,6 +616,88 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Feature Modals */}
+      {activeModal && !activeModal.startsWith('addon_') && featureContent[activeModal] && (
+        <Dialog open={true} onOpenChange={() => setActiveModal(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-2xl">{featureContent[activeModal].title}</DialogTitle>
+              <DialogDescription className="text-base pt-2">
+                {featureContent[activeModal].description}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-6 pt-4">
+              <div>
+                <h4 className="font-semibold mb-3">Key Benefits:</h4>
+                <ul className="space-y-2">
+                  {featureContent[activeModal].benefits.map((benefit, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-muted-foreground">{benefit}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {featureContent[activeModal].useCases && featureContent[activeModal].useCases!.length > 0 && (
+                <div>
+                  <h4 className="font-semibold mb-3">Perfect For:</h4>
+                  <ul className="space-y-2">
+                    {featureContent[activeModal].useCases!.map((useCase, idx) => (
+                      <li key={idx} className="flex items-start gap-3">
+                        <Sparkles className="w-4 h-4 text-primary flex-shrink-0 mt-1" />
+                        <span className="text-sm text-muted-foreground">{useCase}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Add-on Modals */}
+      {activeModal && activeModal.startsWith('addon_') && (() => {
+        const addOnKey = activeModal.replace('addon_', '');
+        const addOn = addOnContent[addOnKey];
+        if (!addOn) return null;
+        
+        return (
+          <Dialog open={true} onOpenChange={() => setActiveModal(null)}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle className="text-2xl">{addOn.title}</DialogTitle>
+                <DialogDescription className="text-base pt-2">
+                  {addOn.description}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-6 pt-4">
+                <div>
+                  <h4 className="font-semibold mb-3">What You Get:</h4>
+                  <ul className="space-y-2">
+                    {addOn.benefits.map((benefit, idx) => (
+                      <li key={idx} className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-muted-foreground">{benefit}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="flex items-center justify-between pt-4 border-t">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Pricing</p>
+                    <p className="text-2xl font-bold text-foreground">{addOn.pricing}</p>
+                  </div>
+                  <Button onClick={() => setLocation(addOn.ctaLink)} size="lg">
+                    {addOn.ctaText}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        );
+      })()}
     </div>
   );
 }

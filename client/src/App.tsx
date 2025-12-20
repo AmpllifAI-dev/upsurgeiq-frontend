@@ -44,6 +44,7 @@ import PurchaseCancel from "./pages/PurchaseCancel";
 import SportsTeams from "./pages/SportsTeams";
 import AIAddons from "./pages/AIAddons";
 import SocialMediaConnections from "./pages/SocialMediaConnections";
+import ImagePacks from "./pages/ImagePacks";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -87,6 +88,7 @@ function Router() {
       <Route path="/dashboard/sports-teams" component={SportsTeams} />
       <Route path="/dashboard/ai-addons" component={AIAddons} />
       <Route path="/dashboard/social-connections" component={SocialMediaConnections} />
+      <Route path="/dashboard/image-packs" component={ImagePacks} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

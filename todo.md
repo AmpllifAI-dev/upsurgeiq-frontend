@@ -1582,3 +1582,22 @@
 - [x] Clarify campaigns include "own imagery" (user's uploaded images, NOT AI-generated)
 - [x] AI-generated images are separate add-on purchases (Image Packs)t AI-generated)
 - [x] AI-generated images are separate add-on purchases (Image Packs)
+
+
+## Feature Explanations & User Experience (December 20, 2025)
+- [x] Build modal system for pricing page features (click to see detailed explanations)
+- [x] Build modal system for add-on explanations (benefits, pricing, purchase CTA)
+- [x] Implement modal behavior (click anywhere closes, only one open at a time)
+- [x] Add "Learn More" icons (Info icons) next to clickable features/add-ons
+- [x] Add image upload UI to campaign creation flow
+- [x] Created ImageUpload component with drag-and-drop support
+- [x] Integrated into PressReleaseNew page with clear "own imagery" labeling
+- [x] Create usage dashboard widget showing "X/Y campaigns used this month"
+- [x] Updated UsageDashboard component to emphasize campaigns as primary metric
+- [x] Removed separate press releases tracking (campaigns are the only limit)
+- [x] Clarified labels: "Campaigns (AI-drafted copy + own imagery)" and "User-Composed Social Posts"
+- [x] Build Image Pack purchase page with credit display and purchase options
+- [x] Created ImagePacks page at /dashboard/image-packs
+- [x] Shows current AI image credit usage and remaining credits
+- [x] Displays three purchase options: Single (£3.99), 5-Pack (£14.99), 10-Pack (£24.99)
+- [x] Includes "How It Works" section explaining the process
