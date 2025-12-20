@@ -1232,3 +1232,11 @@
 - [x] Update Dashboard UI to display new stats
 - [ ] Add recent activity feed
 - [ ] Link stat cards to relevant pages
+
+## Clickable Dashboard Stat Cards
+- [x] Make press releases stat card clickable to navigate to press releases page
+- [x] Make journalists stat card clickable to navigate to journalist list
+- [x] Make active campaigns stat card clickable to navigate to campaign lab
+- [x] Make media outlets stat card clickable to navigate to journalist list
+- [x] Add hover effects (shadow, scale) to indicate cards are clickable
+- [x] All stat cards now navigate to relevant pages

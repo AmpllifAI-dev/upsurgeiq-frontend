@@ -193,7 +193,10 @@ export default function Dashboard() {
         <section aria-labelledby="stats-heading">
           <h2 id="stats-heading" className="sr-only">Statistics Overview</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-          <Card>
+          <Card 
+            className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
+            onClick={() => setLocation("/dashboard/press-releases")}
+          >
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Press Releases</CardTitle>
               <FileText className="w-4 h-4 text-muted-foreground" />
@@ -207,7 +210,10 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card 
+            className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
+            onClick={() => setLocation("/dashboard/journalists")}
+          >
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Journalists</CardTitle>
               <Users className="w-4 h-4 text-muted-foreground" />
@@ -218,7 +224,10 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card 
+            className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
+            onClick={() => setLocation("/dashboard/campaign-lab")}
+          >
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Active Campaigns</CardTitle>
               <Target className="w-4 h-4 text-muted-foreground" />
@@ -229,16 +238,19 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card 
+            className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
+            onClick={() => setLocation("/dashboard/journalists")}
+          >
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Reach</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Media Outlets</CardTitle>
               <TrendingUp className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-foreground">
                 {currentStats.mediaOutlets}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Media outlets</p>
+              <p className="text-xs text-muted-foreground mt-1">Unique publications</p>
             </CardContent>
           </Card>
         </div>
