@@ -338,7 +338,15 @@
                                 "organization": "",
                                 "commentary": "{{1.post.content}}",
                                 "visibility": "PUBLIC",
-                                "media": "{{1.post.image.url}}"
+                                "media": [
+                                    {
+                                        "uploadMethod": "file",
+                                        "name": "{{1.post.image.fileName}}",
+                                        "data": "{{1.post.image.dataUrl}}",
+                                        "title": "",
+                                        "altText": ""
+                                    }
+                                ]
                             },
                             "metadata": {
                                 "designer": {

@@ -1057,3 +1057,9 @@
 - [x] Update test endpoint to include sample image file details
 - [x] Update Make.com blueprint with proper image field mapping
 - [x] Test webhook sends image data correctly
+
+
+## Fix LinkedIn Image Upload (Dec 19, 2025)
+
+- [x] Update LinkedIn module to use file upload structure (fileName + data)
+- [x] Test updated blueprint (ready for user testing)
