@@ -1063,3 +1063,10 @@
 
 - [x] Update LinkedIn module to use file upload structure (fileName + data)
 - [x] Test updated blueprint (ready for user testing)
+
+
+## Add Router Filters & Testing Guide (Dec 19, 2025)
+
+- [x] Add router filters to blueprint for Facebook, Instagram, LinkedIn routes (already exists)
+- [x] Create comprehensive testing guide
+- [x] Create post deletion guide for all platforms
