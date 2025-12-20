@@ -89,6 +89,40 @@ export const PRODUCT_DEFINITIONS: ProductDefinition[] = [
   },
 
   // ========================================
+  // AI Assistant Add-On Subscriptions
+  // ========================================
+  {
+    id: "ai_chat",
+    name: "AI Chat Educational Tool",
+    description: "Educational conversational AI assistant for learning PR and marketing best practices. 32 messages per month (16 exchanges). Fair Usage Policy applies.",
+    price: 3900, // £39.00/month
+    currency: "gbp",
+    type: "subscription",
+    metadata: {
+      units: 32,
+      category: "ai_assistant",
+      billing_period: "monthly",
+      feature_type: "ai_chat",
+    },
+    active: true,
+  },
+  {
+    id: "ai_call_in",
+    name: "AI Call-in Virtual Assistant",
+    description: "Voice-powered PR assistant with Whisper transcription. 32 messages per month (16 voice instructions). Requires dossier recording before use.",
+    price: 5900, // £59.00/month
+    currency: "gbp",
+    type: "subscription",
+    metadata: {
+      units: 32,
+      category: "ai_assistant",
+      billing_period: "monthly",
+      feature_type: "ai_call_in",
+    },
+    active: true,
+  },
+
+  // ========================================
   // Image Pack Add-Ons
   // ========================================
   {

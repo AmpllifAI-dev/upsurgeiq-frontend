@@ -28,11 +28,17 @@ export default function Home() {
       description: "Perfect for solopreneurs and small businesses",
       features: [
         "2 press releases per month",
-        "1 social media channel",
-        "3 default media lists",
-        "AI-powered content generation",
-        "Basic analytics",
+        "5 campaigns per month",
+        "All 4 social media platforms",
+        "Unlimited social posts",
+        "3 media lists (default)",
+        "Unlimited distributions",
         "Email support",
+      ],
+      addOns: [
+        "AI Chat: £39/month",
+        "AI Call-in: £59/month",
+        "Image Packs: £3.99-24.99",
       ],
       cta: "Start Free Trial",
       highlighted: false,
@@ -44,13 +50,18 @@ export default function Home() {
       description: "Most popular for growing businesses",
       features: [
         "5 press releases per month",
-        "3 social media channels",
-        "5 media lists included",
-        "AI-powered content generation",
-        "Conversational AI assistant",
-        "AI call-in feature",
+        "20 campaigns per month",
+        "All 4 social media platforms",
+        "Unlimited social posts",
+        "5 media lists (3 default + 2 optional)",
+        "Unlimited distributions",
         "Advanced analytics",
         "Priority support",
+      ],
+      addOns: [
+        "AI Chat: £39/month",
+        "AI Call-in: £59/month",
+        "Image Packs: £3.99-24.99",
       ],
       cta: "Start Free Trial",
       highlighted: true,
@@ -62,15 +73,20 @@ export default function Home() {
       description: "For agencies and high-growth companies",
       features: [
         "15 press releases per month",
-        "All 4 social media channels",
-        "10 media lists included",
-        "AI-powered content generation",
-        "Conversational AI assistant",
-        "AI call-in feature",
-        "Intelligent Campaign Lab",
+        "Unlimited campaigns",
+        "All 4 social media platforms",
+        "Unlimited social posts",
+        "10 media lists (3 default + 7 optional)",
+        "Unlimited distributions",
+        "Intelligent Campaign Lab included",
         "Advanced analytics & reporting",
+        "White-label options",
         "Priority support",
-        "Dedicated account manager",
+      ],
+      addOns: [
+        "AI Chat: £39/month",
+        "AI Call-in: £59/month",
+        "Image Packs: £3.99-24.99",
       ],
       cta: "Start Free Trial",
       highlighted: false,
@@ -419,12 +435,27 @@ export default function Home() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {tier.features.map((feature, featureIndex) => (
-                    <div key={featureIndex} className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-muted-foreground">{feature}</span>
+                  <div className="space-y-3 pb-4">
+                    {tier.features.map((feature, featureIndex) => (
+                      <div key={featureIndex} className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-muted-foreground">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {tier.addOns && tier.addOns.length > 0 && (
+                    <div className="pt-4 border-t border-border space-y-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="outline" className="text-xs">Optional Add-ons</Badge>
+                      </div>
+                      {tier.addOns.map((addOn, addOnIndex) => (
+                        <div key={addOnIndex} className="flex items-start gap-3">
+                          <span className="text-xs text-muted-foreground">•</span>
+                          <span className="text-xs text-muted-foreground">{addOn}</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </CardContent>
                 <CardFooter>
                   <Button

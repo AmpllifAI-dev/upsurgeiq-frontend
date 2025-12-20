@@ -1525,3 +1525,40 @@
 - [ ] Create final accurate cost analysis document
 - [ ] Test all subscription tier limits
 - [ ] Verify Stripe product pricing matches specifications
+
+
+## Subscription Limits & Pricing Corrections (December 20, 2025)
+- [x] Update pricing page to show corrected limits (2/5/15 press releases)
+- [x] Update pricing page to show corrected campaign limits (5/20/unlimited)
+- [x] Update pricing page to clarify unlimited social posts for all tiers
+- [x] Update pricing page to clarify unlimited distributions for all tiers
+- [x] Add clear "Add-on" badges for AI Chat, AI Call-in, and Image Packs
+
+## AI Chat & AI Call-in Purchase Flows
+- [x] Create Stripe products for AI Chat (£39/month for 32 messages)
+- [x] Create Stripe products for AI Call-in (£59/month for 32 messages)
+- [x] Build AI Chat purchase page with feature description
+- [x] Build AI Call-in purchase page with feature description
+- [ ] Implement Stripe checkout integration for AI Chat (TODO: extend createCheckout to support add-ons)
+- [ ] Implement Stripe checkout integration for AI Call-in (TODO: extend createCheckout to support add-ons)
+- [ ] Add webhook handlers for AI add-on subscriptions
+- [ ] Create add-on subscription management in user profile
+- [ ] Add usage tracking for AI Chat messages
+- [ ] Add usage tracking for AI Call-in messages
+- [ ] Display remaining AI credits in dashboard
+
+## Social Media OAuth Integration
+- [x] Create social media connections page in dashboard
+- [x] Add "Connect Facebook" button with OAuth flow (UI ready, backend TODO)
+- [x] Add "Connect Instagram" button with OAuth flow (UI ready, backend TODO)
+- [x] Add "Connect LinkedIn" button with OAuth flow (UI ready, backend TODO)
+- [x] Add "Connect X (Twitter)" button with OAuth flow (UI ready, backend TODO)
+- [x] Display connected account status with profile pictures
+- [x] Add "Disconnect" functionality for each platform (UI ready, backend TODO)
+- [ ] Implement backend OAuth handlers for Facebook
+- [ ] Implement backend OAuth handlers for Instagram
+- [ ] Implement backend OAuth handlers for LinkedIn
+- [ ] Implement backend OAuth handlers for X (Twitter)
+- [ ] Store OAuth tokens securely in database
+- [ ] Test OAuth flows for all platforms
+- [ ] Update social media posting to use connected accounts
