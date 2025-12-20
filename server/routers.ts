@@ -722,14 +722,7 @@ Generate a complete, publication-ready press release.`;
           });
         }
 
-        // Check usage limits
-        const { allowed } = await checkLimit(ctx.user.id, "socialPosts");
-        if (!allowed) {
-          throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "Social media post limit reached for your subscription tier. Please upgrade to create more.",
-          });
-        }
+        // Social posts are unlimited for all tiers (no limit check needed)
 
         // Create a post for each selected platform
         const posts = await Promise.all(
@@ -744,8 +737,7 @@ Generate a complete, publication-ready press release.`;
           )
         );
 
-        // Increment usage counter
-        await incrementUsage(ctx.user.id, "socialPosts");
+        // Social posts are unlimited - no usage tracking needed
 
         // Log activity
         await logActivity({
@@ -1898,14 +1890,7 @@ Generate a comprehensive campaign strategy that includes:
         })
       )
       .mutation(async ({ ctx, input }) => {
-        // Check usage limits
-        const { allowed } = await checkLimit(ctx.user.id, "distributions");
-        if (!allowed) {
-          throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "Distribution limit reached for your subscription tier. Please upgrade to send more distributions.",
-          });
-        }
+        // Distributions are unlimited for all tiers (no limit check needed)
 
         const distribution = await createDistribution({
           pressReleaseId: input.pressReleaseId,
@@ -1914,9 +1899,7 @@ Generate a comprehensive campaign strategy that includes:
           recipientCount: input.recipientCount || 0,
         });
 
-        // Increment usage counter
-        await incrementUsage(ctx.user.id, "distributions");
-
+        // Distributions are unlimited - no usage tracking needed
         // Log activity
         await logActivity({
           userId: ctx.user.id,
@@ -2714,9 +2697,9 @@ Generate a comprehensive campaign strategy that includes:
         aiChatMessages: usage.aiChatMessages,
         limits: {
           pressReleases: tierLimits.pressReleases,
-          socialMediaPosts: tierLimits.socialPosts,
+          socialMediaPosts: -1, // Unlimited for all tiers
           campaigns: tierLimits.campaigns,
-          distributions: tierLimits.distributions,
+          distributions: -1, // Unlimited for all tiers
           aiImages: tierLimits.aiImages,
           aiChatMessages: tierLimits.aiChatMessages,
         },

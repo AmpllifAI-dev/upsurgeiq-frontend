@@ -1497,3 +1497,31 @@
 - [ ] Create press release scheduling UI with date/time picker
 - [ ] Build background job processor for scheduled releases
 - [ ] Add scheduled release management dashboard
+
+
+## Infrastructure Cost Analysis Corrections (December 20, 2025)
+- [x] Review actual subscription limits in usageTracking.ts
+- [x] Remove image generation from base plan costs (it's an add-on)
+- [x] Research Vercel hosting costs and plans
+- [x] Calculate actual Manus credit consumption based on current limits
+- [x] Update cost projections with accurate service pricing
+- [x] Recalculate break-even analysis with corrected data
+- [x] Create INFRASTRUCTURE_COST_ANALYSIS_REVISED.md with accurate numbers
+
+
+## Critical Corrections (December 20, 2025)
+- [x] Fix subscription limits in usageTracking.ts (2/5/15 press releases, not 10/50/unlimited)
+- [x] Remove AI chat messages from base plan limits
+- [x] Remove AI call-in from base plan limits
+- [x] Remove AI images from base plan limits (already add-on only)
+- [x] Update social media channel limits (all tiers get all 4 platforms)
+- [x] Update media list allocation (Starter: 3, Pro: 5, Scale: 10)
+- [x] Ensure Campaign Lab is included in Scale plan only
+- [ ] Create AI Chat Educational Tool Stripe product (£39/month, 32 messages)
+- [ ] Create AI Call-in Virtual Assistant Stripe product (£59/month, 32 messages)
+- [ ] Add pre-recorded response system for AI call-in to save costs
+- [ ] Update README.md with correct specifications
+- [ ] Recalculate infrastructure costs with accurate subscription limits and pricing
+- [ ] Create final accurate cost analysis document
+- [ ] Test all subscription tier limits
+- [ ] Verify Stripe product pricing matches specifications

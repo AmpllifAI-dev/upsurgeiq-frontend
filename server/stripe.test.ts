@@ -30,29 +30,29 @@ describe("Stripe Product Configuration", () => {
 
   describe("Stripe Product IDs", () => {
     it("should have Stripe Product ID for Starter tier", () => {
-      expect(PRODUCTS.starter.stripeProductId).toBe("prod_Td2pC4hUddBbAH");
+      expect(PRODUCTS.starter.stripeProductId).toBe("prod_TdNbUqVvxJJZw9");
     });
 
     it("should have Stripe Product ID for Pro tier", () => {
-      expect(PRODUCTS.pro.stripeProductId).toBe("prod_Td2sl51moqbe4C");
+      expect(PRODUCTS.pro.stripeProductId).toBe("prod_TdNbapI0V8QDIh");
     });
 
     it("should have Stripe Product ID for Scale tier", () => {
-      expect(PRODUCTS.scale.stripeProductId).toBe("prod_Td2tuhKJPQ41d8");
+      expect(PRODUCTS.scale.stripeProductId).toBe("prod_TdNbEsPcijWqXa");
     });
   });
 
   describe("Stripe Price IDs", () => {
     it("should have Stripe Price ID for Starter tier", () => {
-      expect(PRODUCTS.starter.stripePriceId).toBe("price_1SfmjyAGfyqPBnQ9JPZoNoWl");
+      expect(PRODUCTS.starter.stripePriceId).toBe("price_1Sg6qKIEVr3V21Jeo9ce4tSk");
     });
 
     it("should have Stripe Price ID for Pro tier", () => {
-      expect(PRODUCTS.pro.stripePriceId).toBe("price_1SfmmWAGfyqPBnQ9LeAJ711i");
+      expect(PRODUCTS.pro.stripePriceId).toBe("price_1Sg6qLIEVr3V21JevpkT16ff");
     });
 
     it("should have Stripe Price ID for Scale tier", () => {
-      expect(PRODUCTS.scale.stripePriceId).toBe("price_1SfmnuAGfyqPBnQ9U5P7KfF4");
+      expect(PRODUCTS.scale.stripePriceId).toBe("price_1Sg6qLIEVr3V21JefGTcSmZj");
     });
 
     it("should not have undefined or empty Price IDs", () => {
@@ -65,14 +65,14 @@ describe("Stripe Product Configuration", () => {
   describe("Additional Products", () => {
     it("should have Additional Media List product configured", () => {
       expect(ADDITIONAL_PRODUCTS.additionalMediaList).toBeDefined();
-      expect(ADDITIONAL_PRODUCTS.additionalMediaList.stripeProductId).toBe("prod_Td2wLpX1A6exs9");
-      expect(ADDITIONAL_PRODUCTS.additionalMediaList.stripePriceId).toBe("price_1Sfmq8AGfyqPBnQ9JJ8tsFHt");
+      expect(ADDITIONAL_PRODUCTS.additionalMediaList.stripeProductId).toBe("prod_TdNbgdwBIB6Dbn");
+      expect(ADDITIONAL_PRODUCTS.additionalMediaList.stripePriceId).toBe("price_1Sg6qMIEVr3V21Jeb8Yk1A0n");
     });
 
     it("should have Intelligent Campaign Lab product configured", () => {
       expect(ADDITIONAL_PRODUCTS.intelligentCampaignLab).toBeDefined();
-      expect(ADDITIONAL_PRODUCTS.intelligentCampaignLab.stripeProductId).toBe("prod_Td2yyQ1pFJWNoo");
-      expect(ADDITIONAL_PRODUCTS.intelligentCampaignLab.stripePriceId).toBe("price_1SfmsDAGfyqPBnQ9DTkBb5vw");
+      expect(ADDITIONAL_PRODUCTS.intelligentCampaignLab.stripeProductId).toBe("prod_TdNbuCSuRx3WLE");
+      expect(ADDITIONAL_PRODUCTS.intelligentCampaignLab.stripePriceId).toBe("price_1Sg6qMIEVr3V21JeyfLicP6y");
     });
   });
 

@@ -2,32 +2,38 @@ import { getDb } from "./db";
 import { usageTracking, subscriptions } from "../drizzle/schema";
 import { TRPCError } from "@trpc/server";
 
-// Tier limits
-// Note: AI chat limits reduced for fair usage policy (see fair usage documentation)
+// Tier limits - Updated December 20, 2025 to match correct specifications
+// AI chat, AI call-in, and AI images are ADD-ONS ONLY (not included in base plans)
 export const TIER_LIMITS = {
   starter: {
-    pressReleases: 10,
-    socialPosts: 20,
-    campaigns: 5,
-    distributions: 50,
-    aiImages: 10,
-    aiChatMessages: 50, // Reduced from 100 for cost control
+    pressReleases: 2, // Corrected from 10
+    socialChannels: 4, // All 4 platforms (Facebook, LinkedIn, Instagram, X)
+    mediaLists: 3, // 3 default media lists
+    campaigns: 5, // 5 campaigns per month
+    // AI features are add-ons only:
+    aiImages: 0, // Add-on only (£3.99-24.99 per pack)
+    aiChatMessages: 0, // Add-on only (£39/month for 32 messages)
+    aiCallInMessages: 0, // Add-on only (£59/month for 32 messages)
   },
   pro: {
-    pressReleases: 50,
-    socialPosts: 100,
-    campaigns: 20,
-    distributions: 500,
-    aiImages: 50,
-    aiChatMessages: 200, // Reduced from 1000 for cost control
+    pressReleases: 5, // Corrected from 50
+    socialChannels: 4, // All 4 platforms
+    mediaLists: 5, // 3 default + 2 optional
+    campaigns: 20, // 20 campaigns per month
+    // AI features are add-ons only:
+    aiImages: 0, // Add-on only
+    aiChatMessages: 0, // Add-on only
+    aiCallInMessages: 0, // Add-on only
   },
   scale: {
-    pressReleases: -1, // Unlimited
-    socialPosts: -1,
-    campaigns: -1,
-    distributions: -1,
-    aiImages: -1,
-    aiChatMessages: 500, // Cap at 500 for fair usage (was unlimited)
+    pressReleases: 15, // Corrected from unlimited
+    socialChannels: 4, // All 4 platforms
+    mediaLists: 10, // 3 default + 7 optional
+    campaigns: -1, // Unlimited (Campaign Lab INCLUDED in Scale)
+    // AI features are add-ons only:
+    aiImages: 0, // Add-on only
+    aiChatMessages: 0, // Add-on only
+    aiCallInMessages: 0, // Add-on only
   },
 };
 
@@ -121,9 +127,7 @@ export async function checkLimit(
   // Map feature to usage field
   const usageFieldMap: Record<string, keyof typeof usage> = {
     pressReleases: "pressReleasesCreated",
-    socialPosts: "socialPostsCreated",
     campaigns: "campaignsCreated",
-    distributions: "distributionsSent",
     aiImages: "aiImagesGenerated",
     aiChatMessages: "aiChatMessages",
   };
@@ -153,9 +157,7 @@ export async function incrementUsage(
   // Map feature to usage field
   const usageFieldMap: Record<string, string> = {
     pressReleases: "pressReleasesCreated",
-    socialPosts: "socialPostsCreated",
     campaigns: "campaignsCreated",
-    distributions: "distributionsSent",
     aiImages: "aiImagesGenerated",
     aiChatMessages: "aiChatMessages",
   };
