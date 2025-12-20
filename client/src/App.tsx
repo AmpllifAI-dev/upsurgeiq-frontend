@@ -35,6 +35,8 @@ import Help from "./pages/Help";
 import ContentCalendar from "./pages/ContentCalendar";
 import EmailTemplates from "./pages/EmailTemplates";
 import PressReleaseTemplates from "./pages/PressReleaseTemplates";
+import PressReleaseDetail from "./pages/PressReleaseDetail";
+import PressReleaseEdit from "./pages/PressReleaseEdit";
 import TeamManagement from "./pages/TeamManagement";
 import WebhookSettings from "./pages/WebhookSettings";
 import JournalistList from "./pages/JournalistList";
@@ -59,6 +61,8 @@ function Router() {
       <Route path="/subscribe" component={Subscribe} />
       <Route path="/onboarding" component={Onboarding} />
       <Route path="/press-releases/new" component={PressReleaseNew} />
+      <Route path="/press-releases/:id/edit" component={PressReleaseEdit} />
+      <Route path="/press-releases/:id" component={PressReleaseDetail} />
       <Route path="/press-releases" component={PressReleases} />
       <Route path="/campaign-review/:id" component={CampaignReview} />
       <Route path="/press-release/:id/distribution" component={PressReleaseDistribution} />

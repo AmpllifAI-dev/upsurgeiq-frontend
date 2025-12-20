@@ -33,6 +33,7 @@ export default function Onboarding() {
   const [targetAudience, setTargetAudience] = useState("");
   const [aiImageStyle, setAiImageStyle] = useState("");
   const [aiImageMood, setAiImageMood] = useState("");
+  const [preferredLanguage, setPreferredLanguage] = useState("en-GB");
 
   // Check if user already has a business profile
   const { data: existingBusiness, isLoading: checkingBusiness } = trpc.business.get.useQuery(undefined, {
@@ -183,6 +184,7 @@ export default function Onboarding() {
         dossier: analysisResult.analysis.businessDescription || `${companyName} - ${sicGroup}`,
         aiImageStyle,
         aiImageMood,
+        preferredLanguage,
       });
     } catch (error: any) {
       setIsGeneratingDossier(false);
@@ -207,6 +209,7 @@ export default function Onboarding() {
         dossier: fallbackDossier,
         aiImageStyle,
         aiImageMood,
+        preferredLanguage,
       });
     }
   };
@@ -450,6 +453,44 @@ export default function Onboarding() {
                     value={aiImageMood}
                     onChange={(e) => setAiImageMood(e.target.value)}
                   />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="preferredLanguage">Preferred Language for AI Content *</Label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <HelpCircle className="w-4 h-4 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p>Choose the language for AI-generated press releases and social media posts. Defaults to British English based on your location.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <Select value={preferredLanguage} onValueChange={setPreferredLanguage}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="en-GB">English (British)</SelectItem>
+                      <SelectItem value="en-US">English (American)</SelectItem>
+                      <SelectItem value="es-ES">Spanish (Spain)</SelectItem>
+                      <SelectItem value="es-MX">Spanish (Mexico)</SelectItem>
+                      <SelectItem value="fr-FR">French</SelectItem>
+                      <SelectItem value="de-DE">German</SelectItem>
+                      <SelectItem value="it-IT">Italian</SelectItem>
+                      <SelectItem value="pt-PT">Portuguese (Portugal)</SelectItem>
+                      <SelectItem value="pt-BR">Portuguese (Brazil)</SelectItem>
+                      <SelectItem value="nl-NL">Dutch</SelectItem>
+                      <SelectItem value="pl-PL">Polish</SelectItem>
+                      <SelectItem value="ru-RU">Russian</SelectItem>
+                      <SelectItem value="zh-CN">Chinese (Simplified)</SelectItem>
+                      <SelectItem value="ja-JP">Japanese</SelectItem>
+                      <SelectItem value="ko-KR">Korean</SelectItem>
+                      <SelectItem value="ar-SA">Arabic</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </>
             )}

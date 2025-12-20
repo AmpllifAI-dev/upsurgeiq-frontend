@@ -60,6 +60,7 @@ export const businesses = mysqlTable("businesses", {
   aiImageStyle: varchar("aiImageStyle", { length: 100 }),
   aiImageMood: varchar("aiImageMood", { length: 100 }),
   aiImageColorPalette: varchar("aiImageColorPalette", { length: 255 }),
+  preferredLanguage: varchar("preferredLanguage", { length: 10 }).default("en-GB"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

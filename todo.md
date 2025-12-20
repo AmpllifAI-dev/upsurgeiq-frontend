@@ -1802,3 +1802,10 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [ ] Remove Twitter/X from all other UI locations
 - [ ] Remove Twitter/X from global platform options
 - [ ] Verify Twitter is hidden, not marked as upgrade feature
+
+
+## New Features & Bug Fixes (Current Session - Dec 20)
+- [x] Add language preference to onboarding (ask user preferred language for AI content, default to location-based language like British English)
+- [x] Fix placeholder replacement in press releases (dynamic text placeholders not being replaced with user data)
+- [x] Fix View button on press releases list (not working)
+- [x] Fix Edit button on press releases list (not working)
