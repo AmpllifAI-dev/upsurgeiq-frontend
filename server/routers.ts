@@ -3422,6 +3422,48 @@ Generate a comprehensive campaign strategy that includes:
         await checkCreditAlerts();
         return { success: true, message: "Alert check triggered successfully" };
       }),
+
+    // Stripe Product Management
+    syncStripeProducts: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+
+        const { fullSync } = await import("./stripeProductSync");
+        const result = await fullSync();
+
+        // Log activity
+        await logActivity({
+          userId: ctx.user.id,
+          action: "sync_stripe_products",
+          entityType: "stripe_product",
+          entityId: 0,
+          description: `Synced Stripe products: ${result.created} created, ${result.updated} updated`,
+        });
+
+        return result;
+      }),
+
+    listStripeProducts: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+
+        const { listStripeProducts } = await import("./stripeProductSync");
+        return await listStripeProducts();
+      }),
+
+    getProductDefinitions: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+
+        const { PRODUCT_DEFINITIONS } = await import("./productDefinitions");
+        return PRODUCT_DEFINITIONS;
+      }),
   }),
 });
 

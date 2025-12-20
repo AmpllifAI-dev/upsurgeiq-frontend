@@ -116,8 +116,8 @@ export const WORD_COUNT_PRODUCTS = {
     words: 300,
     price: 400, // £4.00 in pence
     currency: "gbp",
-    stripeProductId: "", // TODO: Create in Stripe Dashboard
-    stripePriceId: "", // TODO: Create in Stripe Dashboard
+    stripeProductId: "prod_Tdga09X45s6WqW", // TODO: Create in Stripe Dashboard
+    stripePriceId: "price_1SgPDIAGfyqPBnQ9QzTEqcRl", // TODO: Create in Stripe Dashboard
     description: "Add 300 words to your press release",
   },
   words_600: {
@@ -125,8 +125,8 @@ export const WORD_COUNT_PRODUCTS = {
     words: 600,
     price: 800, // £8.00 in pence
     currency: "gbp",
-    stripeProductId: "", // TODO: Create in Stripe Dashboard
-    stripePriceId: "", // TODO: Create in Stripe Dashboard
+    stripeProductId: "prod_TdgazVtOrHtGmz", // TODO: Create in Stripe Dashboard
+    stripePriceId: "price_1SgPDIAGfyqPBnQ99t4rwGdX", // TODO: Create in Stripe Dashboard
     description: "Add 600 words to your press release (save £0)",
   },
   words_900: {
@@ -134,8 +134,8 @@ export const WORD_COUNT_PRODUCTS = {
     words: 900,
     price: 1200, // £12.00 in pence
     currency: "gbp",
-    stripeProductId: "", // TODO: Create in Stripe Dashboard
-    stripePriceId: "", // TODO: Create in Stripe Dashboard
+    stripeProductId: "prod_Tdgayy25rImfvT", // TODO: Create in Stripe Dashboard
+    stripePriceId: "price_1SgPDJAGfyqPBnQ99ZjYaO9K", // TODO: Create in Stripe Dashboard
     description: "Add 900 words to your press release (save £0)",
   },
 };
@@ -150,8 +150,8 @@ export const IMAGE_PACK_PRODUCTS = {
     images: 1,
     price: 399, // £3.99 in pence
     currency: "gbp",
-    stripeProductId: "", // TODO: Create in Stripe Dashboard
-    stripePriceId: "", // TODO: Create in Stripe Dashboard
+    stripeProductId: "prod_TdgaO5ahCQIfDy", // TODO: Create in Stripe Dashboard
+    stripePriceId: "price_1SgPDJAGfyqPBnQ94zADTH2s", // TODO: Create in Stripe Dashboard
     description: "Generate 1 additional AI image",
   },
   pack_5: {
@@ -159,8 +159,8 @@ export const IMAGE_PACK_PRODUCTS = {
     images: 5,
     price: 1499, // £14.99 in pence (save £5)
     currency: "gbp",
-    stripeProductId: "", // TODO: Create in Stripe Dashboard
-    stripePriceId: "", // TODO: Create in Stripe Dashboard
+    stripeProductId: "prod_Tdga6MTbsk6kEk", // TODO: Create in Stripe Dashboard
+    stripePriceId: "price_1SgPDKAGfyqPBnQ9vXpCfW5Q", // TODO: Create in Stripe Dashboard
     description: "Generate 5 additional AI images (save £5)",
   },
   pack_10: {
@@ -168,8 +168,8 @@ export const IMAGE_PACK_PRODUCTS = {
     images: 10,
     price: 2499, // £24.99 in pence (save £15)
     currency: "gbp",
-    stripeProductId: "", // TODO: Create in Stripe Dashboard
-    stripePriceId: "", // TODO: Create in Stripe Dashboard
+    stripeProductId: "prod_Tdga9SWsPmfa05", // TODO: Create in Stripe Dashboard
+    stripePriceId: "price_1SgPDKAGfyqPBnQ9ThnceObY", // TODO: Create in Stripe Dashboard
     description: "Generate 10 additional AI images (save £15)",
   },
 };

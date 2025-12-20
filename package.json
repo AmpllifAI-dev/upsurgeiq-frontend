@@ -10,7 +10,10 @@
     "check": "tsc --noEmit",
     "format": "prettier --write .",
     "test": "vitest run",
-    "db:push": "drizzle-kit generate && drizzle-kit migrate"
+    "db:push": "drizzle-kit generate && drizzle-kit migrate",
+    "stripe:sync": "tsx scripts/sync-stripe-products.mjs",
+    "stripe:list": "tsx scripts/sync-stripe-products.mjs --list",
+    "stripe:dry-run": "tsx scripts/sync-stripe-products.mjs --dry-run"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.693.0",
