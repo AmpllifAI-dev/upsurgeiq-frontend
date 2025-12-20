@@ -71,8 +71,22 @@
                                 "type": "date"
                             },
                             {
-                                "name": "imageUrl",
-                                "type": "text"
+                                "name": "image",
+                                "type": "collection",
+                                "spec": [
+                                    {
+                                        "name": "url",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "fileName",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "dataUrl",
+                                        "type": "text"
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -128,16 +142,21 @@
                     "flow": [
                         {
                             "id": 3,
-                            "module": "facebook-pages:CreatePost",
-                            "version": 6,
+                            "module": "facebook-pages:uploadPhoto",
+                            "version": 1,
                             "parameters": {
                                 "__IMTCONN__": 0
                             },
                             "mapper": {
                                 "page": "",
-                                "message": "{{1.post.content}}",
-                                "link": "",
-                                "picture": "{{1.post.imageUrl}}",
+                                "caption": "{{1.post.content}}",
+                                "photos": [
+                                    {
+                                        "type": "file",
+                                        "name": "{{1.post.image.fileName}}",
+                                        "data": "{{1.post.image.dataUrl}}"
+                                    }
+                                ],
                                 "published": true
                             },
                             "metadata": {
@@ -234,7 +253,7 @@
                             "mapper": {
                                 "account": "",
                                 "caption": "{{1.post.content}}",
-                                "image_url": "{{1.post.imageUrl}}"
+                                "image_url": "{{1.post.image.url}}"
                             },
                             "metadata": {
                                 "designer": {
@@ -319,7 +338,7 @@
                                 "organization": "",
                                 "commentary": "{{1.post.content}}",
                                 "visibility": "PUBLIC",
-                                "media": "{{1.post.imageUrl}}"
+                                "media": "{{1.post.image.url}}"
                             },
                             "metadata": {
                                 "designer": {

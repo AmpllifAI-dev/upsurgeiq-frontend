@@ -1049,3 +1049,11 @@
 - [x] Add buildSocialMediaPostPayload function
 - [x] Update webhook test endpoint to send correct payload based on event type
 - [x] Test social media webhook sends post data (not onboarding data)
+
+
+## Update Social Media Image Payload (Dec 19, 2025)
+
+- [x] Update SocialMediaPostPayload to include image.fileName and image.dataUrl
+- [x] Update test endpoint to include sample image file details
+- [x] Update Make.com blueprint with proper image field mapping
+- [x] Test webhook sends image data correctly

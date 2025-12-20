@@ -2108,7 +2108,11 @@ Be concise, actionable, and professional. Use markdown formatting for clarity.`;
               content: "Test post from UpsurgeIQ! 🚀 This is a sample social media post to verify the webhook integration is working correctly.",
               platforms: ["facebook", "instagram", "linkedin"],
               scheduledFor: null,
-              imageUrl: "https://picsum.photos/1200/630",
+              image: {
+                url: "https://picsum.photos/1200/630",
+                fileName: "test-post-image.jpg",
+                dataUrl: "https://picsum.photos/1200/630", // In production, this would be a base64 data URL
+              },
             },
             user: {
               id: ctx.user.id,

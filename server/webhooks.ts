@@ -72,7 +72,11 @@ export interface SocialMediaPostPayload {
     content: string;
     platforms: string[]; // ["facebook", "instagram", "linkedin", "twitter"]
     scheduledFor: string | null;
-    imageUrl: string | null;
+    image: {
+      url: string;
+      fileName: string;
+      dataUrl: string; // Base64 data URL for Make.com file upload
+    } | null;
   };
   user: {
     id: number;
@@ -256,7 +260,11 @@ export function buildSocialMediaPostPayload(data: {
     content: string;
     platforms: string[];
     scheduledFor: Date | null;
-    imageUrl: string | null;
+    image: {
+      url: string;
+      fileName: string;
+      dataUrl: string;
+    } | null;
   };
   user: {
     id: number;
