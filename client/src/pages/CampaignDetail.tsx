@@ -39,6 +39,7 @@ import {
   TrendingUp,
   Edit,
   Trash2,
+  Save,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -51,6 +52,12 @@ export default function CampaignDetail() {
 
   const [isAddMilestoneOpen, setIsAddMilestoneOpen] = useState(false);
   const [isAddDeliverableOpen, setIsAddDeliverableOpen] = useState(false);
+  const [isSaveTemplateOpen, setIsSaveTemplateOpen] = useState(false);
+
+  // Save as template form state
+  const [templateName, setTemplateName] = useState("");
+  const [templateDescription, setTemplateDescription] = useState("");
+  const [templateCategory, setTemplateCategory] = useState("");
 
   // Milestone form state
   const [milestoneTitle, setMilestoneTitle] = useState("");
@@ -142,6 +149,76 @@ export default function CampaignDetail() {
       toast.error(error.message || "Failed to update deliverable");
     },
   });
+
+  // Save as template mutation
+  const saveTemplateMutation = trpc.campaign.createTemplate.useMutation({
+    onSuccess: () => {
+      toast.success("Template saved!", {
+        description: "Campaign saved as reusable template.",
+      });
+      setIsSaveTemplateOpen(false);
+      setTemplateName("");
+      setTemplateDescription("");
+      setTemplateCategory("");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to save template");
+    },
+  });
+
+  const handleSaveAsTemplate = () => {
+    if (!templateName || !campaign) {
+      toast.error("Please enter a template name");
+      return;
+    }
+
+    // Calculate duration in days
+    let duration: number | undefined;
+    if (campaign.startDate && campaign.endDate) {
+      const start = new Date(campaign.startDate);
+      const end = new Date(campaign.endDate);
+      duration = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    }
+
+    // Serialize milestones and deliverables
+    const milestonesData = milestones?.map((m) => ({
+      title: m.title,
+      description: m.description,
+      dueOffset: m.dueDate
+        ? Math.ceil(
+            (new Date(m.dueDate).getTime() - new Date(campaign.startDate!).getTime()) /
+              (1000 * 60 * 60 * 24)
+          )
+        : 0,
+    }));
+
+    const deliverablesData = deliverables?.map((d) => ({
+      title: d.title,
+      type: d.type,
+      dueOffset: d.dueDate
+        ? Math.ceil(
+            (new Date(d.dueDate).getTime() - new Date(campaign.startDate!).getTime()) /
+              (1000 * 60 * 60 * 24)
+          )
+        : 0,
+    }));
+
+    saveTemplateMutation.mutate({
+      name: templateName,
+      description: templateDescription,
+      category: templateCategory || undefined,
+      goal: campaign.goal || undefined,
+      targetAudience: campaign.targetAudience || undefined,
+      platforms: campaign.platforms || undefined,
+      suggestedBudget: campaign.budget || undefined,
+      suggestedDuration: duration,
+      strategy: campaign.aiGeneratedStrategy || undefined,
+      keyMessages: campaign.keyMessages || undefined,
+      successMetrics: campaign.successMetrics || undefined,
+      milestones: milestonesData ? JSON.stringify(milestonesData) : undefined,
+      deliverables: deliverablesData ? JSON.stringify(deliverablesData) : undefined,
+    });
+  };
 
   const handleCreateMilestone = () => {
     if (!milestoneTitle) {
@@ -250,8 +327,71 @@ export default function CampaignDetail() {
             <p className="text-muted-foreground">{campaign.goal}</p>
           </div>
         </div>
-        <Badge className={getStatusColor(campaign.status)}>{campaign.status}</Badge>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => setIsSaveTemplateOpen(true)}>
+            <Save className="w-4 h-4 mr-2" />
+            Save as Template
+          </Button>
+          <Badge className={getStatusColor(campaign.status)}>{campaign.status}</Badge>
+        </div>
       </div>
+
+      {/* Save as Template Dialog */}
+      <Dialog open={isSaveTemplateOpen} onOpenChange={setIsSaveTemplateOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save Campaign as Template</DialogTitle>
+            <DialogDescription>
+              Create a reusable template from this campaign for future use
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="templateName">Template Name *</Label>
+              <Input
+                id="templateName"
+                placeholder="e.g., Product Launch Template"
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="templateDescription">Description</Label>
+              <Textarea
+                id="templateDescription"
+                placeholder="Describe when to use this template..."
+                value={templateDescription}
+                onChange={(e) => setTemplateDescription(e.target.value)}
+                rows={3}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="templateCategory">Category</Label>
+              <Select value={templateCategory} onValueChange={setTemplateCategory}>
+                <SelectTrigger id="templateCategory">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Product Launch">Product Launch</SelectItem>
+                  <SelectItem value="Brand Awareness">Brand Awareness</SelectItem>
+                  <SelectItem value="Lead Generation">Lead Generation</SelectItem>
+                  <SelectItem value="Event Promotion">Event Promotion</SelectItem>
+                  <SelectItem value="Crisis Management">Crisis Management</SelectItem>
+                  <SelectItem value="Thought Leadership">Thought Leadership</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button
+              onClick={handleSaveAsTemplate}
+              disabled={saveTemplateMutation.isPending}
+              className="w-full"
+            >
+              {saveTemplateMutation.isPending ? "Saving..." : "Save Template"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Campaign Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +31,7 @@ export function CampaignPlanningWizard({
 }: CampaignPlanningWizardProps) {
   const [step, setStep] = useState(1);
   const [generating, setGenerating] = useState(false);
+  const [templateLoaded, setTemplateLoaded] = useState(false);
 
   // Step 1: Campaign Basics
   const [campaignName, setCampaignName] = useState("");
@@ -73,6 +74,43 @@ export function CampaignPlanningWizard({
     },
   });
 
+  // Load template from session storage if available
+  useEffect(() => {
+    if (open && !templateLoaded) {
+      const templateData = sessionStorage.getItem("campaignTemplate");
+      if (templateData) {
+        try {
+          const template = JSON.parse(templateData);
+          setCampaignName(template.name || "");
+          setCampaignGoal(template.goal || "");
+          setTargetAudience(template.targetAudience || "");
+          setBudget(template.suggestedBudget || "");
+          setPlatforms(template.platforms ? template.platforms.split(", ") : []);
+          setAiStrategy(template.strategy || "");
+          setKeyMessages(template.keyMessages || "");
+          setSuccessMetrics(template.successMetrics || "");
+          
+          // Calculate suggested dates based on duration
+          if (template.suggestedDuration) {
+            const today = new Date();
+            const endDate = new Date(today);
+            endDate.setDate(today.getDate() + template.suggestedDuration);
+            setStartDate(today.toISOString().split('T')[0]);
+            setEndDate(endDate.toISOString().split('T')[0]);
+          }
+          
+          setTemplateLoaded(true);
+          sessionStorage.removeItem("campaignTemplate");
+          toast.success("Template loaded!", {
+            description: "Campaign wizard pre-filled with template data.",
+          });
+        } catch (error) {
+          console.error("Failed to parse template data:", error);
+        }
+      }
+    }
+  }, [open, templateLoaded]);
+
   const resetForm = () => {
     setStep(1);
     setCampaignName("");
@@ -85,6 +123,7 @@ export function CampaignPlanningWizard({
     setAiStrategy("");
     setKeyMessages("");
     setSuccessMetrics("");
+    setTemplateLoaded(false);
   };
 
   const togglePlatform = (platform: string) => {
