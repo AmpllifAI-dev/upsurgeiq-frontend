@@ -226,7 +226,7 @@ export default function Dashboard() {
 
           <Card 
             className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
-            onClick={() => setLocation("/dashboard/campaign-lab")}
+            onClick={() => setLocation("/dashboard/campaign-lab?status=active")}
           >
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Active Campaigns</CardTitle>
@@ -256,6 +256,32 @@ export default function Dashboard() {
         </div>
 
         </section>
+
+        {/* Admin Section (visible only to admins) */}
+        {user.role === "admin" && (
+          <section className="mb-8">
+            <Card className="border-primary/30 bg-primary/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-primary" />
+                  Admin Tools
+                </CardTitle>
+                <CardDescription>
+                  Platform administration and monitoring
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  onClick={() => setLocation("/admin/credit-monitoring")}
+                  className="w-full sm:w-auto"
+                >
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  Manus Credit Monitoring
+                </Button>
+              </CardContent>
+            </Card>
+          </section>
+        )}
 
         {/* Quick Actions */}
         <section aria-labelledby="quick-actions-heading">

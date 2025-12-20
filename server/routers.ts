@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
-import { sql, eq, and, isNotNull } from "drizzle-orm";
+import { sql, eq, and, isNotNull, gte } from "drizzle-orm";
 import { getDb } from "./db";
-import { pressReleases, campaigns, journalists } from "../drizzle/schema";
+import { pressReleases, campaigns, journalists, users, creditUsage } from "../drizzle/schema";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { COOKIE_NAME } from "@shared/const";
 import { systemRouter } from "./_core/systemRouter";
@@ -3084,6 +3084,126 @@ Generate a comprehensive campaign strategy that includes:
     list: protectedProcedure.query(async () => {
       return getAllTags();
     }),
+  }),
+
+  // Admin-only endpoints
+  admin: router({
+    getCreditStats: protectedProcedure
+      .input(z.object({
+        timeRange: z.enum(["7d", "30d", "90d", "all"]),
+      }))
+      .query(async ({ ctx, input }) => {
+        // Only allow admin users
+        if (ctx.user?.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        }
+
+        const { timeRange } = input;
+
+        // Calculate date filter
+        let dateFilter: Date | null = null;
+        if (timeRange !== "all") {
+          const days = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90;
+          dateFilter = new Date();
+          dateFilter.setDate(dateFilter.getDate() - days);
+        }
+
+        // Get total credits and tokens
+        const creditQuery = db
+          .select({
+            totalCredits: sql<number>`COALESCE(SUM(CAST(${creditUsage.creditsUsed} AS DECIMAL(10,4))), 0)`,
+            totalTokens: sql<number>`COALESCE(SUM(${creditUsage.tokensUsed}), 0)`,
+          })
+          .from(creditUsage);
+
+        if (dateFilter) {
+          creditQuery.where(gte(creditUsage.createdAt, dateFilter));
+        }
+
+        const [totals] = await creditQuery;
+
+        // Get total users
+        const [userCount] = await db
+          .select({ count: sql<number>`COUNT(DISTINCT ${creditUsage.userId})` })
+          .from(creditUsage);
+
+        const totalUsers = userCount?.count || 0;
+        const avgCreditsPerUser = totalUsers > 0 ? Number(totals.totalCredits) / totalUsers : 0;
+
+        // Get daily trend
+        const dailyQuery = db
+          .select({
+            date: sql<string>`DATE(${creditUsage.createdAt})`,
+            credits: sql<number>`SUM(CAST(${creditUsage.creditsUsed} AS DECIMAL(10,4)))`,
+          })
+          .from(creditUsage)
+          .groupBy(sql`DATE(${creditUsage.createdAt})`)
+          .orderBy(sql`DATE(${creditUsage.createdAt})`);
+
+        if (dateFilter) {
+          dailyQuery.where(gte(creditUsage.createdAt, dateFilter));
+        }
+
+        const dailyTrend = await dailyQuery;
+
+        // Get breakdown by feature
+        const featureQuery = db
+          .select({
+            name: creditUsage.featureType,
+            value: sql<number>`SUM(CAST(${creditUsage.creditsUsed} AS DECIMAL(10,4)))`,
+          })
+          .from(creditUsage)
+          .groupBy(creditUsage.featureType);
+
+        if (dateFilter) {
+          featureQuery.where(gte(creditUsage.createdAt, dateFilter));
+        }
+
+        const byFeature = await featureQuery;
+
+        // Get top users
+        const topUsersQuery = db
+          .select({
+            name: users.name,
+            email: users.email,
+            credits: sql<number>`SUM(CAST(${creditUsage.creditsUsed} AS DECIMAL(10,4)))`,
+          })
+          .from(creditUsage)
+          .leftJoin(users, eq(creditUsage.userId, users.id))
+          .groupBy(users.id, users.name, users.email)
+          .orderBy(sql`SUM(CAST(${creditUsage.creditsUsed} AS DECIMAL(10,4))) DESC`)
+          .limit(10);
+
+        if (dateFilter) {
+          topUsersQuery.where(gte(creditUsage.createdAt, dateFilter));
+        }
+
+        const topUsers = await topUsersQuery;
+
+        return {
+          totalCredits: Number(totals.totalCredits),
+          totalTokens: Number(totals.totalTokens),
+          totalUsers,
+          avgCreditsPerUser,
+          dailyTrend: dailyTrend.map(d => ({
+            date: d.date,
+            credits: Number(d.credits),
+          })),
+          byFeature: byFeature.map(f => ({
+            name: f.name,
+            value: Number(f.value),
+          })),
+          topUsers: topUsers.map(u => ({
+            name: u.name || u.email || "Unknown",
+            credits: Number(u.credits),
+          })),
+        };
+      }),
   }),
 });
 

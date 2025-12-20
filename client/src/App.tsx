@@ -36,6 +36,7 @@ import WebhookSettings from "./pages/WebhookSettings";
 import JournalistList from "./pages/JournalistList";
 import JournalistForm from "./pages/JournalistForm";
 import JournalistDetail from "./pages/JournalistDetail";
+import AdminCreditMonitoring from "./pages/AdminCreditMonitoring";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -71,6 +72,7 @@ function Router() {
       <Route path="/team" component={TeamManagement} />
       <Route path="/webhook-settings" component={WebhookSettings} />
       <Route path="/help" component={Help} />
+      <Route path="/admin/credit-monitoring" component={AdminCreditMonitoring} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

@@ -799,4 +799,26 @@ export const campaignActivityLog = mysqlTable("campaign_activity_log", {
 export type CampaignActivityLog = typeof campaignActivityLog.$inferSelect;
 export type InsertCampaignActivityLog = typeof campaignActivityLog.$inferInsert;
 
+// Admin Credit Usage Tracking (Manus credit consumption monitoring)
+export const creditUsage = mysqlTable("credit_usage", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  featureType: mysqlEnum("featureType", [
+    "press_release_generation",
+    "campaign_strategy_generation",
+    "ai_chat",
+    "image_generation",
+    "voice_transcription",
+    "content_analysis",
+    "other"
+  ]).notNull(),
+  creditsUsed: decimal("creditsUsed", { precision: 10, scale: 4 }).notNull(), // Precise credit tracking
+  tokensUsed: int("tokensUsed"), // For LLM calls, track token count
+  metadata: json("metadata"), // Store additional context (model used, request details, etc.)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CreditUsage = typeof creditUsage.$inferSelect;
+export type InsertCreditUsage = typeof creditUsage.$inferInsert;
+
 // ========================================

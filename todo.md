@@ -1240,3 +1240,21 @@
 - [x] Make media outlets stat card clickable to navigate to journalist list
 - [x] Add hover effects (shadow, scale) to indicate cards are clickable
 - [x] All stat cards now navigate to relevant pages
+
+## Campaign Status Filtering
+- [x] Add URL parameter support to CampaignLab for status filtering
+- [x] Update dashboard Active Campaigns card to pass status=active parameter
+- [x] CampaignLab already has filter UI with status dropdown
+- [x] Filter automatically reads from URL parameter on page load
+
+## Admin Credit Monitoring Dashboard
+- [x] Create credit usage tracking table in database schema
+- [x] Create admin-only credit monitoring page
+- [x] Build credit usage charts (daily trend, feature breakdown, top users)
+- [x] Add breakdown by feature type (press releases, campaigns, chat, images, transcription)
+- [x] Show total credits consumed, tokens used, and per-user averages
+- [x] Add admin-only navigation link in dashboard (visible only to admin role)
+- [x] Implement role-based access control for admin pages
+- [x] Add tRPC admin.getCreditStats endpoint with permission checking
+- [ ] Add credit logging to all AI service calls (requires integration at each call site)
+- [ ] Populate credit usage data from actual AI service usage

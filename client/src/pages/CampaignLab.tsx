@@ -26,7 +26,11 @@ export default function CampaignLab() {
   const [campaignGoal, setCampaignGoal] = useState("");
   const [campaignBudget, setCampaignBudget] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  
+  // Check URL parameters for initial status filter
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialStatus = urlParams.get('status') || 'all';
+  const [statusFilter, setStatusFilter] = useState<string>(initialStatus);
   const [startDateFilter, setStartDateFilter] = useState("");
   const [endDateFilter, setEndDateFilter] = useState("");
   const [sortBy, setSortBy] = useState<"date" | "name" | "status" | "budget">("date");
