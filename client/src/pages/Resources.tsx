@@ -10,8 +10,8 @@ export function Resources() {
       title: 'Press Release Template',
       description: 'Professional press release template following AP style guidelines. Includes structure for headline, dateline, body, boilerplate, and media contact information.',
       fileSize: '45 KB',
-      format: 'DOCX',
-      downloadUrl: '#', // TODO: Add actual file URL
+      format: 'PDF',
+      downloadUrl: '/templates/press-release-template.pdf',
       features: [
         'AP Style compliant format',
         'Editable sections with guidance',
@@ -23,8 +23,8 @@ export function Resources() {
       title: 'Media Pitch Email Template',
       description: 'Proven email template for pitching stories to journalists. Includes subject line formulas, opening hooks, and follow-up sequences that get responses.',
       fileSize: '38 KB',
-      format: 'DOCX',
-      downloadUrl: '#',
+      format: 'PDF',
+      downloadUrl: '/templates/media-pitch-template.pdf',
       features: [
         'Subject line formulas',
         'Personalization framework',
@@ -37,7 +37,7 @@ export function Resources() {
       description: 'Complete checklist for planning and executing successful PR campaigns. Covers strategy, content creation, distribution, and measurement.',
       fileSize: '52 KB',
       format: 'PDF',
-      downloadUrl: '#',
+      downloadUrl: '/templates/campaign-planning-checklist.pdf',
       features: [
         'Pre-launch planning checklist',
         'Content creation workflow',
@@ -49,8 +49,8 @@ export function Resources() {
       title: 'Social Media Content Calendar',
       description: 'Monthly planning template for coordinating social media posts across platforms. Includes content themes, posting schedules, and engagement tracking.',
       fileSize: '128 KB',
-      format: 'XLSX',
-      downloadUrl: '#',
+      format: 'PDF',
+      downloadUrl: '/templates/social-media-calendar-template.pdf',
       features: [
         'Multi-platform planning grid',
         'Content theme tracker',
@@ -59,16 +59,16 @@ export function Resources() {
       ]
     },
     {
-      title: 'Media List Building Guide',
-      description: 'Step-by-step guide to building targeted media lists that get results. Includes research strategies, contact verification, and GDPR compliance.',
+      title: 'Press Kit Guide',
+      description: 'Comprehensive guide to creating professional press kits that make journalists\' jobs easier. Includes essential components, visual assets, and distribution tips.',
       fileSize: '1.2 MB',
       format: 'PDF',
-      downloadUrl: '#',
+      downloadUrl: '/templates/press-kit-guide.pdf',
       features: [
-        'Research methodology',
-        'Contact verification process',
-        'GDPR compliance checklist',
-        'List segmentation strategies'
+        'Essential components checklist',
+        'Visual asset requirements',
+        'Distribution best practices',
+        'Media contact guidelines'
       ]
     },
     {
@@ -76,7 +76,7 @@ export function Resources() {
       description: 'Essential framework for handling PR crises effectively. Includes response templates, escalation procedures, and post-crisis analysis.',
       fileSize: '890 KB',
       format: 'PDF',
-      downloadUrl: '#',
+      downloadUrl: '/templates/crisis-communication-template.pdf',
       features: [
         'Crisis severity assessment',
         'Response templates by scenario',
@@ -169,10 +169,12 @@ export function Resources() {
 
                 <div className="flex items-center justify-between pt-4 border-t">
                   <span className="text-xs text-muted-foreground">{resource.fileSize}</span>
-                  <Button size="sm" className="gap-2">
-                    <Download className="h-4 w-4" />
-                    Download
-                  </Button>
+                  <a href={resource.downloadUrl} download>
+                    <Button size="sm" className="gap-2">
+                      <Download className="h-4 w-4" />
+                      Download
+                    </Button>
+                  </a>
                 </div>
               </Card>
             ))}

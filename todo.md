@@ -2184,3 +2184,25 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [ ] Create media pitch guide template
 - [ ] Add email capture for resource downloads
 - [ ] Test all resources and legal pages
+
+## Resources & WordPress Enhancement Tasks (Current)
+- [ ] Create downloadable PR template files (DOCX/PDF) for Resources page
+  - [ ] Press Release Template
+  - [ ] Media Pitch Template
+  - [ ] Campaign Planning Checklist
+  - [ ] Social Media Content Calendar
+  - [ ] Press Kit Guide
+  - [ ] Crisis Communication Template
+- [ ] Configure WordPress permalinks to use trailing slash format (/post-name/)
+- [ ] Add featured images to 4 blog posts in WordPress
+  - [ ] PR Best Practices for SMBs
+  - [ ] AI in Marketing
+  - [ ] Press Release Writing Tips
+  - [ ] Digital Marketing Effectiveness Methodology
+
+
+## Resources & WordPress Enhancements (Dec 21, 2025)
+- [x] Create downloadable PR template PDFs for Resources page
+- [x] Update Resources page with download links
+- [x] Configure WordPress permalinks to use trailing slash format
+- [x] Add featured images to all 4 blog posts in WordPress
