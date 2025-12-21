@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { Loader2, Upload } from "lucide-react";
+import { EmailTemplatePreview } from "@/components/EmailTemplatePreview";
 
 export default function WhiteLabelSettings() {
   const { user } = useAuth();
@@ -313,6 +314,16 @@ export default function WhiteLabelSettings() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Email Template Preview */}
+        {enabled && (
+          <EmailTemplatePreview
+            logoUrl={logoUrl || undefined}
+            companyName={companyName || "Your Company"}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
+          />
+        )}
       </div>
     </DashboardLayout>
   );

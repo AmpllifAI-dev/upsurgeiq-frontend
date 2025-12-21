@@ -705,6 +705,7 @@ Generate a complete, publication-ready press release.`;
           content: z.string(),
           imageUrl: z.string().optional(),
           status: z.enum(["draft", "scheduled", "published"]),
+          distributionType: z.enum(["ai_assisted", "manual"]).default("ai_assisted"),
           scheduledFor: z.string().optional(), // ISO date string
         })
       )
@@ -717,13 +718,15 @@ Generate a complete, publication-ready press release.`;
           });
         }
 
-        // Check usage limits
-        const { allowed } = await checkLimit(ctx.user.id, "pressReleases");
-        if (!allowed) {
-          throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "Press release limit reached for your subscription tier. Please upgrade to create more.",
-          });
+        // Check usage limits (skip for manual distribution)
+        if (input.distributionType === "ai_assisted") {
+          const { allowed } = await checkLimit(ctx.user.id, "pressReleases");
+          if (!allowed) {
+            throw new TRPCError({
+              code: "FORBIDDEN",
+              message: "Press release limit reached for your subscription tier. Please upgrade to create more.",
+            });
+          }
         }
 
         // If scheduledFor is provided, set status to scheduled
@@ -738,10 +741,13 @@ Generate a complete, publication-ready press release.`;
           imageUrl: input.imageUrl,
           scheduledFor: input.scheduledFor ? new Date(input.scheduledFor) : undefined,
           status: status,
+          distributionType: input.distributionType,
         });
 
-        // Increment usage counter
-        await incrementUsage(ctx.user.id, "pressReleases");
+        // Increment usage counter (only for AI-assisted)
+        if (input.distributionType === "ai_assisted") {
+          await incrementUsage(ctx.user.id, "pressReleases");
+        }
 
         // Log activity
         await logActivity({

@@ -1993,3 +1993,33 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
   - [x] Add "Apply Changes" vs "Exit Preview" button modes
   - [x] Automatic cleanup when preview disabled or navigating away
   - [x] Visual indicator when preview mode is active
+
+
+## Feature Expansion - Bulk Actions, Email Preview, Filters & Manual Distribution (Dec 21, 2024)
+- [x] Manual Distribution Mode (Unlimited, No Credits)
+  - [x] Add distributionType field to press releases schema (ai_assisted vs manual)
+  - [x] Update create endpoint to skip credit checks for manual distributions
+  - [x] Add distribution type selector to press release creation UI
+  - [x] Update usage tracking to differentiate between types (only AI-assisted consumes credits)
+  - [x] Show "Manual Distribution" badge on press releases list
+  - [x] Visual indicator showing unlimited status for manual distribution
+- [x] Bulk Actions for Press Releases
+  - [x] Add bulk delete functionality with confirmation
+  - [x] Add bulk status change (draft/published)
+  - [x] Improve existing bulk export UI (PDF export)
+  - [x] Add confirmation dialogs for destructive actions
+  - [x] Show selected count in action buttons
+- [x] White-Label Email Template Preview
+  - [x] Create email template preview component
+  - [x] Add preview section to White Label Settings
+  - [x] Show transactional email examples (welcome, notification, press release)
+  - [x] Apply white-label branding to email preview (logo, colors, company name)
+  - [x] Tabbed interface for different email types
+  - [ ] Add "Send Test Email" functionality (marked as coming soon- [x] Saved Filter Shortcuts
+  - [x] Add quick filter chips above Press Releases list
+  - [x] Create "My Drafts", "This Week", "Scheduled", "Published" presets
+  - [x] Highlight active filter with default variant
+  - [x] One-click filter application with automatic sorting
+  - [ ] Add quick filter chips to Campaigns list (can be added later)
+  - [ ] Add quick filter chips to Social Media list (can be added later)ntly
+  - [ ] Show active filter indicator

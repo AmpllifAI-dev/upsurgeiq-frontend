@@ -46,6 +46,7 @@ export default function PressReleaseNew() {
     purchasedWords: number;
   } | null>(null);
   const [showAIWarning, setShowAIWarning] = useState(false);
+  const [distributionType, setDistributionType] = useState<"ai_assisted" | "manual">("ai_assisted");
 
   const { data: business } = trpc.business.get.useQuery(undefined, {
     enabled: !!user,
@@ -174,6 +175,7 @@ export default function PressReleaseNew() {
       content: generatedContent,
       imageUrl: generatedImageUrl || uploadedImageUrl || undefined,
       status: scheduledFor ? "scheduled" : "draft",
+      distributionType,
       scheduledFor,
     });
   };
@@ -267,6 +269,26 @@ export default function PressReleaseNew() {
                 />
                 <p className="text-xs text-muted-foreground">
                   Default: {business.targetAudience || "General audience"}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="distributionType">Distribution Type</Label>
+                <Select value={distributionType} onValueChange={(val: "ai_assisted" | "manual") => setDistributionType(val)} disabled={isGenerating}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ai_assisted">AI-Assisted (uses tier credits)</SelectItem>
+                    <SelectItem value="manual">Manual Distribution (unlimited, no credits)</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  {distributionType === "manual" ? (
+                    <span className="text-green-600 dark:text-green-400 font-medium">✓ Unlimited - No credits consumed</span>
+                  ) : (
+                    "Uses 1 press release credit from your tier allowance"
+                  )}
                 </p>
               </div>
 

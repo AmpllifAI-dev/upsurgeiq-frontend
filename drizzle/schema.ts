@@ -129,6 +129,7 @@ export const pressReleases = mysqlTable("press_releases", {
   subtitle: varchar("subtitle", { length: 500 }),
   body: text("body").notNull(),
   status: mysqlEnum("status", ["draft", "scheduled", "published", "archived"]).default("draft").notNull(),
+  distributionType: mysqlEnum("distributionType", ["ai_assisted", "manual"]).default("ai_assisted").notNull(),
   scheduledFor: timestamp("scheduledFor"),
   publishedAt: timestamp("publishedAt"),
   imageUrl: varchar("imageUrl", { length: 500 }),

@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 export default function PressReleases() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
+  const utils = trpc.useUtils();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"date" | "title" | "status">("date");
@@ -206,6 +207,30 @@ export default function PressReleases() {
     setSelectedIds([]);
   };
 
+  const bulkDeleteMutation = trpc.pressRelease.bulkDelete.useMutation({
+    onSuccess: (data) => {
+      utils.pressRelease.list.invalidate();
+      toast.success(`Deleted ${data.count} press releases`);
+      setBulkMode(false);
+      setSelectedIds([]);
+    },
+    onError: (error) => {
+      toast.error('Failed to delete press releases', { description: error.message });
+    },
+  });
+
+  const bulkUpdateStatusMutation = trpc.pressRelease.bulkUpdateStatus.useMutation({
+    onSuccess: (data) => {
+      utils.pressRelease.list.invalidate();
+      toast.success(`Updated ${data.count} press releases`);
+      setBulkMode(false);
+      setSelectedIds([]);
+    },
+    onError: (error) => {
+      toast.error('Failed to update press releases', { description: error.message });
+    },
+  });
+
   const exportCSVMutation = trpc.csvExport.exportPressReleaseAnalytics.useMutation({
     onSuccess: (data) => {
       const blob = new Blob([data.csv], { type: 'text/csv' });
@@ -228,6 +253,24 @@ export default function PressReleases() {
 
   const handleExportCSV = () => {
     exportCSVMutation.mutate({});
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedIds.length === 0) {
+      toast.error("Please select at least one press release");
+      return;
+    }
+    if (confirm(`Are you sure you want to delete ${selectedIds.length} press release(s)? This action cannot be undone.`)) {
+      bulkDeleteMutation.mutate({ ids: selectedIds });
+    }
+  };
+
+  const handleBulkStatusChange = (status: "draft" | "scheduled" | "published" | "archived") => {
+    if (selectedIds.length === 0) {
+      toast.error("Please select at least one press release");
+      return;
+    }
+    bulkUpdateStatusMutation.mutate({ ids: selectedIds, status });
   };
 
   const toggleSelection = (id: number) => {
@@ -283,7 +326,7 @@ export default function PressReleases() {
             <h1 className="text-4xl font-bold text-foreground">Press Releases</h1>
             <p className="text-muted-foreground mt-2">Manage your press releases and announcements</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {bulkMode ? (
               <>
                 <Button variant="outline" onClick={() => {
@@ -292,16 +335,41 @@ export default function PressReleases() {
                 }}>
                   Cancel
                 </Button>
-                <Button onClick={handleBulkExport} disabled={selectedIds.length === 0}>
+                <Button 
+                  variant="outline" 
+                  onClick={handleBulkExport} 
+                  disabled={selectedIds.length === 0}
+                >
                   <Download className="w-4 h-4 mr-2" />
-                  Export {selectedIds.length > 0 && `(${selectedIds.length})`}
+                  Export PDF {selectedIds.length > 0 && `(${selectedIds.length})`}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleBulkStatusChange("draft")} 
+                  disabled={selectedIds.length === 0}
+                >
+                  Set as Draft
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleBulkStatusChange("published")} 
+                  disabled={selectedIds.length === 0}
+                >
+                  Publish
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  onClick={handleBulkDelete} 
+                  disabled={selectedIds.length === 0}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete {selectedIds.length > 0 && `(${selectedIds.length})`}
                 </Button>
               </>
             ) : (
               <>
                 <Button variant="outline" onClick={() => setBulkMode(true)}>
-                  <Download className="w-4 h-4 mr-2" />
-                  Bulk Export PDF
+                  Bulk Actions
                 </Button>
                 <Button variant="outline" onClick={handleExportCSV}>
                   <FileSpreadsheet className="w-4 h-4 mr-2" />
@@ -330,6 +398,63 @@ export default function PressReleases() {
                 setSortOrder("desc");
               }}
             />
+
+            {/* Quick Filter Shortcuts */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm font-medium text-muted-foreground">Quick Filters:</span>
+              <Button
+                variant={statusFilter === "draft" && searchQuery === "" ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  setStatusFilter("draft");
+                  setSearchQuery("");
+                  setSortBy("date");
+                  setSortOrder("desc");
+                }}
+              >
+                My Drafts
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const oneWeekAgo = new Date();
+                  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                  setStatusFilter("all");
+                  setSearchQuery("");
+                  setSortBy("date");
+                  setSortOrder("desc");
+                  // Note: This would need backend support for date filtering
+                  toast.info("Showing all recent items (date filtering coming soon)");
+                }}
+              >
+                This Week
+              </Button>
+              <Button
+                variant={statusFilter === "scheduled" && searchQuery === "" ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  setStatusFilter("scheduled");
+                  setSearchQuery("");
+                  setSortBy("date");
+                  setSortOrder("asc");
+                }}
+              >
+                Scheduled
+              </Button>
+              <Button
+                variant={statusFilter === "published" && searchQuery === "" ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  setStatusFilter("published");
+                  setSearchQuery("");
+                  setSortBy("date");
+                  setSortOrder("desc");
+                }}
+              >
+                Published
+              </Button>
+            </div>
 
             {/* Saved Filters */}
             <div className="flex items-center gap-2 flex-wrap">
@@ -451,10 +576,15 @@ export default function PressReleases() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
+                      <div className="flex items-center gap-3 mb-2 flex-wrap">
                         <Badge variant={getStatusBadge(pr.status)}>
                           {pr.status.charAt(0).toUpperCase() + pr.status.slice(1)}
                         </Badge>
+                        {pr.distributionType === "manual" && (
+                          <Badge variant="outline" className="bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800">
+                            Manual Distribution
+                          </Badge>
+                        )}
                         <span className="text-sm text-muted-foreground flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
                           {format(new Date(pr.createdAt), "MMM d, yyyy")}
