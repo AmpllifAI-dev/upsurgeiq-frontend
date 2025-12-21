@@ -2156,3 +2156,14 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [ ] Implement email capture forms on blog and calculator pages
 - [ ] Add lead magnet (free PR template/guide) for email signups
 - [ ] Test all fixes and verify SEO tags
+
+
+## December 21, 2025 - Blog Content & Legal Pages
+- [ ] Fix persistent Dashboard navigation issue
+- [ ] Write blog post: PR Best Practices That Actually Work
+- [ ] Write blog post: The Future of AI in Marketing
+- [ ] Write blog post: Press Release Writing Tips
+- [ ] Write blog post: Digital Marketing Effectiveness Methodology
+- [ ] Complete Privacy Policy page with proper legal content
+- [ ] Complete Terms of Service page with proper legal content
+- [ ] Add newsletter system to V2 roadmap

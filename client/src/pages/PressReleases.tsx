@@ -87,6 +87,50 @@ export default function PressReleases() {
     },
   });
 
+  const bulkDeleteMutation = trpc.pressRelease.bulkDelete.useMutation({
+    onSuccess: (data) => {
+      utils.pressRelease.list.invalidate();
+      toast.success(`Deleted ${data.count} press releases`);
+      setBulkMode(false);
+      setSelectedIds([]);
+    },
+    onError: (error) => {
+      toast.error('Failed to delete press releases', { description: error.message });
+    },
+  });
+
+  const bulkUpdateStatusMutation = trpc.pressRelease.bulkUpdateStatus.useMutation({
+    onSuccess: (data) => {
+      utils.pressRelease.list.invalidate();
+      toast.success(`Updated ${data.count} press releases`);
+      setBulkMode(false);
+      setSelectedIds([]);
+    },
+    onError: (error) => {
+      toast.error('Failed to update press releases', { description: error.message });
+    },
+  });
+
+  const exportCSVMutation = trpc.csvExport.exportPressReleaseAnalytics.useMutation({
+    onSuccess: (data) => {
+      const blob = new Blob([data.csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `press-releases-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      toast.success('Press releases exported to CSV');
+    },
+    onError: (error) => {
+      toast.error('Failed to export CSV', {
+        description: error.message
+      });
+    },
+  });
+
   // Filter and sort press releases - MUST be before early returns to avoid hooks error
   const filteredPressReleases = useMemo(() => {
     if (!pressReleases) return [];
@@ -206,50 +250,6 @@ export default function PressReleases() {
     setBulkMode(false);
     setSelectedIds([]);
   };
-
-  const bulkDeleteMutation = trpc.pressRelease.bulkDelete.useMutation({
-    onSuccess: (data) => {
-      utils.pressRelease.list.invalidate();
-      toast.success(`Deleted ${data.count} press releases`);
-      setBulkMode(false);
-      setSelectedIds([]);
-    },
-    onError: (error) => {
-      toast.error('Failed to delete press releases', { description: error.message });
-    },
-  });
-
-  const bulkUpdateStatusMutation = trpc.pressRelease.bulkUpdateStatus.useMutation({
-    onSuccess: (data) => {
-      utils.pressRelease.list.invalidate();
-      toast.success(`Updated ${data.count} press releases`);
-      setBulkMode(false);
-      setSelectedIds([]);
-    },
-    onError: (error) => {
-      toast.error('Failed to update press releases', { description: error.message });
-    },
-  });
-
-  const exportCSVMutation = trpc.csvExport.exportPressReleaseAnalytics.useMutation({
-    onSuccess: (data) => {
-      const blob = new Blob([data.csv], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `press-releases-${format(new Date(), 'yyyy-MM-dd')}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-      toast.success('Press releases exported to CSV');
-    },
-    onError: (error) => {
-      toast.error('Failed to export CSV', {
-        description: error.message
-      });
-    },
-  });
 
   const handleExportCSV = () => {
     exportCSVMutation.mutate({});
