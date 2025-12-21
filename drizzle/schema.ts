@@ -1314,3 +1314,79 @@ export const issueComments = mysqlTable("issue_comments", {
 
 export type IssueComment = typeof issueComments.$inferSelect;
 export type InsertIssueComment = typeof issueComments.$inferInsert;
+
+// Blog Posts - Thought leadership content
+export const blogPosts = mysqlTable("blog_posts", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Author
+  authorId: int("authorId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Content
+  title: varchar("title", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  excerpt: text("excerpt"), // Short summary for listing pages
+  content: text("content").notNull(), // Full markdown or HTML content
+  coverImageUrl: varchar("coverImageUrl", { length: 500 }),
+  
+  // SEO
+  metaTitle: varchar("metaTitle", { length: 255 }),
+  metaDescription: text("metaDescription"),
+  metaKeywords: varchar("metaKeywords", { length: 500 }),
+  
+  // Organization
+  category: varchar("category", { length: 100 }), // e.g., "AI in PR", "Best Practices", "Case Studies"
+  tags: text("tags"), // JSON array of tags
+  
+  // Publishing
+  status: mysqlEnum("status", ["draft", "published", "archived"]).default("draft").notNull(),
+  publishedAt: timestamp("publishedAt"),
+  
+  // Analytics
+  viewCount: int("viewCount").default(0),
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BlogPost = typeof blogPosts.$inferSelect;
+export type InsertBlogPost = typeof blogPosts.$inferInsert;
+
+// Customer Testimonials
+export const testimonials = mysqlTable("testimonials", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Customer Info
+  customerName: varchar("customerName", { length: 255 }).notNull(),
+  customerTitle: varchar("customerTitle", { length: 255 }), // e.g., "CEO", "Marketing Director"
+  companyName: varchar("companyName", { length: 255 }).notNull(),
+  companyLogo: varchar("companyLogo", { length: 500 }),
+  customerPhoto: varchar("customerPhoto", { length: 500 }),
+  
+  // Testimonial Content
+  quote: text("quote").notNull(),
+  rating: int("rating").notNull(), // 1-5 stars
+  
+  // Metrics (optional)
+  metricsAchieved: text("metricsAchieved"), // e.g., "300% increase in media placements"
+  
+  // Organization
+  category: varchar("category", { length: 100 }), // e.g., "Technology", "Healthcare", "Finance"
+  featured: int("featured").default(0), // 1 = show on homepage
+  
+  // Publishing
+  status: mysqlEnum("status", ["pending", "approved", "rejected"]).default("pending").notNull(),
+  approvedBy: int("approvedBy").references(() => users.id),
+  approvedAt: timestamp("approvedAt"),
+  
+  // Display Order
+  displayOrder: int("displayOrder").default(0),
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Testimonial = typeof testimonials.$inferSelect;
+export type InsertTestimonial = typeof testimonials.$inferInsert;

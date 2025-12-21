@@ -65,6 +65,10 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import CookiePolicy from "./pages/CookiePolicy";
 import ReportIssue from "./pages/ReportIssue";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
+import PricingCalculator from "./pages/PricingCalculator";
+import Testimonials from "./pages/Testimonials";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -130,6 +134,10 @@ function Router() {
       <Route path="/terms" component={Terms} />
       <Route path="/cookie-policy" component={CookiePolicy} />
       <Route path="/report-issue" component={ReportIssue} />
+      <Route path="/blog" component={Blog} />
+      <Route path="/blog/:slug" component={BlogPost} />
+      <Route path="/pricing-calculator" component={PricingCalculator} />
+      <Route path="/testimonials" component={Testimonials} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
