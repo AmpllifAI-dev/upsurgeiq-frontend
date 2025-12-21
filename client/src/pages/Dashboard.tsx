@@ -23,6 +23,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { KeyboardShortcut } from "@/components/KeyboardShortcut";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { UsageDashboard } from "@/components/UsageDashboard";
+import { AICreditsUsage } from "@/components/AICreditsUsage";
 
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -178,15 +179,20 @@ export default function Dashboard() {
 
       <div id="main-content" className="container mx-auto py-8 space-y-8" role="main">
         {/* Header */}
-        <header className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold text-foreground">Welcome back, {user.name?.split(' ')[0] || 'there'}!</h1>
-            <p className="text-muted-foreground mt-2">Here's what's happening with your campaigns today.</p>
+        <header className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-foreground">Welcome back, {user.name?.split(' ')[0] || 'there'}!</h1>
+              <p className="text-muted-foreground mt-2">Here's what's happening with your campaigns today.</p>
+            </div>
+            <Button size="lg" onClick={() => setLocation("/press-releases/new")} aria-label="Create new press release">
+              <Plus className="w-5 h-5 mr-2" />
+              New Press Release
+            </Button>
           </div>
-          <Button size="lg" onClick={() => setLocation("/press-releases/new")} aria-label="Create new press release">
-            <Plus className="w-5 h-5 mr-2" />
-            New Press Release
-          </Button>
+          
+          {/* AI Credits Usage Meters */}
+          <AICreditsUsage />
         </header>
 
         {/* Stats Overview */}

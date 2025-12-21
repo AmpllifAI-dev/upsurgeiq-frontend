@@ -245,6 +245,43 @@ export const appRouter = router({
       }),
   }),
 
+  aiCredits: router({
+    getUsage: protectedProcedure.query(async ({ ctx }) => {
+      // Check if user has AI Chat or AI Call-in add-ons
+      // For now, return mock data - will be replaced with actual subscription check
+      const subscription = await getUserSubscription(ctx.user.id);
+      
+      // TODO: Check actual add-on subscriptions from Stripe
+      const aiChatEnabled = false; // Will be true if user has AI Chat subscription
+      const aiCallInEnabled = false; // Will be true if user has AI Call-in subscription
+      
+      if (!aiChatEnabled && !aiCallInEnabled) {
+        return {
+          aiChatEnabled: false,
+          aiCallInEnabled: false,
+          aiChatTotal: 0,
+          aiChatUsed: 0,
+          aiChatRemaining: 0,
+          aiCallInTotal: 0,
+          aiCallInUsed: 0,
+          aiCallInRemaining: 0,
+        };
+      }
+      
+      // TODO: Track actual usage in database
+      return {
+        aiChatEnabled,
+        aiCallInEnabled,
+        aiChatTotal: aiChatEnabled ? 32 : 0,
+        aiChatUsed: 0, // TODO: Get from usage tracking
+        aiChatRemaining: aiChatEnabled ? 32 : 0,
+        aiCallInTotal: aiCallInEnabled ? 32 : 0,
+        aiCallInUsed: 0, // TODO: Get from usage tracking
+        aiCallInRemaining: aiCallInEnabled ? 32 : 0,
+      };
+    }),
+  }),
+
   business: router({
     get: protectedProcedure.query(async ({ ctx }) => {
       const business = await getUserBusiness(ctx.user.id);
