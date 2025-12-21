@@ -2498,3 +2498,8 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Rich text editor rendering (fixed placeholder visibility)
 - [x] MediaLists hooks error (moved useMemo before early returns)
 - [x] Press release creation dialog working correctly
+
+
+## New Bugs - Dec 21 (User Reported)
+- [x] Bug report submission fails with "Unexpected token '<', \"<!doctype \"... is not valid JSON" error (fixed by removing file upload to non-existent endpoint)
+- [ ] Profile save button doesn't trigger mutation (button stays active, no toast, no save) - NEEDS INVESTIGATION

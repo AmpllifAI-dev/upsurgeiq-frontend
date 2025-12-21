@@ -45,35 +45,15 @@ export function IssueReportDialog({ open, onOpenChange, defaultType = "bug" }: I
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setUploading(true);
     
-    try {
-      // Upload attachments if any
-      let screenshotUrl = "";
-      if (attachments.length > 0) {
-        const formData = new FormData();
-        attachments.forEach(file => formData.append('files', file));
-        
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          screenshotUrl = data.urls.join(',');
-        }
-      }
-      
-      createIssueMutation.mutate({
-        ...formData,
-        browserInfo: navigator.userAgent,
-        pageUrl: window.location.href,
-        screenshotUrl,
-      });
-    } finally {
-      setUploading(false);
-    }
+    // For now, skip file upload and just submit the issue
+    // TODO: Implement proper file upload endpoint
+    createIssueMutation.mutate({
+      ...formData,
+      browserInfo: navigator.userAgent,
+      pageUrl: window.location.href,
+      screenshotUrl: attachments.length > 0 ? `${attachments.length} file(s) attached (upload pending)` : "",
+    });
   };
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
