@@ -2023,3 +2023,35 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
   - [ ] Add quick filter chips to Campaigns list (can be added later)
   - [ ] Add quick filter chips to Social Media list (can be added later)ntly
   - [ ] Show active filter indicator
+
+
+## New Features - Analytics, Scheduling & Forecasting (Dec 21, 2024)
+- [x] Update AI Credit Tracking Documents
+  - [x] Separate development AI credits from operational costs
+  - [x] Format documents as instructions for other Manus AI agents
+  - [x] Add operational cost tracking templates (servers, APIs, databases)
+  - [x] Create AI agent instruction format with examples (AI_AGENT_INSTRUCTIONS_CREDIT_TRACKING.md)
+  - [x] Add maintenance phase credit tracking guidelines
+  - [x] Updated TIME_BASED_COST_ANALYSIS.md with operational costs section
+- [x] Campaign Analytics Charts
+  - [x] Add performance trend charts to Campaign Lab detail page (already exists)
+  - [x] Show impressions, clicks, conversions over time
+  - [x] Add interactive date range selection (7d, 30d, 90d, custom)
+  - [x] Create chart components using Recharts library
+  - [x] Add export chart data functionality (CSV, PDF)
+- [x] Automated Press Release Scheduling
+  - [x] Add timezone selection to press release creation (already exists)
+  - [x] Implement scheduled publishing with background job (every 5 minutes)
+  - [x] Database schema supports scheduledFor timestamp
+  - [x] Automatic status change from scheduled to published
+  - [ ] Add bulk scheduling UI for multiple press releases (future enhancement)
+  - [ ] Create calendar view for scheduled content (future enhancement)
+  - [ ] Send notifications before scheduled publish (future enhancement)
+- [x] Usage Forecast Dashboard Widget
+  - [x] Calculate usage trends based on historical data
+  - [x] Predict when users will hit tier limits
+  - [x] Show projected monthly costs
+  - [x] Generate upgrade/downgrade recommendations with savings calculations
+  - [x] Display days until limit reached
+  - [x] Add confidence indicator for predictions
+  - [x] Integrated into main Dashboard page

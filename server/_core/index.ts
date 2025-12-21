@@ -85,6 +85,11 @@ async function startServer() {
     
     // Initialize usage notifications job (daily at 9 AM)
     import("../jobs/usageNotificationsJob").catch(console.error);
+    
+    // Initialize scheduled press release publishing job (every 5 minutes)
+    import("../jobs/publishScheduledReleases").then(module => {
+      module.startScheduledPublishingJob();
+    }).catch(console.error);
   });
 }
 

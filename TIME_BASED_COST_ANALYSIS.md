@@ -1,4 +1,9 @@
 # Time-Based Cost Analysis - Manus Credits Usage
+
+> **For AI Agents:** See `AI_AGENT_INSTRUCTIONS_CREDIT_TRACKING.md` for detailed instructions on implementing this tracking system in other projects.
+
+> **Important:** This document tracks **Development AI Credits** (Manus usage during build). **Operational costs** (servers, APIs, databases) are tracked separately - see Operational Costs section at the end.
+
 **Date:** December 21, 2024  
 **Session Start:** ~2:50 AM (based on first checkpoint)  
 **Session End:** ~5:10 AM  
@@ -393,3 +398,56 @@ For most medium-complexity features: **Budget 30-45 minutes (30-45 credits)** wi
 - **Recoverable Time Waste:** 38 minutes (14.8%)
 
 With better practices (direct SQL migrations, minimal status checks), this session could have been completed in **~220 minutes (3.7 hours)**, saving 15% of credits.
+
+---
+
+## Operational Costs (Separate from AI Credits)
+
+**Important:** These costs are **NOT AI credits** - they represent ongoing business expenses after deployment.
+
+### Monthly Operational Budget for UpsurgeIQ
+
+#### Fixed Costs
+| Item | Provider | Monthly Cost | Notes |
+|------|----------|--------------|-------|
+| Hosting & Database | Manus | Included | Part of subscription |
+| Custom Domain | Registrar | $1.25 | $15/year |
+| Email Service (SendGrid) | SendGrid | $15-90 | Based on volume |
+| **Total Fixed** | | **$16-91** | |
+
+#### Variable Costs (Usage-Based)
+| Item | Provider | Unit Cost | Est. Monthly Usage | Est. Cost |
+|------|----------|-----------|-------------------|-----------||
+| Payment Processing | Stripe | 2.9% + $0.30 | 200 transactions | $118 |
+| AI API (OpenAI) | OpenAI | $0.02/1K tokens | 1M tokens | $20 |
+| Storage (S3) | AWS/Manus | $0.023/GB | 50GB | $1.15 |
+| Bandwidth | CDN | $0.09/GB | 100GB | $9 |
+| **Total Variable** | | | | **$148** |
+
+### **Total Monthly Operational Cost: $164-239**
+
+*Note: Actual costs will vary based on user activity, transaction volume, and feature usage.*
+
+---
+
+## Complete Cost Picture
+
+### Development Phase (One-Time)
+- **AI Credits Used:** 1,850-1,950 credits
+- **Development Time:** 30-32 hours
+- **Average Cost:** 60 credits/hour
+
+### Maintenance Phase (Ongoing)
+- **AI Credits:** 100-150 credits/month
+- **Maintenance Time:** 1.5-2.5 hours/month
+
+### Operational Phase (Ongoing)
+- **Infrastructure:** $164-239/month
+- **Scales with usage:** More users = higher variable costs
+
+### Total First Year Cost Estimate
+- **Development:** 1,900 AI credits (one-time)
+- **Maintenance:** 1,200-1,800 AI credits (12 months)
+- **Operations:** $1,968-2,868 (12 months)
+- **Total AI Credits Year 1:** ~3,100-3,700 credits
+- **Total Cash Costs Year 1:** $1,968-2,868

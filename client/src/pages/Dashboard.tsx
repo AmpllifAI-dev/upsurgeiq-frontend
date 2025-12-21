@@ -24,6 +24,7 @@ import { KeyboardShortcut } from "@/components/KeyboardShortcut";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { UsageDashboard } from "@/components/UsageDashboard";
 import { AICreditsUsage } from "@/components/AICreditsUsage";
+import { UsageForecastWidget } from "@/components/UsageForecastWidget";
 
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -359,7 +360,10 @@ export default function Dashboard() {
         {/* Usage Dashboard */}
         <section aria-labelledby="usage-dashboard-heading" className="mt-6">
           <h2 id="usage-dashboard-heading" className="sr-only">Usage Dashboard</h2>
-          <UsageDashboard />
+          <div className="grid gap-6 md:grid-cols-2">
+            <UsageDashboard />
+            <UsageForecastWidget />
+          </div>
         </section>
       </div>
     </div>
