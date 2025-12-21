@@ -2,14 +2,16 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Zap } from "lucide-react";
+import { Check, Zap, Menu, X } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export default function Subscribe() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const { data: subscription } = trpc.subscription.get.useQuery(undefined, {
     enabled: !!user,
@@ -136,19 +138,144 @@ export default function Subscribe() {
             </div>
             <span className="text-2xl font-bold text-foreground">UpsurgeIQ</span>
           </a>
-          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-            <a href="/#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Features
-            </a>
-            <a href="/#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Pricing
-            </a>
-            <Button onClick={() => setLocation("/dashboard")} variant="default">
+          <div className="flex items-center gap-4">
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-6">
+              <a href="/#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Features
+              </a>
+              <a href="/#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Pricing
+              </a>
+            </div>
+            
+            {/* CTA Button */}
+            <Button onClick={() => setLocation("/dashboard")} variant="default" className="hidden sm:flex">
               Go to Dashboard
+            </Button>
+            
+            {/* Hamburger Menu Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="flex"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
           </div>
         </div>
       </nav>
+
+      {/* Mobile Menu Dropdown */}
+      {mobileMenuOpen && (
+        <div className="border-b border-border bg-card/95 backdrop-blur-sm">
+          <div className="container mx-auto py-6 space-y-6">
+            {/* Quick Links */}
+            <div className="space-y-3">
+              <a
+                href="/#features"
+                className="block text-sm font-medium text-foreground hover:text-primary transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Features
+              </a>
+              <a
+                href="/#pricing"
+                className="block text-sm font-medium text-foreground hover:text-primary transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Pricing
+              </a>
+            </div>
+
+            {/* Product Section */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Product</h3>
+              <a
+                href="/#features"
+                className="block text-sm text-foreground hover:text-primary transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Features
+              </a>
+              <a
+                href="/#pricing"
+                className="block text-sm text-foreground hover:text-primary transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Pricing
+              </a>
+              <a
+                href="#"
+                className="block text-sm text-foreground hover:text-primary transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Integrations
+              </a>
+            </div>
+
+            {/* Company Section */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Company</h3>
+              <a
+                href="#"
+                className="block text-sm text-foreground hover:text-primary transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                About
+              </a>
+              <a
+                href="#"
+                className="block text-sm text-foreground hover:text-primary transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Blog
+              </a>
+              <a
+                href="#"
+                className="block text-sm text-foreground hover:text-primary transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Careers
+              </a>
+            </div>
+
+            {/* Legal Section */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Legal</h3>
+              <a
+                href="#"
+                className="block text-sm text-foreground hover:text-primary transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Privacy
+              </a>
+              <a
+                href="#"
+                className="block text-sm text-foreground hover:text-primary transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Terms
+              </a>
+              <a
+                href="#"
+                className="block text-sm text-foreground hover:text-primary transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Security
+              </a>
+            </div>
+
+            {/* Mobile CTA */}
+            <div className="pt-4 sm:hidden">
+              <Button onClick={() => setLocation("/dashboard")} variant="default" className="w-full">
+                Go to Dashboard
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="container mx-auto py-16 space-y-12">
         {/* Header */}
