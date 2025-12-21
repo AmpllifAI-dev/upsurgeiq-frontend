@@ -2464,3 +2464,17 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Add press release creation choice dialog (AI vs Manual) with usage tracking
 - [x] Audit all pages and ensure proper dashboard navigation accessibility
 - [x] Add missing navigation links to inaccessible pages (Content Calendar, Email Campaigns, Email Analytics, AI Assistant, Profile, Notifications, Billing, Admin tools)
+
+
+## CRITICAL BUGS - User Reported (Priority 1)
+- [ ] Fix rich text editor not rendering text (box appears empty)
+- [ ] Fix journalist and media lists hooks error still occurring
+- [ ] Add hamburger menu to dashboard
+- [ ] Add floating tech issue reporting button
+- [ ] Fix creation dialog not appearing when clicking "Create Press Release"
+- [ ] Fix profile changes not persisting after save (name changes don't stick)
+- [ ] Remove all Twitter/X references from profile and social media pages
+- [ ] Add navigation/return path to profile page
+- [ ] Fix upgrade button 404 error at bottom of dashboard
+- [ ] Add service promotion CTAs to dashboard (AI Add-ons, Image Packs, Campaign Lab)
+- [ ] Verify admin dashboard shows more than just credit monitoring

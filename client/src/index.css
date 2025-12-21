@@ -204,14 +204,15 @@
 /* TipTap Rich Text Editor Styles */
 .ProseMirror {
   outline: none;
+  color: oklch(var(--foreground));
+  min-height: 200px;
 }
 
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
-  float: left;
-  color: hsl(var(--muted-foreground));
+  color: oklch(var(--muted-foreground));
   pointer-events: none;
-  height: 0;
+  position: absolute;
 }
 
 .ProseMirror h2 {

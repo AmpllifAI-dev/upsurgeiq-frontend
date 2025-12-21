@@ -78,11 +78,71 @@ export default function MediaLists() {
 
   const handlePurchaseList = (listId: number, listName: string) => {
     purchaseMutation.mutate({
-      mediaListId: listId,
-      mediaListName: listName,
-      amount: 400, // £4 in pence
+      listId,
+      listName,
     });
   };
+
+  // Data preparation - must be before early returns to maintain hooks order
+  const defaultListsData = [
+    {
+      id: "tech-uk",
+      name: "UK Tech Media",
+      description: "Technology journalists and publications in the United Kingdom",
+      type: "default",
+      industry: "Technology",
+      region: "UK",
+      contactCount: 150,
+      isDefault: true,
+    },
+    {
+      id: "finance-london",
+      name: "London Finance Press",
+      description: "Financial journalists based in London",
+      type: "default",
+      industry: "Finance",
+      region: "London",
+      contactCount: 85,
+      isDefault: true,
+    },
+    {
+      id: "lifestyle-national",
+      name: "National Lifestyle Media",
+      description: "Lifestyle and culture journalists across the UK",
+      type: "default",
+      industry: "Lifestyle",
+      region: "National",
+      contactCount: 120,
+      isDefault: true,
+    },
+  ];
+
+  // Combine default and custom lists
+  const allLists = [
+    ...defaultListsData,
+    ...(mediaLists || []).map(list => ({ ...list, isDefault: false }))
+  ];
+
+  // Filter media lists based on search and type
+  const filteredLists = useMemo(() => {
+    return allLists.filter((list) => {
+      const matchesSearch = searchQuery === "" || 
+        list.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (list.description && list.description.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      const matchesType = typeFilter === "all" || 
+        (typeFilter === "default" && list.isDefault) ||
+        (typeFilter === "custom" && !list.isDefault);
+      
+      const matchesIndustry = industryFilter === "all" || 
+        ('industry' in list && list.industry === industryFilter);
+      
+      return matchesSearch && matchesType && matchesIndustry;
+    });
+  }, [allLists, searchQuery, typeFilter, industryFilter]);
+
+  const filteredDefaultLists = filteredLists.filter(list => list.isDefault);
+  const filteredCustomLists = filteredLists.filter(list => !list.isDefault);
 
   if (loading || isLoading) {
     return (
@@ -153,66 +213,6 @@ export default function MediaLists() {
       setDeleteListId(null);
     }
   };
-
-  const defaultListsData = [
-    {
-      id: "tech-uk",
-      name: "UK Tech Media",
-      description: "Technology journalists and publications in the United Kingdom",
-      type: "default",
-      industry: "Technology",
-      region: "UK",
-      contactCount: 150,
-      isDefault: true,
-    },
-    {
-      id: "finance-london",
-      name: "London Finance Press",
-      description: "Financial journalists based in London",
-      type: "default",
-      industry: "Finance",
-      region: "London",
-      contactCount: 85,
-      isDefault: true,
-    },
-    {
-      id: "lifestyle-national",
-      name: "National Lifestyle Media",
-      description: "Lifestyle and consumer journalists across the UK",
-      type: "default",
-      industry: "Lifestyle",
-      region: "National",
-      contactCount: 200,
-      isDefault: true,
-    },
-  ];
-
-  // Combine default and custom lists
-  const allLists = [
-    ...defaultListsData,
-    ...(mediaLists || []).map(list => ({ ...list, isDefault: false }))
-  ];
-
-  // Filter media lists based on search and type
-  const filteredLists = useMemo(() => {
-    return allLists.filter((list) => {
-      const matchesSearch = searchQuery === "" || 
-        list.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (list.description && list.description.toLowerCase().includes(searchQuery.toLowerCase()));
-      
-      const matchesType = typeFilter === "all" || 
-        (typeFilter === "default" && list.isDefault) ||
-        (typeFilter === "custom" && !list.isDefault);
-      
-      const matchesIndustry = industryFilter === "all" || 
-        ('industry' in list && list.industry === industryFilter);
-      
-      return matchesSearch && matchesType && matchesIndustry;
-    });
-  }, [allLists, searchQuery, typeFilter, industryFilter]);
-
-  const filteredDefaultLists = filteredLists.filter(list => list.isDefault);
-  const filteredCustomLists = filteredLists.filter(list => !list.isDefault);
 
   return (
     <div className="min-h-screen bg-background">

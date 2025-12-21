@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Zap, Sparkles, FileText, ArrowLeft, Wand2 } from "lucide-react";
+import { Zap, Sparkles, FileText, ArrowLeft, Wand2, PenTool } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -55,7 +55,7 @@ export default function PressReleaseNew() {
   const [showAIWarning, setShowAIWarning] = useState(false);
   const [distributionType, setDistributionType] = useState<"ai_assisted" | "manual">("ai_assisted");
 
-  const { data: business } = trpc.business.get.useQuery(undefined, {
+  const { data: business, isLoading: businessLoading } = trpc.business.get.useQuery(undefined, {
     enabled: !!user,
   });
 
@@ -102,7 +102,7 @@ export default function PressReleaseNew() {
     },
   });
 
-  if (loading) {
+  if (loading || businessLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -118,7 +118,8 @@ export default function PressReleaseNew() {
     return null;
   }
 
-  if (!business) {
+  // Only redirect to onboarding if business data is explicitly null after loading
+  if (!business && !businessLoading) {
     setLocation("/onboarding");
     return null;
   }
