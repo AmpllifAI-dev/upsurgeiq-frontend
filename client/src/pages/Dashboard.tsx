@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,9 @@ import {
   Calendar,
   Target,
   AlertCircle,
-  Search
+  Search,
+  Menu,
+  X
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -30,6 +33,7 @@ import { UsageForecastWidget } from "@/components/UsageForecastWidget";
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const { data: subscription, isLoading: subLoading } = trpc.subscription.get.useQuery(undefined, {
     enabled: !!user,
@@ -130,14 +134,25 @@ export default function Dashboard() {
       </a>
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50" role="navigation" aria-label="Main navigation">
-        <div className="container mx-auto flex flex-col md:flex-row items-start md:items-center justify-between py-4 gap-4">
+        <div className="container mx-auto flex items-center justify-between py-4">
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
               <Zap className="w-6 h-6 text-primary-foreground" />
             </div>
             <span className="text-2xl font-bold text-foreground">UpsurgeIQ</span>
           </div>
-          <div className="flex flex-wrap items-center gap-3 md:gap-6 text-sm">
+          
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 text-foreground"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+          
+          {/* Desktop navigation */}
+          <div className="hidden md:flex flex-wrap items-center gap-3 md:gap-6 text-sm">
             <a href="/dashboard" className="text-sm font-medium text-foreground" aria-current="page">
               Dashboard
             </a>
@@ -177,6 +192,60 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+        
+        {/* Mobile menu dropdown */}
+        {mobileMenuOpen && (
+          <div className="md:hidden fixed top-[73px] left-0 right-0 bg-card border-b border-border shadow-lg z-40">
+            <div className="container mx-auto py-4 space-y-3">
+              <div className="space-y-2">
+                <h3 className="text-xs font-semibold text-muted-foreground px-3">Dashboard</h3>
+                <a href="/dashboard" className="block px-3 py-2 text-sm font-medium text-foreground hover:bg-accent rounded-md" onClick={() => setMobileMenuOpen(false)}>
+                  Dashboard
+                </a>
+                <a href="/press-releases" className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground rounded-md" onClick={() => setMobileMenuOpen(false)}>
+                  Press Releases
+                </a>
+                <a href="/social-media" className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground rounded-md" onClick={() => setMobileMenuOpen(false)}>
+                  Social Media
+                </a>
+                <a href="/campaigns" className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground rounded-md" onClick={() => setMobileMenuOpen(false)}>
+                  Campaigns
+                </a>
+                <a href="/analytics" className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground rounded-md" onClick={() => setMobileMenuOpen(false)}>
+                  Analytics
+                </a>
+              </div>
+              
+              <div className="border-t border-border pt-3 space-y-2">
+                <h3 className="text-xs font-semibold text-muted-foreground px-3">Public Pages</h3>
+                <a href="/" className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground rounded-md" onClick={() => setMobileMenuOpen(false)}>
+                  Home
+                </a>
+                <a href="/about" className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground rounded-md" onClick={() => setMobileMenuOpen(false)}>
+                  About
+                </a>
+                <a href="/contact" className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground rounded-md" onClick={() => setMobileMenuOpen(false)}>
+                  Contact
+                </a>
+                <a href="/blog" className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground rounded-md" onClick={() => setMobileMenuOpen(false)}>
+                  Blog
+                </a>
+                <a href="/privacy" className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground rounded-md" onClick={() => setMobileMenuOpen(false)}>
+                  Privacy Policy
+                </a>
+                <a href="/terms" className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground rounded-md" onClick={() => setMobileMenuOpen(false)}>
+                  Terms of Service
+                </a>
+              </div>
+              
+              <div className="border-t border-border pt-3">
+                <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => { setLocation("/profile"); setMobileMenuOpen(false); }}>
+                  Settings
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
 
       <div id="main-content" className="container mx-auto py-8 space-y-8" role="main">

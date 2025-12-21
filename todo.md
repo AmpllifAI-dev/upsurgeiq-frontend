@@ -2414,3 +2414,44 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Create escalation logic for complex issues
 - [x] Integrate owner notifications for escalations only
 - [x] Trigger autonomous workflow on issue creation
+
+
+## FloatingIssueButton Not Rendering Bug
+- [ ] Investigate why FloatingIssueButton component is not appearing on dashboard
+- [ ] Check for JavaScript errors in browser console
+- [ ] Verify component is being imported and rendered correctly
+- [ ] Check for CSS/z-index conflicts
+- [ ] Test button visibility after fix
+
+
+## Press Release Creation Flow
+- [ ] Add choice dialog when clicking "Create Press Release"
+- [ ] Show AI-generated vs Manual write options
+- [ ] Display current usage vs allowance for AI generations
+- [ ] Warn user that AI generation uses one allowance
+- [ ] Route to appropriate creation page based on choice
+
+## Journalist/Media List Errors
+- [ ] Fix React hooks error in MediaLists page
+- [ ] Fix React hooks error in JournalistList page
+- [ ] Fix React hooks error in JournalistForm page
+- [ ] Test all journalist/media list navigation
+
+## Floating Issue Button
+- [ ] Fix FloatingIssueButton not rendering on Dashboard
+- [ ] Ensure button appears on all dashboard pages
+- [ ] Test button functionality
+
+
+## Dashboard Hamburger Menu
+- [x] Add hamburger menu icon to dashboard header
+- [x] Create mobile navigation drawer
+- [x] Include links to public pages (About, Contact, Blog, etc.)
+- [x] Ensure menu works on all dashboard pages
+
+## Rich Text Editor for Press Releases
+- [ ] Replace markdown editor with WYSIWYG rich text editor
+- [ ] Install and configure rich text editor library (TipTap or similar)
+- [ ] Add formatting toolbar (bold, italic, headings, lists, links)
+- [ ] Convert markdown to/from HTML for storage
+- [ ] Update press release creation and editing pages
