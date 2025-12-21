@@ -1550,3 +1550,44 @@ export const emailCampaignHistory = mysqlTable("email_campaign_history", {
 
 export type EmailCampaignHistory = typeof emailCampaignHistory.$inferSelect;
 export type InsertEmailCampaignHistory = typeof emailCampaignHistory.$inferInsert;
+
+// Email Campaigns
+export const emailCampaigns = mysqlTable("email_campaigns", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  subject: varchar("subject", { length: 255 }).notNull(),
+  previewText: varchar("previewText", { length: 255 }),
+  emailTemplate: text("emailTemplate").notNull(),
+  targetSegmentId: int("targetSegmentId").references(() => userSegments.id, { onDelete: "set null" }),
+  status: mysqlEnum("status", ["draft", "scheduled", "sending", "sent", "failed"]).default("draft").notNull(),
+  scheduledAt: timestamp("scheduledAt"),
+  sentAt: timestamp("sentAt"),
+  recipientCount: int("recipientCount").default(0),
+  openCount: int("openCount").default(0),
+  clickCount: int("clickCount").default(0),
+  bounceCount: int("bounceCount").default(0),
+  unsubscribeCount: int("unsubscribeCount").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EmailCampaign = typeof emailCampaigns.$inferSelect;
+export type InsertEmailCampaign = typeof emailCampaigns.$inferInsert;
+
+// Campaign A/B Test Variants
+export const campaignAbVariants = mysqlTable("campaign_ab_variants", {
+  id: int("id").autoincrement().primaryKey(),
+  campaignId: int("campaignId").notNull().references(() => emailCampaigns.id, { onDelete: "cascade" }),
+  variantName: varchar("variantName", { length: 50 }).notNull(),
+  subject: varchar("subject", { length: 255 }).notNull(),
+  emailTemplate: text("emailTemplate").notNull(),
+  recipientPercentage: int("recipientPercentage").default(50),
+  sentCount: int("sentCount").default(0),
+  openCount: int("openCount").default(0),
+  clickCount: int("clickCount").default(0),
+  isWinner: int("isWinner").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CampaignAbVariant = typeof campaignAbVariants.$inferSelect;
+export type InsertCampaignAbVariant = typeof campaignAbVariants.$inferInsert;

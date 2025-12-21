@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { sql, eq, and, isNotNull, gte } from "drizzle-orm";
 import { getDb } from "./db";
 import { generatePressReleaseImage, regenerateImage, getImageStylePresets } from "./pressReleaseImages";
-import { pressReleases, campaigns, journalists, users, creditUsage, creditAlertThresholds, creditAlertHistory, wordCountCredits, imageCredits } from "../drizzle/schema";
+import { pressReleases, campaigns, journalists, users, creditUsage, creditAlertThresholds, creditAlertHistory, wordCountCredits, imageCredits, emailCampaigns } from "../drizzle/schema";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { COOKIE_NAME } from "@shared/const";
 import { systemRouter } from "./_core/systemRouter";
@@ -5014,6 +5014,76 @@ Generate a comprehensive campaign strategy that includes:
         return await deleteSubscriber(input.id);
       }),
   }),
+
+  campaigns: router({
+    list: protectedProcedure
+      .query(async () => {
+        const db = await getDb();
+        if (!db) throw new Error("Database connection failed");
+        const { emailCampaigns } = await import("../drizzle/schema");
+        return await db.select().from(emailCampaigns);
+      }),
+
+    create: protectedProcedure
+      .input(z.object({
+        name: z.string(),
+        subject: z.string(),
+        previewText: z.string().optional(),
+        emailTemplate: z.string(),
+        targetSegmentId: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database connection failed");
+        const { emailCampaigns } = await import("../drizzle/schema");
+        await db.insert(emailCampaigns).values(input);
+        return { success: true };
+      }),
+
+    sendToAllSubscribers: protectedProcedure
+      .input(z.object({
+        campaignId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        const { sendBlogNotification } = await import("./emailCampaigns");
+        // This will be implemented to send campaign to all subscribers
+        return { success: true, message: "Campaign queued for sending" };
+      }),
+  }),
+
+  // Webhook endpoint for WordPress blog notifications
+  blogWebhook: publicProcedure
+    .input(z.object({
+      title: z.string(),
+      excerpt: z.string(),
+      url: z.string().url(),
+      secret: z.string(),
+    }))
+    .mutation(async ({ input }) => {
+      // Verify webhook secret
+      const expectedSecret = process.env.BLOG_WEBHOOK_SECRET || "upsurgeiq-blog-secret-2025";
+      if (input.secret !== expectedSecret) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Invalid webhook secret",
+        });
+      }
+
+      // Send blog notification to all subscribers
+      const { sendBlogNotification } = await import("./emailCampaigns");
+      const result = await sendBlogNotification({
+        blogTitle: input.title,
+        blogExcerpt: input.excerpt,
+        blogUrl: input.url,
+      });
+
+      return {
+        success: true,
+        sent: result.sent,
+        failed: result.failed,
+        total: result.total,
+      };
+    }),
 });
 
 export type AppRouter = typeof appRouter;

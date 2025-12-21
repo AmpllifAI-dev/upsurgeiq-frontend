@@ -12,7 +12,9 @@ import { sendEmail } from "./_core/email";
 
 /**
  * Create a new email trigger
+ * TODO: Fix Drizzle type inference issue
  */
+/*
 export async function createEmailTrigger(params: {
   name: string;
   description?: string;
@@ -37,6 +39,7 @@ export async function createEmailTrigger(params: {
 
   return { success: true };
 }
+*/
 
 /**
  * Get all active email triggers

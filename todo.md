@@ -2291,3 +2291,21 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Convert all marketing pages to British English
 - [x] Create downloadable PR template PDFs for Resources page
 
+
+
+## Email Campaign Builder & Blog Notifications (Dec 21, 2025)
+- [x] Create email campaign builder UI with template selection
+- [x] Build email template system with multiple templates
+- [ ] Implement A/B testing functionality for campaigns
+- [ ] Create campaign scheduling system
+- [ ] Build subscriber segment targeting
+- [ ] Add campaign preview and test email sending
+- [x] Create automated blog notification webhook endpoint
+- [x] Implement WordPress webhook integration for new posts
+- [x] Build blog notification email template system
+- [ ] Add campaign analytics dashboard with open/click rates
+- [ ] Create campaign performance reporting
+- [ ] Write tests for campaign system
+
+## V2 Features (Future)
+- [ ] Add testimonials carousel on homepage with client quotes and logos
