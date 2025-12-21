@@ -75,6 +75,7 @@ import { CaseStudies } from "./pages/CaseStudies";
 import { NewsletterAdmin } from "./pages/NewsletterAdmin";
 import { AnalyticsDashboard } from "./pages/AnalyticsDashboard";
 import { EmailCampaigns } from "./pages/EmailCampaigns";
+import { SubscriberPreferences } from "./pages/SubscriberPreferences";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -150,6 +151,7 @@ function Router() {
         <Route path="/newsletter-admin" component={NewsletterAdmin} />
         <Route path="/analytics" component={AnalyticsDashboard} />
         <Route path="/email-campaigns" component={EmailCampaigns} />
+        <Route path="/preferences" component={SubscriberPreferences} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

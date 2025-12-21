@@ -1416,6 +1416,12 @@ export const newsletterSubscribers = mysqlTable("newsletter_subscribers", {
   subscribedAt: timestamp("subscribedAt").defaultNow().notNull(),
   unsubscribedAt: timestamp("unsubscribedAt"),
   tags: text("tags"), // JSON array of tags for segmentation
+  // Content preferences
+  preferPrTips: int("preferPrTips").default(1), // 1 = yes, 0 = no
+  preferMarketingInsights: int("preferMarketingInsights").default(1),
+  preferAiUpdates: int("preferAiUpdates").default(1),
+  preferCaseStudies: int("preferCaseStudies").default(1),
+  preferProductNews: int("preferProductNews").default(1),
 });
 
 export type NewsletterSubscriber = typeof newsletterSubscribers.$inferSelect;
@@ -1562,6 +1568,14 @@ export const emailCampaigns = mysqlTable("email_campaigns", {
   status: mysqlEnum("status", ["draft", "scheduled", "sending", "sent", "failed"]).default("draft").notNull(),
   scheduledAt: timestamp("scheduledAt"),
   sentAt: timestamp("sentAt"),
+  // A/B testing configuration
+  abTestEnabled: int("abTestEnabled").default(0), // 1 = enabled, 0 = disabled
+  variantBSubject: text("variantBSubject"), // Alternative subject line for A/B testing
+  abTestSampleSize: int("abTestSampleSize").default(20), // Percentage of recipients for A/B test
+  abTestDuration: int("abTestDuration").default(24), // Hours to run test before sending winner
+  abTestWinnerSentAt: timestamp("abTestWinnerSentAt"), // When winner was sent to remaining recipients
+  winningVariantId: int("winningVariantId"), // ID of winning variant (no FK to avoid circular ref)
+  // Analytics
   recipientCount: int("recipientCount").default(0),
   openCount: int("openCount").default(0),
   clickCount: int("clickCount").default(0),

@@ -42,13 +42,9 @@ export function EmailCampaigns() {
   const [previewText, setPreviewText] = useState("");
   const [emailContent, setEmailContent] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState("blank");
-  
-  // Scheduling state
   const [scheduleType, setScheduleType] = useState<"now" | "scheduled">("now");
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
-  
-  // A/B testing state
   const [enableAbTest, setEnableAbTest] = useState(false);
   const [variantASubject, setVariantASubject] = useState("");
   const [variantBSubject, setVariantBSubject] = useState("");
@@ -96,15 +92,6 @@ export function EmailCampaigns() {
       return;
     }
 
-    if (enableAbTest && (!variantASubject || !variantBSubject)) {
-      toast({
-        title: "Missing A/B test variants",
-        description: "Please provide both subject line variants for A/B testing.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     const template = getTemplateContent(selectedTemplate, subject, emailContent);
     
     // Combine date and time for scheduling
@@ -115,14 +102,11 @@ export function EmailCampaigns() {
 
     createCampaign.mutate({
       name: campaignName,
-      subject: enableAbTest ? variantASubject : subject,
+      subject,
       previewText: previewText || undefined,
       emailTemplate: template,
       scheduledAt: scheduledAt?.toISOString(),
       status: scheduleType === "scheduled" ? "scheduled" : "draft",
-      abTestEnabled: enableAbTest ? 1 : 0,
-      abTestDuration: enableAbTest ? parseInt(testDuration) : undefined,
-      variantBSubject: enableAbTest ? variantBSubject : undefined,
     });
   };
 
@@ -310,6 +294,7 @@ export function EmailCampaigns() {
                         </div>
                       </div>
                       
+                      {/* Optimal Timing Suggestions */}
                       <div className="bg-muted/50 p-3 rounded-lg">
                         <div className="flex items-start gap-2">
                           <Calendar className="w-4 h-4 mt-0.5 text-primary" />
@@ -426,6 +411,61 @@ export function EmailCampaigns() {
                 </Button>
                 <Button onClick={handleCreateCampaign} disabled={createCampaign.isPending}>
                   {createCampaign.isPending ? "Creating..." : scheduleType === "scheduled" ? "Schedule Campaign" : "Create Campaign"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {/* Campaigns List */}
+        <Card>
+          <div className="p-6 border-b">
+            <h2 className="text-xl font-semibold">Your Campaigns</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Manage your email campaigns and track performance
+            </p>
+          </div>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Campaign Name</TableHead>
+                  <TableHead>Subject</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Recipients</TableHead>
+                  <TableHead className="text-right">Opens</TableHead>
+                  <TableHead className="text-right">Clicks</TableHead>
+                  <TableHead>Created</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                      Loading campaigns...
+                      <div className="bg-muted/50 p-3 rounded-lg">
+                        <div className="flex items-start gap-2">
+                          <Calendar className="w-4 h-4 mt-0.5 text-primary" />
+                          <div className="text-sm">
+                            <div className="font-medium mb-1">Optimal Send Times</div>
+                            <div className="text-muted-foreground space-y-1">
+                              <div>• <strong>Tuesday-Thursday, 10:00-11:00</strong> - Highest open rates</div>
+                              <div>• <strong>Tuesday, 10:00</strong> - Best overall engagement</div>
+                              <div>• Avoid Mondays (inbox overload) and Fridays (weekend mode)</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleCreateCampaign} disabled={createCampaign.isPending}>
+                  {createCampaign.isPending ? "Creating..." : "Create Campaign"}
                 </Button>
               </DialogFooter>
             </DialogContent>

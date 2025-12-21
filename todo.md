@@ -2307,5 +2307,15 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [ ] Create campaign performance reporting
 - [ ] Write tests for campaign system
 
+## Email Campaign Enhancements (Dec 21, 2025 - Current Work)
+- [x] Campaign scheduling with date/time picker
+- [x] Optimal timing suggestions (e.g., Tuesday 10am)
+- [x] A/B testing interface for subject lines
+- [x] A/B testing for content variations
+- [x] Automatic winner selection and sending
+- [x] Subscriber preference centre
+- [x] Category selection (PR tips, marketing insights, AI updates)
+- [x] Preference-based campaign targeting
+
 ## V2 Features (Future)
 - [ ] Add testimonials carousel on homepage with client quotes and logos

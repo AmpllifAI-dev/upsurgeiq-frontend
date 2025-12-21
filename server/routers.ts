@@ -5013,6 +5013,58 @@ Generate a comprehensive campaign strategy that includes:
         const { deleteSubscriber } = await import("./newsletter");
         return await deleteSubscriber(input.id);
       }),
+
+    getSubscriberPreferences: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+      }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database connection failed");
+        const { newsletterSubscribers } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        
+        const [subscriber] = await db
+          .select()
+          .from(newsletterSubscribers)
+          .where(eq(newsletterSubscribers.email, input.email))
+          .limit(1);
+        
+        if (!subscriber) {
+          throw new Error("Subscriber not found");
+        }
+        
+        return subscriber;
+      }),
+
+    updatePreferences: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+        preferPrTips: z.number().min(0).max(1),
+        preferMarketingInsights: z.number().min(0).max(1),
+        preferAiUpdates: z.number().min(0).max(1),
+        preferCaseStudies: z.number().min(0).max(1),
+        preferProductNews: z.number().min(0).max(1),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database connection failed");
+        const { newsletterSubscribers } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        
+        await db
+          .update(newsletterSubscribers)
+          .set({
+            preferPrTips: input.preferPrTips,
+            preferMarketingInsights: input.preferMarketingInsights,
+            preferAiUpdates: input.preferAiUpdates,
+            preferCaseStudies: input.preferCaseStudies,
+            preferProductNews: input.preferProductNews,
+          })
+          .where(eq(newsletterSubscribers.email, input.email));
+        
+        return { success: true };
+      }),
   }),
 
   campaigns: router({

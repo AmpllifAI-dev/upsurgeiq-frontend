@@ -14,6 +14,9 @@ upsurgeIQ is a comprehensive SaaS platform that empowers businesses with AI-powe
 - **Social Media Distribution** - Schedule and distribute content across Facebook, Instagram, LinkedIn, and X (Twitter)
 - **Journalist Media List Management** - Access curated media lists organized by industry and region
 - **Business Dossier** - Comprehensive onboarding captures company information, SIC codes, brand voice, and target audience
+- **User Behaviour Tracking & Lead Scoring** - Automatic tracking of page views, downloads, blog reads, and case studies with intelligent lead scoring (Cold/Warm/Hot/Qualified)
+- **Email Campaign Builder** - Create targeted email campaigns with template selection, scheduling, and automated blog notifications
+- **Newsletter System** - Subscriber management with analytics dashboard and behaviour-based segmentation
 - **Conversational AI Assistant** (Pro/Scale) - Real-time PR and marketing consultation with text and voice capabilities
 - **Intelligent Campaign Lab** (Scale) - A/B testing with multi-variant campaigns and performance monitoring
 - **White-Label Partnership Portal** (Admin) - Manage chambers of commerce and business network partnerships with 20% commission tracking
@@ -273,6 +276,63 @@ The multi-step onboarding wizard captures:
 - Co-branding customization options
 - Partner dashboard with organization details
 - Member analytics and reporting
+
+### User Behaviour Tracking & Lead Scoring
+
+**Automatic Activity Tracking:**
+- Page views (Resources, Case Studies, Blog, Pricing)
+- PDF template downloads (6 PR templates)
+- Blog post reads (4 articles on PR best practices)
+- Case study views (4 client success stories)
+- Newsletter signups
+
+**Intelligent Lead Scoring System:**
+- **Cold Lead (0-20 points)**: Minimal engagement, basic page views
+- **Warm Lead (21-50 points)**: Downloaded resources, read blog posts
+- **Hot Lead (51-80 points)**: Multiple interactions, case study views, newsletter signup
+- **Qualified Lead (81+ points)**: High engagement across multiple touchpoints, ready for sales outreach
+
+**Scoring Rules:**
+- Page view: +5 points
+- Blog post read: +10 points
+- PDF download: +15 points
+- Case study view: +20 points
+- Newsletter signup: +25 points
+
+**Analytics Dashboard:**
+- View all tracked users with lead scores
+- Filter by lead tier (Cold/Warm/Hot/Qualified)
+- See detailed activity timeline for each user
+- Export data for CRM integration
+- Real-time score updates as users engage
+
+### Email Campaign Builder & Newsletter System
+
+**Newsletter Management:**
+- Subscriber database with status tracking (active/unsubscribed)
+- Admin dashboard at `/newsletter-admin` for subscriber management
+- Automatic unsubscribe handling with one-click links
+- Source tracking (Resources page, Blog, Case Studies)
+
+**Email Campaign Builder:**
+- Create targeted campaigns with visual template selection
+- Segment subscribers by behaviour and lead score
+- Schedule campaigns for optimal delivery times
+- Track opens, clicks, and engagement metrics
+- A/B testing for subject lines and content (coming soon)
+
+**Automated Blog Notifications:**
+- WordPress webhook integration for new post detection
+- Automatic email delivery to all active subscribers
+- Beautiful HTML templates with featured images
+- One-click unsubscribe in every email
+- WordPress plugin included: `upsurgeiq-blog-notifier.php`
+
+**Campaign Analytics:**
+- Real-time open and click tracking
+- Engagement rate calculations
+- Campaign performance comparison
+- Subscriber growth metrics
 
 ---
 
