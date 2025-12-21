@@ -22,13 +22,14 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, Share2, Megaphone, BarChart3, Mail, Trophy, Sparkles, Image, Link2, Settings } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, Share2, Megaphone, BarChart3, Mail, Trophy, Sparkles, Image, Link2, Settings, Bug } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 import { HelpCenter } from "./HelpCenter";
 import { CreditBalanceDisplay } from "./CreditBalanceDisplay";
+import { FloatingIssueButton } from "./FloatingIssueButton";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
@@ -38,6 +39,7 @@ const menuItems = [
   { icon: Trophy, label: "Sports Teams", path: "/dashboard/sports-teams" },
   { icon: Mail, label: "Media Lists", path: "/media-lists" },
   { icon: BarChart3, label: "Analytics", path: "/analytics" },
+  { icon: Bug, label: "Issue Tracker", path: "/issues" },
   { icon: Sparkles, label: "AI Add-ons", path: "/dashboard/ai-addons" },
   { icon: Image, label: "Image Packs", path: "/dashboard/image-packs" },
   { icon: Link2, label: "Social Connections", path: "/dashboard/social-connections" },
@@ -339,6 +341,7 @@ function DashboardLayoutContent({
             </div>
           )}
         </main>
+        <FloatingIssueButton />
       </SidebarInset>
     </>
   );

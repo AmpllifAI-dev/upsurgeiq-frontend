@@ -48,6 +48,7 @@ import AdminCreditMonitoring from "./pages/AdminCreditMonitoring";
 import AdminAlertManagement from "./pages/AdminAlertManagement";
 import AdminCreditManagement from "./pages/AdminCreditManagement";
 import Purchases from "./pages/Purchases";
+import Issues from "./pages/Issues";
 import PurchaseSuccess from "./pages/PurchaseSuccess";
 import PurchaseCancel from "./pages/PurchaseCancel";
 import SportsTeams from "./pages/SportsTeams";
@@ -117,6 +118,7 @@ function Router() {
       <Route path="/partners" component={Partners} />
       <Route path="/wordpress-settings" component={WordPressSettings} />
       <Route path="/error-logs" component={ErrorLogs} />
+      <Route path="/issues" component={Issues} />
       <Route path="/analytics" component={Analytics} />
       <Route path="/profile" component={Profile} />
       <Route path="/content-calendar" component={ContentCalendar} />

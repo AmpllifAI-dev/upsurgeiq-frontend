@@ -189,26 +189,8 @@ export default function Home() {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="border-b border-border bg-card/95 backdrop-blur-sm">
+        <div className="fixed top-[73px] left-0 right-0 z-40 border-b border-border bg-card/95 backdrop-blur-sm shadow-lg max-h-[calc(100vh-73px)] overflow-y-auto">
           <div className="container mx-auto py-6 space-y-6">
-            {/* Quick Links */}
-            <div className="space-y-3">
-              <a
-                href="#features"
-                className="block text-sm font-medium text-foreground hover:text-primary transition-colours"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Features
-              </a>
-              <a
-                href="#pricing"
-                className="block text-sm font-medium text-foreground hover:text-primary transition-colours"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Pricing
-              </a>
-            </div>
-
             {/* Product Section */}
             <div className="space-y-3">
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Product</h3>
@@ -226,65 +208,70 @@ export default function Home() {
               >
                 Pricing
               </a>
-              <a
-                href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colours"
-                onClick={() => setMobileMenuOpen(false)}
+              <button
+                onClick={() => { setLocation("/resources"); setMobileMenuOpen(false); }}
+                className="block text-sm text-foreground hover:text-primary transition-colours text-left w-full"
               >
-                Integrations
-              </a>
+                Resources
+              </button>
+              <button
+                onClick={() => { setLocation("/case-studies"); setMobileMenuOpen(false); }}
+                className="block text-sm text-foreground hover:text-primary transition-colours text-left w-full"
+              >
+                Case Studies
+              </button>
             </div>
 
             {/* Company Section */}
             <div className="space-y-3">
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Company</h3>
-              <a
-                href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colours"
-                onClick={() => setMobileMenuOpen(false)}
+              <button
+                onClick={() => { setLocation("/about"); setMobileMenuOpen(false); }}
+                className="block text-sm text-foreground hover:text-primary transition-colours text-left w-full"
               >
                 About
-              </a>
-              <a
-                href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colours"
-                onClick={() => setMobileMenuOpen(false)}
+              </button>
+              <button
+                onClick={() => { setLocation("/blog"); setMobileMenuOpen(false); }}
+                className="block text-sm text-foreground hover:text-primary transition-colours text-left w-full"
               >
                 Blog
-              </a>
-              <a
-                href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colours"
-                onClick={() => setMobileMenuOpen(false)}
+              </button>
+              <button
+                onClick={() => { setLocation("/contact"); setMobileMenuOpen(false); }}
+                className="block text-sm text-foreground hover:text-primary transition-colours text-left w-full"
               >
-                Careers
-              </a>
+                Contact
+              </button>
+              <button
+                onClick={() => { setLocation("/testimonials"); setMobileMenuOpen(false); }}
+                className="block text-sm text-foreground hover:text-primary transition-colours text-left w-full"
+              >
+                Testimonials
+              </button>
             </div>
 
             {/* Legal Section */}
             <div className="space-y-3">
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Legal</h3>
-              <a
-                href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colours"
-                onClick={() => setMobileMenuOpen(false)}
+              <button
+                onClick={() => { setLocation("/privacy"); setMobileMenuOpen(false); }}
+                className="block text-sm text-foreground hover:text-primary transition-colours text-left w-full"
               >
-                Privacy
-              </a>
-              <a
-                href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colours"
-                onClick={() => setMobileMenuOpen(false)}
+                Privacy Policy
+              </button>
+              <button
+                onClick={() => { setLocation("/terms"); setMobileMenuOpen(false); }}
+                className="block text-sm text-foreground hover:text-primary transition-colours text-left w-full"
               >
-                Terms
-              </a>
-              <a
-                href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colours"
-                onClick={() => setMobileMenuOpen(false)}
+                Terms of Service
+              </button>
+              <button
+                onClick={() => { setLocation("/status"); setMobileMenuOpen(false); }}
+                className="block text-sm text-foreground hover:text-primary transition-colours text-left w-full"
               >
-                Security
-              </a>
+                System Status
+              </button>
             </div>
 
             {/* CTA Button for Mobile */}

@@ -4762,41 +4762,6 @@ Generate a comprehensive campaign strategy that includes:
       }),
   }),
 
-  issues: router({
-    submit: protectedProcedure
-      .input(
-        z.object({
-          issueType: z.enum(["bug", "feature_request", "improvement", "question"]),
-          title: z.string().min(1),
-          description: z.string().min(1),
-          stepsToReproduce: z.string().optional(),
-          expectedBehavior: z.string().optional(),
-          actualBehavior: z.string().optional(),
-          browserInfo: z.string().optional(),
-          deviceInfo: z.string().optional(),
-          pageUrl: z.string().optional(),
-        })
-      )
-      .mutation(async ({ input, ctx }) => {
-        const { notifyOwner } = await import("./_core/notification");
-        try {
-          // TODO: Implement database insert once schema is migrated
-          // For now, just log and notify owner
-          await notifyOwner({
-            title: `New ${input.issueType} from ${ctx.user.name}: ${input.title}`,
-            content: `Description: ${input.description}\n\nSteps: ${input.stepsToReproduce || "N/A"}\n\nExpected: ${input.expectedBehavior || "N/A"}\n\nActual: ${input.actualBehavior || "N/A"}\n\nBrowser: ${input.browserInfo || "N/A"}\nDevice: ${input.deviceInfo || "N/A"}\nPage: ${input.pageUrl || "N/A"}`,
-          });
-
-          return { success: true };
-        } catch (error) {
-          console.error("Error submitting issue:", error);
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to submit issue",
-          });
-        }
-      }),
-  }),
 
   marketing: router({
     captureEmail: publicProcedure
@@ -5629,6 +5594,67 @@ Generate a comprehensive campaign strategy that includes:
         lastEvent: recentEvents[0]?.createdAt,
       };
     }),
+  }),
+
+  issues: router({
+    create: protectedProcedure
+      .input(z.object({
+        title: z.string().min(5),
+        description: z.string().min(10),
+        type: z.enum(["bug", "feature_request", "improvement", "question"]),
+        priority: z.enum(["low", "medium", "high", "critical"]).optional(),
+        category: z.string().optional(),
+        pageUrl: z.string().optional(),
+        browserInfo: z.string().optional(),
+        reproSteps: z.string().optional(),
+        expectedBehavior: z.string().optional(),
+        actualBehavior: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { createIssue } = await import("./issueTracker");
+        return await createIssue({ userId: ctx.user.id, ...input });
+      }),
+
+    list: protectedProcedure
+      .input(z.object({
+        status: z.string().optional(),
+        type: z.string().optional(),
+        priority: z.string().optional(),
+        myIssuesOnly: z.boolean().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const { getIssues } = await import("./issueTracker");
+        const filters: any = {};
+        if (input.myIssuesOnly) filters.userId = ctx.user.id;
+        if (input.status) filters.status = input.status;
+        if (input.type) filters.type = input.type;
+        if (input.priority) filters.priority = input.priority;
+        return await getIssues(filters);
+      }),
+
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const { getIssueById } = await import("./issueTracker");
+        return await getIssueById(input.id);
+      }),
+
+    updateStatus: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.enum(["new", "acknowledged", "in_progress", "resolved", "closed", "wont_fix"]),
+        resolutionNotes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { updateIssueStatus } = await import("./issueTracker");
+        return await updateIssueStatus(input.id, input.status, ctx.user.id, input.resolutionNotes);
+      }),
+
+    stats: protectedProcedure
+      .query(async () => {
+        const { getIssueStats } = await import("./issueTracker");
+        return await getIssueStats();
+      }),
   }),
 });
 
