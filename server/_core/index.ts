@@ -45,6 +45,12 @@ async function startServer() {
   
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
+  
+  // SendGrid webhook for email event tracking
+  app.post("/api/sendgrid/webhook", async (req, res) => {
+    const { handleSendGridWebhook } = await import("../sendgridWebhook");
+    await handleSendGridWebhook(req, res);
+  });
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
@@ -89,6 +95,16 @@ async function startServer() {
     // Initialize scheduled press release publishing job (every 5 minutes)
     import("../jobs/publishScheduledReleases").then(module => {
       module.startScheduledPublishingJob();
+    }).catch(console.error);
+    
+    // Initialize workflow automation engine (every 5 minutes)
+    import("../workflowEngine").then(module => {
+      setInterval(() => {
+        module.processDueWorkflowEmails().catch(console.error);
+      }, 5 * 60 * 1000); // Every 5 minutes
+      
+      // Run immediately on startup
+      module.processDueWorkflowEmails().catch(console.error);
     }).catch(console.error);
   });
 }
