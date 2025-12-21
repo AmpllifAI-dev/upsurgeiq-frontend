@@ -1,6 +1,6 @@
 # The Future of AI in Marketing: Beyond the Hype
 
-**Author:** Christopher Lovelock, Founder of UpsurgeIQ  
+**Author:** Christopher Lembke, Founder of UpsurgeIQ  
 **Published:** December 21, 2025  
 **Reading Time:** 9 minutes  
 **Category:** Artificial Intelligence, Marketing Strategy, Digital Transformation
@@ -75,6 +75,6 @@ The organizations that thrive in this evolving landscape will be those that view
 
 ---
 
-**About the Author:** Christopher Lovelock is the founder of UpsurgeIQ, an AI-powered PR and marketing platform that helps businesses amplify their voice across press releases, social media, and journalist networks. With extensive experience in communications strategy and digital marketing, Christopher combines traditional PR expertise with cutting-edge AI technology to deliver measurable results for clients across industries.
+**About the Author:** Christopher Lembke is the founder of UpsurgeIQ, an AI-powered PR and marketing platform that helps businesses amplify their voice across press releases, social media, and journalist networks. With extensive experience in communications strategy and digital marketing, Christopher combines traditional PR expertise with cutting-edge AI technology to deliver measurable results for clients across industries.
 
 **Experience the future of marketing today.** [Start your free trial of UpsurgeIQ](https://upsurgeiq.com/subscribe) and discover how AI-powered content generation, intelligent distribution, and data-driven optimization can transform your marketing results.

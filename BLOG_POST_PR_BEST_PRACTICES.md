@@ -1,6 +1,6 @@
 # PR Best Practices That Actually Work in 2025
 
-**Author:** Christopher Lovelock, Founder of UpsurgeIQ  
+**Author:** Christopher Lembke, Founder of UpsurgeIQ  
 **Published:** December 21, 2025  
 **Reading Time:** 8 minutes  
 **Category:** Public Relations, Best Practices
@@ -69,6 +69,6 @@ The future of PR lies in integration—seamlessly blending traditional media rel
 
 ---
 
-**About the Author:** Christopher Lovelock is the founder of UpsurgeIQ, an AI-powered PR and marketing platform that helps businesses amplify their voice across press releases, social media, and journalist networks. With extensive experience in communications strategy and digital marketing, Christopher combines traditional PR expertise with cutting-edge technology to deliver measurable results for clients across industries.
+**About the Author:** Christopher Lembke is the founder of UpsurgeIQ, an AI-powered PR and marketing platform that helps businesses amplify their voice across press releases, social media, and journalist networks. With extensive experience in communications strategy and digital marketing, Christopher combines traditional PR expertise with cutting-edge technology to deliver measurable results for clients across industries.
 
 **Ready to elevate your PR strategy?** [Start your free trial of UpsurgeIQ](https://upsurgeiq.com/subscribe) and experience AI-powered press release generation, targeted media list management, and multi-channel distribution that actually drives results.

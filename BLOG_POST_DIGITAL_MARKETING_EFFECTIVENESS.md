@@ -1,6 +1,6 @@
 # Measuring Digital Marketing Effectiveness: A Data-Driven Methodology
 
-**Author:** Christopher Lovelock, Founder of UpsurgeIQ  
+**Author:** Christopher Lembke, Founder of UpsurgeIQ  
 **Published:** December 21, 2025  
 **Reading Time:** 10 minutes  
 **Category:** Digital Marketing, Analytics, Marketing Strategy
@@ -85,6 +85,6 @@ Continuous learning cultures treat every campaign as an experiment generating in
 
 ---
 
-**About the Author:** Christopher Lovelock is the founder of UpsurgeIQ, an AI-powered PR and marketing platform that helps businesses amplify their voice across press releases, social media, and journalist networks. With extensive experience in communications strategy and digital marketing, Christopher combines traditional PR expertise with cutting-edge technology to deliver measurable results for clients across industries.
+**About the Author:** Christopher Lembke is the founder of UpsurgeIQ, an AI-powered PR and marketing platform that helps businesses amplify their voice across press releases, social media, and journalist networks. With extensive experience in communications strategy and digital marketing, Christopher combines traditional PR expertise with cutting-edge technology to deliver measurable results for clients across industries.
 
 **Ready to measure what matters?** [Start your free trial of UpsurgeIQ](https://upsurgeiq.com/subscribe) and access integrated analytics, campaign tracking, and performance insights that connect your marketing efforts to real business outcomes.

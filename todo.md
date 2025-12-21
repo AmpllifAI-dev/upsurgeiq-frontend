@@ -2337,3 +2337,7 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Template duplication
 - [x] Template library management
 - [x] Write tests for all new features
+
+## Author Name Correction (Dec 21, 2025)
+- [x] Update author name from "Christopher Lovelock" to "Christopher Lembke" in all source files
+- [x] Verify all 4 blog post markdown files have correct author name

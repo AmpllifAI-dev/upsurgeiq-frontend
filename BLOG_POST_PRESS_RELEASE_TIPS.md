@@ -1,6 +1,6 @@
 # Press Release Writing Tips: How to Get Journalists to Actually Read Your Story
 
-**Author:** Christopher Lovelock, Founder of UpsurgeIQ  
+**Author:** Christopher Lembke, Founder of UpsurgeIQ  
 **Published:** December 21, 2025  
 **Reading Time:** 7 minutes  
 **Category:** Public Relations, Content Writing, Media Relations
@@ -81,6 +81,6 @@ Targeted distribution to relevant journalists and publications generates better 
 
 ---
 
-**About the Author:** Christopher Lovelock is the founder of UpsurgeIQ, an AI-powered PR and marketing platform that helps businesses amplify their voice across press releases, social media, and journalist networks. With extensive experience in communications strategy and digital marketing, Christopher combines traditional PR expertise with cutting-edge technology to deliver measurable results for clients across industries.
+**About the Author:** Christopher Lembke is the founder of UpsurgeIQ, an AI-powered PR and marketing platform that helps businesses amplify their voice across press releases, social media, and journalist networks. With extensive experience in communications strategy and digital marketing, Christopher combines traditional PR expertise with cutting-edge technology to deliver measurable results for clients across industries.
 
 **Ready to write press releases that get results?** [Start your free trial of UpsurgeIQ](https://upsurgeiq.com/subscribe) and access AI-powered writing assistance, professional templates, and targeted media distribution that connects your stories with the right journalists.
