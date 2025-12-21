@@ -66,12 +66,16 @@ export default function Subscribe() {
       period: "/month",
       description: "Perfect for solopreneurs and small businesses",
       features: [
-        "2 press releases per month",
-        "1 social media channel",
-        "3 default media lists",
-        "AI-powered content generation",
-        "Basic analytics",
+        "2 campaigns per month (AI-drafted copy + own imagery)",
+        "3 social media platforms (Facebook, Instagram, LinkedIn)",
+        "Unlimited user-composed social posts",
+        "3 media lists (default)",
         "Email support",
+      ],
+      optionalAddons: [
+        "AI Chat: £39/month",
+        "AI Call-in: £59/month",
+        "AI Generated Image Packs: £3.99-24.99",
       ],
       cta: "Start Free Trial",
       highlighted: false,
@@ -83,14 +87,16 @@ export default function Subscribe() {
       period: "/month",
       description: "Most popular for growing businesses",
       features: [
-        "5 press releases per month",
-        "3 social media channels",
-        "5 media lists included",
-        "AI-powered content generation",
-        "Conversational AI assistant",
-        "AI call-in feature",
-        "Advanced analytics",
+        "5 campaigns per month (AI-drafted copy + own imagery)",
+        "3 social media platforms (Facebook, Instagram, LinkedIn)",
+        "Unlimited user-composed social posts",
+        "5 media lists (3 default + 2 optional)",
         "Priority support",
+      ],
+      optionalAddons: [
+        "AI Chat: £39/month",
+        "AI Call-in: £59/month",
+        "AI Generated Image Packs: £3.99-24.99",
       ],
       cta: "Start Free Trial",
       highlighted: true,
@@ -102,16 +108,17 @@ export default function Subscribe() {
       period: "/month",
       description: "For agencies and high-growth companies",
       features: [
-        "15 press releases per month",
-        "All 4 social media channels",
-        "10 media lists included",
-        "AI-powered content generation",
-        "Conversational AI assistant",
-        "AI call-in feature",
-        "Intelligent Campaign Lab",
-        "Advanced analytics & reporting",
+        "15 campaigns per month (AI-drafted copy + own imagery)",
+        "3 social media platforms (Facebook, Instagram, LinkedIn)",
+        "Unlimited user-composed social posts",
+        "10 media lists (3 default + 7 optional)",
+        "Intelligent Campaign Lab included",
         "Priority support",
-        "Dedicated account manager",
+      ],
+      optionalAddons: [
+        "AI Chat: £39/month",
+        "AI Call-in: £59/month",
+        "AI Generated Image Packs: £3.99-24.99",
       ],
       cta: "Start Free Trial",
       highlighted: false,
@@ -188,6 +195,17 @@ export default function Subscribe() {
                     <span className="text-sm text-muted-foreground">{feature}</span>
                   </div>
                 ))}
+                
+                {tier.optionalAddons && tier.optionalAddons.length > 0 && (
+                  <div className="pt-4 mt-4 border-t border-border">
+                    <p className="text-xs font-semibold text-foreground mb-2">Optional Add-ons</p>
+                    {tier.optionalAddons.map((addon, addonIndex) => (
+                      <div key={addonIndex} className="flex items-start gap-2 mt-1">
+                        <span className="text-xs text-muted-foreground">• {addon}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
               <CardFooter>
                 <Button

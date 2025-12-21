@@ -164,8 +164,8 @@ export function HelpCenter() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <FAQItem
-                  question="How many press releases can I create?"
-                  answer="It depends on your subscription tier. Starter plans include 10 press releases per month, Pro includes 50, and Scale includes unlimited press releases."
+                  question="How many campaigns can I create?"
+                  answer="It depends on your subscription tier. Starter includes 2 campaigns per month (AI-drafted copy + own imagery), Pro includes 5 campaigns, and Scale includes 15 campaigns per month."
                 />
 
                 <FAQItem
