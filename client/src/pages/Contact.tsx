@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -47,6 +48,13 @@ export default function Contact() {
   };
 
   return (
+    <>
+      <SEO
+        title="Contact Us - Get in Touch"
+        description="Have questions about UpsurgeIQ? Contact our team for sales inquiries, support, or partnership opportunities. We're here to help you succeed."
+        keywords="contact UpsurgeIQ, customer support, sales inquiry, PR software support, get in touch"
+        canonicalUrl="https://upsurgeiq.com/contact"
+      />
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm">
@@ -330,5 +338,6 @@ export default function Contact() {
         </div>
       </footer>
     </div>
+      </>
   );
 }

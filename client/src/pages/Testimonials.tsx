@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Zap, Menu, X, Star, Quote } from "lucide-react";
@@ -99,6 +100,13 @@ export default function Testimonials() {
     : testimonials.filter(t => t.category === selectedCategory);
 
   return (
+    <>
+      <SEO
+        title="Customer Success Stories & Testimonials"
+        description="Read how businesses across industries achieve better PR results with UpsurgeIQ. Real customer testimonials showcasing increased media coverage and significant cost savings."
+        keywords="UpsurgeIQ reviews, customer testimonials, PR success stories, case studies, client results"
+        canonicalUrl="https://upsurgeiq.com/testimonials"
+      />
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
@@ -309,5 +317,6 @@ export default function Testimonials() {
         </div>
       </footer>
     </div>
+      </>
   );
 }

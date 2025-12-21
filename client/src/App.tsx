@@ -69,6 +69,7 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import PricingCalculator from "./pages/PricingCalculator";
 import Testimonials from "./pages/Testimonials";
+import FAQ from "./pages/FAQ";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -138,6 +139,7 @@ function Router() {
       <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/pricing-calculator" component={PricingCalculator} />
       <Route path="/testimonials" component={Testimonials} />
+      <Route path="/faq" component={FAQ} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

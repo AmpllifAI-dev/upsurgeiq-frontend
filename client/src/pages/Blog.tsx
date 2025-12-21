@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -59,6 +60,12 @@ export default function Blog() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Blog - Insights & Best Practices"
+        description="Expert advice on AI-powered PR, marketing strategies, and industry trends. Learn how to amplify your brand voice and grow your business with professional content creation."
+        keywords="PR blog, marketing insights, AI content creation, press release tips, media relations, content marketing strategies"
+        canonicalUrl="https://upsurgeiq.com/blog"
+      />
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between py-4 gap-4">

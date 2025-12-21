@@ -1,5 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useState } from "react";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -136,6 +137,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="AI-Powered PR & Marketing Platform"
+        description="Transform your PR strategy with UpsurgeIQ's AI-powered platform. Generate professional press releases, manage media lists, and amplify your brand voice at a fraction of traditional agency costs."
+        keywords="AI PR, press release generator, media relations, marketing automation, PR software, journalist database, content marketing"
+        canonicalUrl="https://upsurgeiq.com"
+      />
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between py-4 gap-4">

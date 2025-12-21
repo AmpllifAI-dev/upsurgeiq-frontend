@@ -1390,3 +1390,17 @@ export const testimonials = mysqlTable("testimonials", {
 
 export type Testimonial = typeof testimonials.$inferSelect;
 export type InsertTestimonial = typeof testimonials.$inferInsert;
+
+
+// Email capture for lead generation
+export const emailCaptures = mysqlTable("email_captures", {
+  id: int("id").autoincrement().primaryKey(),
+  email: varchar("email", { length: 320 }).notNull(),
+  source: varchar("source", { length: 100 }).notNull(), // 'blog', 'calculator', 'homepage', etc.
+  leadMagnet: varchar("leadMagnet", { length: 100 }), // 'pr_template', 'guide', etc.
+  subscribed: int("subscribed").default(1),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type EmailCapture = typeof emailCaptures.$inferSelect;
+export type InsertEmailCapture = typeof emailCaptures.$inferInsert;

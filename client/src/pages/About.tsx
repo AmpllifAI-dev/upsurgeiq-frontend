@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +11,13 @@ export default function About() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
+    <>
+      <SEO
+        title="About Us - Meet Christopher Logue"
+        description="Learn about Christopher Logue, founder of UpsurgeIQ. With extensive experience in PR, marketing, and AI innovation, Christopher is transforming how businesses communicate."
+        keywords="Christopher Logue, UpsurgeIQ founder, PR expert, marketing consultant, AI communications"
+        canonicalUrl="https://upsurgeiq.com/about"
+      />
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm">
@@ -361,5 +369,6 @@ export default function About() {
         </div>
       </footer>
     </div>
+      </>
   );
 }

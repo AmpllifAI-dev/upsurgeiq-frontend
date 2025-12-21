@@ -2147,3 +2147,12 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [ ] Implement testimonials management (admin)
 - [x] Add navigation links for blog and testimonials
 - [x] Test all new features
+
+
+## December 21, 2025 - Dashboard Fix & SEO Enhancements
+- [ ] Fix React hooks error on Dashboard page (stat cards navigation)
+- [ ] Add SEO meta tags to all public pages (Home, Blog, About, Contact, etc.)
+- [ ] Create FAQ page with common questions
+- [ ] Implement email capture forms on blog and calculator pages
+- [ ] Add lead magnet (free PR template/guide) for email signups
+- [ ] Test all fixes and verify SEO tags

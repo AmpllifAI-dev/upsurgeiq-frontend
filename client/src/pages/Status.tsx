@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -96,6 +97,13 @@ export default function Status() {
   };
 
   return (
+    <>
+      <SEO
+        title="Platform Status - System Health"
+        description="Check the current status of UpsurgeIQ platform services, API health, and scheduled maintenance. Real-time monitoring of all systems."
+        keywords="UpsurgeIQ status, platform health, system status, uptime monitoring, service status"
+        canonicalUrl="https://upsurgeiq.com/status"
+      />
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm">
@@ -306,5 +314,6 @@ export default function Status() {
         </div>
       </footer>
     </div>
+      </>
   );
 }

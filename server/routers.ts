@@ -4798,6 +4798,65 @@ Generate a comprehensive campaign strategy that includes:
       }),
   }),
 
+  marketing: router({
+    captureEmail: publicProcedure
+      .input(
+        z.object({
+          email: z.string().email(),
+          source: z.string(),
+          leadMagnet: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const db = getDb();
+        const { emailCaptures } = await import("../drizzle/schema");
+        const { sendEmail } = await import("./_core/email");
+        const { notifyOwner } = await import("./_core/notification");
+
+        try {
+          // Save email capture to database
+          await db.insert(emailCaptures).values({
+            email: input.email,
+            source: input.source,
+            leadMagnet: input.leadMagnet || null,
+          });
+
+          // Notify owner of new lead
+          await notifyOwner({
+            title: `New Email Capture from ${input.source}`,
+            content: `Email: ${input.email}\nSource: ${input.source}\nLead Magnet: ${input.leadMagnet || "None"}`,
+          });
+
+          // Send welcome email with resources
+          await sendEmail({
+            to: input.email,
+            subject: "Your Free PR Resources - UpsurgeIQ",
+            html: `
+              <h2>Welcome to UpsurgeIQ!</h2>
+              <p>Thank you for subscribing. Here are your free PR resources:</p>
+              <ul>
+                <li><strong>Press Release Template:</strong> A professional template to get you started</li>
+                <li><strong>Media List Building Guide:</strong> How to find and connect with journalists</li>
+                <li><strong>PR Best Practices:</strong> Industry insights from our blog</li>
+              </ul>
+              <p>Ready to take your PR to the next level? <a href="https://upsurgeiq.com/subscribe">Start your free trial</a> today.</p>
+              <br>
+              <p>Best regards,<br>The UpsurgeIQ Team</p>
+              <p style="font-size: 12px; color: #666;">You can <a href="#">unsubscribe</a> at any time.</p>
+            `,
+          });
+
+          return { success: true };
+        } catch (error) {
+          console.error("Error capturing email:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to subscribe. Please try again.",
+          });
+        }
+      }),
+  }),
+
   contact: router({
     submit: publicProcedure
       .input(

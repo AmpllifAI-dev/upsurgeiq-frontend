@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -54,6 +55,13 @@ export default function PricingCalculator() {
   const savingsPercentage = ((monthlySavings / traditionalMonthlyCost) * 100).toFixed(0);
 
   return (
+    <>
+      <SEO
+        title="ROI Calculator - Calculate Your Savings"
+        description="See how much you can save by switching from traditional PR agencies to UpsurgeIQ. Calculate your potential ROI and discover why businesses save up to 99% on PR costs."
+        keywords="PR cost calculator, ROI calculator, PR agency savings, marketing cost comparison, PR pricing"
+        canonicalUrl="https://upsurgeiq.com/pricing-calculator"
+      />
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
@@ -368,5 +376,6 @@ export default function PricingCalculator() {
         </div>
       </footer>
     </div>
+      </>
   );
 }
