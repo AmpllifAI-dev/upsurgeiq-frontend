@@ -15,7 +15,28 @@ export default function Subscribe() {
     enabled: !!user,
   });
 
-  // If already has subscription, redirect to dashboard
+  // All hooks must be called before any conditional returns
+  const checkoutMutation = trpc.stripe.createCheckout.useMutation({
+    onSuccess: (data) => {
+      if (data.url) {
+        toast.success("Redirecting to checkout...");
+        window.open(data.url, "_blank");
+      }
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to create checkout session");
+    },
+  });
+
+  const handleSelectPlan = (tier: "starter" | "pro" | "scale") => {
+    if (!user) {
+      toast.error("Please sign in to subscribe");
+      return;
+    }
+    checkoutMutation.mutate({ tier });
+  };
+
+  // Conditional returns AFTER all hooks
   if (subscription) {
     setLocation("/dashboard");
     return null;
@@ -36,26 +57,6 @@ export default function Subscribe() {
     setLocation("/");
     return null;
   }
-
-  const checkoutMutation = trpc.stripe.createCheckout.useMutation({
-    onSuccess: (data) => {
-      if (data.url) {
-        toast.success("Redirecting to checkout...");
-        window.open(data.url, "_blank");
-      }
-    },
-    onError: (error: any) => {
-      toast.error(error.message || "Failed to create checkout session");
-    },
-  });
-
-  const handleSelectPlan = (tier: "starter" | "pro" | "scale") => {
-    if (!user) {
-      toast.error("Please sign in to subscribe");
-      return;
-    }
-    checkoutMutation.mutate({ tier });
-  };
 
   const pricingTiers = [
     {

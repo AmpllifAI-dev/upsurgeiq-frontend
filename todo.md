@@ -1825,3 +1825,6 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Add platform-specific social media post generation
 - [x] Complete Intelligent Campaign Lab features
 - [x] Complete White-Label Partnership Portal features
+
+## Bug Fixes (Current Session)
+- [x] Fix subscription page showing "This page is currently unavailable" error
