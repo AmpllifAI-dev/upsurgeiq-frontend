@@ -11,6 +11,7 @@ import { useState, useEffect } from "react";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Subscribe from "./pages/Subscribe";
+import SubscriptionUpgrade from "./pages/SubscriptionUpgrade";
 import Onboarding from "./pages/Onboarding";
 import PressReleaseNew from "./pages/PressReleaseNew";
 import PressReleases from "./pages/PressReleases";
@@ -22,6 +23,7 @@ import Upgrade from "./pages/Upgrade";
 import MediaLists from "./pages/MediaLists";
 import AIAssistant from "./pages/AIAssistant";
 import CampaignLab from "./pages/CampaignLab";
+import CampaignLabSales from "./pages/CampaignLabSales";
 import CampaignDetail from "./pages/CampaignDetail";
 import CampaignTemplates from "./pages/CampaignTemplates";
 import Partners from "./pages/Partners";
@@ -59,6 +61,7 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/subscribe" component={Subscribe} />
+      <Route path="/subscription/upgrade" component={SubscriptionUpgrade} />
       <Route path="/onboarding" component={Onboarding} />
       <Route path="/press-releases/new" component={PressReleaseNew} />
       <Route path="/press-releases/:id/edit" component={PressReleaseEdit} />
@@ -78,6 +81,7 @@ function Router() {
       <Route path="/journalists/:id" component={JournalistDetail} />
       <Route path="/journalists/:id/edit" component={JournalistForm} />
       <Route path="/ai-assistant" component={AIAssistant} />
+      <Route path="/campaign-lab-info" component={CampaignLabSales} />
       <Route path="/campaign-lab" component={CampaignLab} />
       <Route path="/dashboard/campaign/:id" component={CampaignDetail} />
       <Route path="/dashboard/campaign-lab" component={CampaignLab} />

@@ -488,6 +488,71 @@ export default function Profile() {
             {/* Social Media Connections */}
             <SocialMediaConnections />
 
+            {/* Add-on Management */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Optional Add-ons</CardTitle>
+                <CardDescription>Enhance your plan with optional features</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-4">
+                  {/* AI Chat Add-on */}
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-medium">AI Chat</h4>
+                        <Badge variant="secondary">£39/month</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Conversational AI assistant for content generation and refinement
+                      </p>
+                    </div>
+                    <Button variant="outline" size="sm">
+                      Add to Plan
+                    </Button>
+                  </div>
+
+                  {/* AI Call-in Add-on */}
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-medium">AI Call-in</h4>
+                        <Badge variant="secondary">£59/month</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Voice call-in feature with Whisper transcription for hands-free content creation
+                      </p>
+                    </div>
+                    <Button variant="outline" size="sm">
+                      Add to Plan
+                    </Button>
+                  </div>
+
+                  {/* AI Generated Image Packs */}
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-medium">AI Generated Image Packs</h4>
+                        <Badge variant="secondary">£3.99-24.99</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Professional AI-generated images for press releases and campaigns
+                      </p>
+                    </div>
+                    <Button variant="outline" size="sm">
+                      Purchase Pack
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="bg-muted/50 p-4 rounded-lg">
+                  <p className="text-xs text-muted-foreground">
+                    Add-ons are billed monthly and can be canceled anytime. Changes take effect immediately.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Data & Privacy */}
             <Card>
               <CardHeader>

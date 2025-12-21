@@ -46,11 +46,11 @@
 - [x] Create press release creation form with guided prompts
 - [x] Implement AI content generation using business dossier
 - [x] Build rich text editor for manual refinement
-- [ ] Add AI-powered image generation for press releases
+- [x] Add AI-powered image generation for press releases
 - [x] Create press release preview and approval flow
-- [ ] Implement press release scheduling
+- [x] Implement press release scheduling
 - [x] Build press release library/history view
-- [ ] Add platform-specific social media post generation
+- [x] Add platform-specific social media post generation
 
 ## Social Media Distribution System
 - [x] Create social media post composer
@@ -1831,3 +1831,9 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 
 ## Pricing Plan Corrections (Current Session)
 - [x] Fix incorrect pricing plans and product descriptions across all pages (Subscribe, Home, Pricing, etc.)
+
+## New Tasks (Uninterrupted Work Session)
+- [x] Create Intelligent Campaign Lab sales/marketing page
+- [x] Implement subscription upgrade flow with prorated billing
+- [x] Create add-on management UI in Profile/Settings
+- [x] Continue working through remaining incomplete todo items
