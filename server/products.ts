@@ -80,15 +80,41 @@ export const PRODUCTS: Record<PricingTier, ProductConfig> = {
 export const ADDITIONAL_PRODUCTS = {
   additionalMediaList: {
     name: "Additional Media List",
+    price: 400, // £4.00 in pence
+    currency: "gbp",
+    interval: "month" as const,
     stripeProductId: "prod_TdNbgdwBIB6Dbn",
     stripePriceId: "price_1Sg6qMIEVr3V21Jeb8Yk1A0n",
     description: "Add extra media list to your subscription",
   },
   intelligentCampaignLab: {
     name: "Intelligent Campaign Lab",
+    price: 9900, // £99.00 in pence (standalone purchase)
+    currency: "gbp",
+    interval: "month" as const,
     stripeProductId: "prod_TdNbuCSuRx3WLE",
     stripePriceId: "price_1Sg6qMIEVr3V21JeyfLicP6y",
-    description: "Advanced campaign optimization and A/B testing",
+    description: "Advanced campaign optimization and A/B testing (can be purchased standalone)",
+  },
+  aiChat: {
+    name: "AI Chat",
+    price: 3900, // £39.00 in pence
+    currency: "gbp",
+    interval: "month" as const,
+    stripeProductId: "prod_PLACEHOLDER_AI_CHAT", // TODO: Create in Stripe Dashboard
+    stripePriceId: "price_PLACEHOLDER_AI_CHAT", // TODO: Create in Stripe Dashboard
+    description: "Conversational AI assistant for content generation (32 messages/month)",
+    credits: 32,
+  },
+  aiCallIn: {
+    name: "AI Call-in",
+    price: 5900, // £59.00 in pence
+    currency: "gbp",
+    interval: "month" as const,
+    stripeProductId: "prod_PLACEHOLDER_AI_CALL", // TODO: Create in Stripe Dashboard
+    stripePriceId: "price_PLACEHOLDER_AI_CALL", // TODO: Create in Stripe Dashboard
+    description: "Voice call-in with Whisper transcription (32 messages/month)",
+    credits: 32,
   },
 };
 

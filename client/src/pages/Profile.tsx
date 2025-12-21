@@ -78,6 +78,37 @@ export default function Profile() {
     },
   });
 
+  // Add-on checkout mutations
+  const aiChatCheckoutMutation = trpc.subscription.createAddonCheckout.useMutation({
+    onSuccess: (data) => {
+      window.location.href = data.url;
+    },
+    onError: (error) => {
+      toast.error("Failed to start checkout", {
+        description: error.message,
+      });
+    },
+  });
+
+  const aiCallInCheckoutMutation = trpc.subscription.createAddonCheckout.useMutation({
+    onSuccess: (data) => {
+      window.location.href = data.url;
+    },
+    onError: (error) => {
+      toast.error("Failed to start checkout", {
+        description: error.message,
+      });
+    },
+  });
+
+  const handleAddAiChat = () => {
+    aiChatCheckoutMutation.mutate({ addonType: 'aiChat' });
+  };
+
+  const handleAddAiCallIn = () => {
+    aiCallInCheckoutMutation.mutate({ addonType: 'aiCallIn' });
+  };
+
   if (authLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -507,8 +538,13 @@ export default function Profile() {
                         Conversational AI assistant for content generation and refinement
                       </p>
                     </div>
-                    <Button variant="outline" size="sm">
-                      Add to Plan
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleAddAiChat}
+                      disabled={aiChatCheckoutMutation.isPending}
+                    >
+                      {aiChatCheckoutMutation.isPending ? "Loading..." : "Add to Plan"}
                     </Button>
                   </div>
 
@@ -523,8 +559,13 @@ export default function Profile() {
                         Voice call-in feature with Whisper transcription for hands-free content creation
                       </p>
                     </div>
-                    <Button variant="outline" size="sm">
-                      Add to Plan
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleAddAiCallIn}
+                      disabled={aiCallInCheckoutMutation.isPending}
+                    >
+                      {aiCallInCheckoutMutation.isPending ? "Loading..." : "Add to Plan"}
                     </Button>
                   </div>
 

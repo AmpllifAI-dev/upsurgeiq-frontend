@@ -1837,3 +1837,25 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Implement subscription upgrade flow with prorated billing
 - [x] Create add-on management UI in Profile/Settings
 - [x] Continue working through remaining incomplete todo items
+
+## Add-on Integration & Usage Tracking (Current Session)
+- [ ] Create Stripe products for AI Chat, AI Call-in, and Campaign Lab add-ons
+- [ ] Connect add-on buttons in Profile to Stripe checkout
+- [ ] Implement webhook handlers for add-on subscription activation/deactivation
+- [ ] Create Campaign Lab teaser cards for Starter and Pro users in dashboard (standalone purchase)
+- [ ] Build usage meters for AI Chat credits (32/month) in dashboard header
+- [ ] Build usage meters for AI Call-in credits (32/month) in dashboard header
+- [ ] Update Campaign Lab access to support standalone purchase (not Scale-only)
+
+## Campaign Lab Restructuring (Current Session)
+- [ ] Restructure Intelligent Campaign Lab as standalone plan (not add-on)
+- [ ] Update Subscribe page to show Campaign Lab as independent purchase option
+- [ ] Allow Campaign Lab to be purchased without base subscription
+- [ ] Allow Campaign Lab to be added to any tier (Starter/Pro/Scale)
+- [ ] Update Dashboard to show Campaign Lab purchase card for all users
+
+## IMPORTANT NOTE (Current Session)
+- Intelligent Campaign Lab will be added as a 4th standalone plan option (£99/month)
+- DO NOT change existing plans (Starter, Pro, Scale) - they remain exactly as they are
+- Scale plan still includes Campaign Lab
+- Campaign Lab components and details to be reviewed tomorrow

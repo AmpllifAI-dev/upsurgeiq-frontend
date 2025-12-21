@@ -190,6 +190,59 @@ export const appRouter = router({
       const subscription = await getUserSubscription(ctx.user.id);
       return subscription || null;
     }),
+
+    createAddonCheckout: protectedProcedure
+      .input(
+        z.object({
+          addonType: z.enum(["aiChat", "aiCallIn", "intelligentCampaignLab"]),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { ADDITIONAL_PRODUCTS } = await import("./products");
+        const addon = ADDITIONAL_PRODUCTS[input.addonType];
+
+        if (!addon) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid add-on type",
+          });
+        }
+
+        const origin = ctx.req.headers.origin || "http://localhost:3000";
+
+        // Create Stripe checkout session for add-on
+        const stripe = (await import("stripe")).default;
+        const stripeClient = new stripe(process.env.STRIPE_SECRET_KEY!, {
+          apiVersion: "2024-11-20.acacia",
+        });
+
+        const session = await stripeClient.checkout.sessions.create({
+          customer_email: ctx.user.email || undefined,
+          client_reference_id: ctx.user.id.toString(),
+          line_items: [
+            {
+              price: addon.stripePriceId,
+              quantity: 1,
+            },
+          ],
+          mode: "subscription",
+          success_url: `${origin}/dashboard?addon_success=true`,
+          cancel_url: `${origin}/profile?addon_canceled=true`,
+          metadata: {
+            userId: ctx.user.id.toString(),
+            addonType: input.addonType,
+          },
+        });
+
+        if (!session.url) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create checkout session",
+          });
+        }
+
+        return { url: session.url };
+      }),
   }),
 
   business: router({
