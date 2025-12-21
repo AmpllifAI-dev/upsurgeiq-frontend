@@ -2006,6 +2006,74 @@ Generate a comprehensive campaign strategy that includes:
         const { getCampaignPerformanceSummary } = await import("./campaignOptimization");
         return await getCampaignPerformanceSummary(input.campaignId);
       }),
+
+    aiAssistant: protectedProcedure
+      .input(
+        z.object({
+          campaignId: z.number().optional(),
+          message: z.string(),
+          conversationHistory: z.array(
+            z.object({
+              role: z.enum(["user", "assistant"]),
+              content: z.string(),
+            })
+          ),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const business = await getUserBusiness(ctx.user.id);
+        if (!business) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Business not found" });
+        }
+
+        // Build context for AI
+        let systemPrompt = `You are a campaign strategy AI assistant for ${business.name}. `;
+        
+        if (input.campaignId) {
+          // Get campaign details for context
+          const { getCampaignById } = await import("./campaigns");
+          const campaign = await getCampaignById(input.campaignId);
+          if (!campaign) {
+            throw new TRPCError({ code: "NOT_FOUND", message: "Campaign not found" });
+          }
+          
+          systemPrompt += `You are helping optimize an existing campaign: "${campaign.name}". `;
+          systemPrompt += `Goal: ${campaign.goal}. Budget: ${campaign.budget}. Status: ${campaign.status}. `;
+          systemPrompt += `Provide specific, actionable advice for improving this campaign's performance. `;
+          systemPrompt += `Analyze metrics, suggest A/B test variations, recommend budget adjustments, and identify optimization opportunities.`;
+        } else {
+          systemPrompt += `You are helping plan a new campaign. `;
+          systemPrompt += `Ask clarifying questions about goals, target audience, budget, and platforms. `;
+          systemPrompt += `Provide strategic recommendations, suggest campaign structures, and guide the user through best practices. `;
+          systemPrompt += `Be specific and actionable in your advice.`;
+        }
+
+        // Add business context
+        if (business.brandVoiceTone) {
+          systemPrompt += ` Brand voice: ${business.brandVoiceTone}.`;
+        }
+        if (business.targetAudience) {
+          systemPrompt += ` Target audience: ${business.targetAudience}.`;
+        }
+
+        // Call LLM
+        const response = await invokeLLM({
+          messages: [
+            { role: "system", content: systemPrompt },
+            ...input.conversationHistory.map((m) => ({
+              role: m.role,
+              content: m.content,
+            })),
+            { role: "user", content: input.message },
+          ],
+        });
+
+        const aiMessage = response.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response.";
+
+        return {
+          message: aiMessage,
+        };
+      }),
   }),
 
   partner: router({
@@ -4436,10 +4504,8 @@ Generate a comprehensive campaign strategy that includes:
         const conversations = await getAIConversations(ctx.user.id, input.limit);
         return conversations;
       }),
-  }),
 
-  // Admin router
-  admin: router({
+    // Admin Credit Management procedures
     getAllUsersCredits: protectedProcedure.query(async ({ ctx }) => {
       // Check if user is admin
       if (ctx.user.role !== "admin") {
@@ -4447,14 +4513,6 @@ Generate a comprehensive campaign strategy that includes:
       }
       const { getAllUsersCreditsUsage } = await import("./adminCreditManagement");
       return await getAllUsersCreditsUsage();
-    }),
-
-    getCreditStats: protectedProcedure.query(async ({ ctx }) => {
-      if (ctx.user.role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-      }
-      const { getCreditUsageStats } = await import("./adminCreditManagement");
-      return await getCreditUsageStats();
     }),
 
     adjustCredits: protectedProcedure
