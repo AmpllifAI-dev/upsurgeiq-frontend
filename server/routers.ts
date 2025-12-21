@@ -1888,6 +1888,33 @@ Generate a comprehensive campaign strategy that includes:
 
         return await getCampaignActivityLog(input.campaignId, input.limit);
       }),
+
+    // Campaign Optimization
+    optimizeCampaign: protectedProcedure
+      .input(z.object({ campaignId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const { autoOptimizeCampaign } = await import("./campaignOptimization");
+        const result = await autoOptimizeCampaign(input.campaignId);
+
+        if (result.optimized) {
+          await logCampaignActivity({
+            campaignId: input.campaignId,
+            userId: ctx.user.id,
+            action: "optimized",
+            entityType: "campaign",
+            changes: { winnerId: result.winnerId },
+          });
+        }
+
+        return result;
+      }),
+
+    getPerformanceSummary: protectedProcedure
+      .input(z.object({ campaignId: z.number() }))
+      .query(async ({ input }) => {
+        const { getCampaignPerformanceSummary } = await import("./campaignOptimization");
+        return await getCampaignPerformanceSummary(input.campaignId);
+      }),
   }),
 
   partner: router({
@@ -1975,6 +2002,89 @@ Generate a comprehensive campaign strategy that includes:
         }
         await deletePartner(input.id);
         return { success: true };
+      }),
+
+    // Marketing Materials Library
+    getMarketingMaterials: protectedProcedure.query(async () => {
+      const { getAllMarketingMaterials } = await import("./partnerMaterials");
+      return await getAllMarketingMaterials();
+    }),
+
+    getMaterialsByCategory: protectedProcedure
+      .input(
+        z.object({
+          category: z.enum(["logo", "banner", "brochure", "presentation", "email_template", "social_media", "video", "other"]),
+        })
+      )
+      .query(async ({ input }) => {
+        const { getMarketingMaterialsByCategory } = await import("./partnerMaterials");
+        return await getMarketingMaterialsByCategory(input.category);
+      }),
+
+    trackDownload: protectedProcedure
+      .input(z.object({ materialId: z.number(), partnerId: z.number() }))
+      .mutation(async ({ input }) => {
+        const { trackMaterialDownload } = await import("./partnerMaterials");
+        await trackMaterialDownload(input.materialId, input.partnerId);
+        return { success: true };
+      }),
+
+    // Commission Reporting
+    getCommissionReport: protectedProcedure
+      .input(
+        z.object({
+          partnerId: z.number(),
+          startDate: z.string(),
+          endDate: z.string(),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Admin access required",
+          });
+        }
+        const { generateCommissionReport } = await import("./partnerMaterials");
+        return await generateCommissionReport(
+          input.partnerId,
+          new Date(input.startDate),
+          new Date(input.endDate)
+        );
+      }),
+
+    getAllCommissionPayouts: protectedProcedure
+      .input(z.object({ status: z.enum(["pending", "processing", "paid", "failed"]).optional() }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Admin access required",
+          });
+        }
+        const { getAllCommissionPayouts } = await import("./partnerMaterials");
+        return await getAllCommissionPayouts(input.status);
+      }),
+
+    // Account Manager Assignment
+    assignAccountManager: protectedProcedure
+      .input(z.object({ partnerId: z.number(), managerId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Admin access required",
+          });
+        }
+        const { assignAccountManager } = await import("./partnerMaterials");
+        return await assignAccountManager(input.partnerId, input.managerId);
+      }),
+
+    getAccountManager: protectedProcedure
+      .input(z.object({ partnerId: z.number() }))
+      .query(async ({ input }) => {
+        const { getPartnerAccountManager } = await import("./partnerMaterials");
+        return await getPartnerAccountManager(input.partnerId);
       }),
   }),
 
