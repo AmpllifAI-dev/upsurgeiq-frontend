@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS workflow_enrollments (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  workflowId INT NOT NULL,\n  subscriberId INT NOT NULL,\n  currentStepId INT NULL,\n  status ENUM('active', 'completed', 'paused', 'cancelled') DEFAULT 'active' NOT NULL,\n  enrolledAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  completedAt TIMESTAMP NULL,\n  nextScheduledAt TIMESTAMP NULL,\n  FOREIGN KEY (workflowId) REFERENCES email_workflows(id) ON DELETE CASCADE,\n  FOREIGN KEY (subscriberId) REFERENCES newsletter_subscribers(id) ON DELETE CASCADE,\n  FOREIGN KEY (currentStepId) REFERENCES workflow_steps(id) ON DELETE SET NULL,\n  INDEX idx_workflow_subscriber (workflowId, subscriberId),\n  INDEX idx_next_scheduled (nextScheduledAt),\n  INDEX idx_status (status)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute CREATE TABLE IF NOT EXISTS workflow_enrollments (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  workflowId INT NOT NULL,\n  subscriberId INT NOT NULL,\n  currentStepId INT NULL,\n  status ENUM('active', 'completed', 'paused', 'cancelled') DEFAULT 'active' NOT NULL,\n  enrolledAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  completedAt TIMESTAMP NULL,\n  nextScheduledAt TIMESTAMP NULL,\n  FOREIGN KEY (workflowId) REFERENCES email_workflows(id) ON DELETE CASCADE,\n  FOREIGN KEY (subscriberId) REFERENCES newsletter_subscribers(id) ON DELETE CASCADE,\n  FOREIGN KEY (currentStepId) REFERENCES workflow_steps(id) ON DELETE SET NULL,\n  INDEX idx_workflow_subscriber (workflowId, subscriberId),\n  INDEX idx_next_scheduled (nextScheduledAt),\n  INDEX idx_status (status)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 265
+}

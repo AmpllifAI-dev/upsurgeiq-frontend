@@ -1605,3 +1605,84 @@ export const campaignAbVariants = mysqlTable("campaign_ab_variants", {
 
 export type CampaignAbVariant = typeof campaignAbVariants.$inferSelect;
 export type InsertCampaignAbVariant = typeof campaignAbVariants.$inferInsert;
+
+// Email Campaign Analytics Events
+export const campaignEvents = mysqlTable("campaign_events", {
+  id: int("id").autoincrement().primaryKey(),
+  campaignId: int("campaignId").notNull().references(() => emailCampaigns.id, { onDelete: "cascade" }),
+  subscriberId: int("subscriberId").references(() => newsletterSubscribers.id, { onDelete: "set null" }),
+  eventType: mysqlEnum("eventType", ["sent", "delivered", "opened", "clicked", "bounced", "unsubscribed"]).notNull(),
+  eventData: json("eventData"), // Additional data like clicked URL, bounce reason, etc.
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CampaignEvent = typeof campaignEvents.$inferSelect;
+export type InsertCampaignEvent = typeof campaignEvents.$inferInsert;
+
+// Email Workflows (Drip Campaigns & Automation)
+export const emailWorkflows = mysqlTable("email_workflows", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  triggerType: mysqlEnum("triggerType", ["manual", "subscription", "time_delay", "subscriber_action", "date_based"]).notNull(),
+  triggerConfig: json("triggerConfig"), // Configuration for trigger (e.g., delay days, action type)
+  status: mysqlEnum("status", ["active", "paused", "draft"]).default("draft").notNull(),
+  isActive: int("isActive").default(0), // 1 = active, 0 = inactive
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EmailWorkflow = typeof emailWorkflows.$inferSelect;
+export type InsertEmailWorkflow = typeof emailWorkflows.$inferInsert;
+
+// Workflow Steps (Individual emails in a workflow)
+export const workflowSteps = mysqlTable("workflow_steps", {
+  id: int("id").autoincrement().primaryKey(),
+  workflowId: int("workflowId").notNull().references(() => emailWorkflows.id, { onDelete: "cascade" }),
+  stepOrder: int("stepOrder").notNull(), // Order of execution
+  name: varchar("name", { length: 255 }).notNull(),
+  subject: varchar("subject", { length: 255 }).notNull(),
+  emailTemplate: text("emailTemplate").notNull(),
+  delayDays: int("delayDays").default(0), // Days to wait before sending this step
+  delayHours: int("delayHours").default(0), // Additional hours to wait
+  condition: json("condition"), // Optional condition to check before sending
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type WorkflowStep = typeof workflowSteps.$inferSelect;
+export type InsertWorkflowStep = typeof workflowSteps.$inferInsert;
+
+// Workflow Enrollments (Track subscribers in workflows)
+export const workflowEnrollments = mysqlTable("workflow_enrollments", {
+  id: int("id").autoincrement().primaryKey(),
+  workflowId: int("workflowId").notNull().references(() => emailWorkflows.id, { onDelete: "cascade" }),
+  subscriberId: int("subscriberId").notNull().references(() => newsletterSubscribers.id, { onDelete: "cascade" }),
+  currentStepId: int("currentStepId").references(() => workflowSteps.id, { onDelete: "set null" }),
+  status: mysqlEnum("status", ["active", "completed", "paused", "cancelled"]).default("active").notNull(),
+  enrolledAt: timestamp("enrolledAt").defaultNow().notNull(),
+  completedAt: timestamp("completedAt"),
+  nextScheduledAt: timestamp("nextScheduledAt"), // When next step should be sent
+});
+
+export type WorkflowEnrollment = typeof workflowEnrollments.$inferSelect;
+export type InsertWorkflowEnrollment = typeof workflowEnrollments.$inferInsert;
+
+// Email Template Library
+export const emailTemplateLibrary = mysqlTable("email_template_library", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  category: varchar("category", { length: 100 }), // e.g., "newsletter", "promotional", "transactional"
+  thumbnailUrl: varchar("thumbnailUrl", { length: 500 }),
+  htmlContent: text("htmlContent").notNull(),
+  jsonStructure: json("jsonStructure"), // For drag-and-drop editor state
+  isPublic: int("isPublic").default(0), // 1 = available to all users, 0 = private
+  usageCount: int("usageCount").default(0), // Track how many times used
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EmailTemplateLibrary = typeof emailTemplateLibrary.$inferSelect;
+export type InsertEmailTemplateLibrary = typeof emailTemplateLibrary.$inferInsert;

@@ -1,8 +1,8 @@
 import { TRPCError } from "@trpc/server";
-import { sql, eq, and, isNotNull, gte } from "drizzle-orm";
+import { sql, eq, and, isNotNull, gte, desc } from "drizzle-orm";
 import { getDb } from "./db";
 import { generatePressReleaseImage, regenerateImage, getImageStylePresets } from "./pressReleaseImages";
-import { pressReleases, campaigns, journalists, users, creditUsage, creditAlertThresholds, creditAlertHistory, wordCountCredits, imageCredits, emailCampaigns } from "../drizzle/schema";
+import { pressReleases, campaigns, journalists, users, creditUsage, creditAlertThresholds, creditAlertHistory, wordCountCredits, imageCredits, emailCampaigns, campaignEvents, emailWorkflows, workflowSteps, workflowEnrollments, emailTemplateLibrary } from "../drizzle/schema";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { COOKIE_NAME } from "@shared/const";
 import { systemRouter } from "./_core/systemRouter";
@@ -5136,6 +5136,397 @@ Generate a comprehensive campaign strategy that includes:
         total: result.total,
       };
     }),
+
+  analytics: router({
+    getOverview: protectedProcedure
+      .input(z.object({ days: z.number().default(30) }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - input.days);
+
+        // Get event counts
+        const [sentEvents] = await db
+          .select({ count: sql<number>`count(*)` })
+          .from(campaignEvents)
+          .where(
+            and(
+              eq(campaignEvents.eventType, "sent"),
+              sql`${campaignEvents.createdAt} >= ${startDate}`
+            )
+          );
+
+        const [deliveredEvents] = await db
+          .select({ count: sql<number>`count(*)` })
+          .from(campaignEvents)
+          .where(
+            and(
+              eq(campaignEvents.eventType, "delivered"),
+              sql`${campaignEvents.createdAt} >= ${startDate}`
+            )
+          );
+
+        const [openedEvents] = await db
+          .select({ count: sql<number>`count(*)` })
+          .from(campaignEvents)
+          .where(
+            and(
+              eq(campaignEvents.eventType, "opened"),
+              sql`${campaignEvents.createdAt} >= ${startDate}`
+            )
+          );
+
+        const [clickedEvents] = await db
+          .select({ count: sql<number>`count(*)` })
+          .from(campaignEvents)
+          .where(
+            and(
+              eq(campaignEvents.eventType, "clicked"),
+              sql`${campaignEvents.createdAt} >= ${startDate}`
+            )
+          );
+
+        const [bouncedEvents] = await db
+          .select({ count: sql<number>`count(*)` })
+          .from(campaignEvents)
+          .where(
+            and(
+              eq(campaignEvents.eventType, "bounced"),
+              sql`${campaignEvents.createdAt} >= ${startDate}`
+            )
+          );
+
+        const [unsubscribedEvents] = await db
+          .select({ count: sql<number>`count(*)` })
+          .from(campaignEvents)
+          .where(
+            and(
+              eq(campaignEvents.eventType, "unsubscribed"),
+              sql`${campaignEvents.createdAt} >= ${startDate}`
+            )
+          );
+
+        const totalSent = Number(sentEvents?.count || 0);
+        const totalDelivered = Number(deliveredEvents?.count || 0);
+        const totalOpened = Number(openedEvents?.count || 0);
+        const totalClicked = Number(clickedEvents?.count || 0);
+        const totalBounced = Number(bouncedEvents?.count || 0);
+        const totalUnsubscribed = Number(unsubscribedEvents?.count || 0);
+
+        return {
+          totalSent,
+          totalDelivered,
+          totalOpened,
+          totalClicked,
+          totalBounced,
+          totalUnsubscribed,
+          openRate: totalDelivered > 0 ? (totalOpened / totalDelivered) * 100 : 0,
+          clickRate: totalDelivered > 0 ? (totalClicked / totalDelivered) * 100 : 0,
+          bounceRate: totalSent > 0 ? (totalBounced / totalSent) * 100 : 0,
+        };
+      }),
+
+    getCampaignPerformance: protectedProcedure
+      .input(
+        z.object({
+          campaignId: z.number().optional(),
+          days: z.number().default(30),
+        })
+      )
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - input.days);
+
+        // Build query conditions
+        const conditions = [sql`${emailCampaigns.createdAt} >= ${startDate}`];
+        if (input.campaignId) {
+          conditions.push(eq(emailCampaigns.id, input.campaignId));
+        }
+
+        // Get campaigns with their stats
+        const campaigns = await db
+          .select({
+            id: emailCampaigns.id,
+            name: emailCampaigns.name,
+            sent: emailCampaigns.recipientCount,
+            opened: emailCampaigns.openCount,
+            clicked: emailCampaigns.clickCount,
+            bounced: emailCampaigns.bounceCount,
+          })
+          .from(emailCampaigns)
+          .where(and(...conditions))
+          .orderBy(desc(emailCampaigns.createdAt));
+
+        return campaigns.map((campaign) => {
+          const sent = campaign.sent || 0;
+          const opened = campaign.opened || 0;
+          const clicked = campaign.clicked || 0;
+          const bounced = campaign.bounced || 0;
+          
+          return {
+            ...campaign,
+            sent,
+            opened,
+            clicked,
+            bounced,
+            delivered: sent - bounced,
+            openRate: sent > 0 ? (opened / sent) * 100 : 0,
+            clickRate: sent > 0 ? (clicked / sent) * 100 : 0,
+            bounceRate: sent > 0 ? (bounced / sent) * 100 : 0,
+          };
+        });
+      }),
+  }),
+
+  workflows: router({
+    list: protectedProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      const workflows = await db
+        .select({
+          id: emailWorkflows.id,
+          name: emailWorkflows.name,
+          description: emailWorkflows.description,
+          triggerType: emailWorkflows.triggerType,
+          status: emailWorkflows.status,
+          isActive: emailWorkflows.isActive,
+          createdAt: emailWorkflows.createdAt,
+        })
+        .from(emailWorkflows)
+        .orderBy(desc(emailWorkflows.createdAt));
+
+      // Get step and enrollment counts for each workflow
+      const workflowsWithCounts = await Promise.all(
+        workflows.map(async (workflow) => {
+          const [stepCount] = await db
+            .select({ count: sql<number>`count(*)` })
+            .from(workflowSteps)
+            .where(eq(workflowSteps.workflowId, workflow.id));
+
+          const [enrollmentCount] = await db
+            .select({ count: sql<number>`count(*)` })
+            .from(workflowEnrollments)
+            .where(eq(workflowEnrollments.workflowId, workflow.id));
+
+          return {
+            ...workflow,
+            stepCount: Number(stepCount?.count || 0),
+            enrollmentCount: Number(enrollmentCount?.count || 0),
+          };
+        })
+      );
+
+      return workflowsWithCounts;
+    }),
+
+    getDetails: protectedProcedure
+      .input(z.object({ workflowId: z.number() }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        const [workflow] = await db
+          .select()
+          .from(emailWorkflows)
+          .where(eq(emailWorkflows.id, input.workflowId))
+          .limit(1);
+
+        if (!workflow) throw new Error("Workflow not found");
+
+        const steps = await db
+          .select()
+          .from(workflowSteps)
+          .where(eq(workflowSteps.workflowId, input.workflowId))
+          .orderBy(workflowSteps.stepOrder);
+
+        return {
+          ...workflow,
+          steps,
+        };
+      }),
+
+    create: protectedProcedure
+      .input(
+        z.object({
+          name: z.string(),
+          description: z.string().optional(),
+          triggerType: z.enum(["manual", "subscription", "time_delay", "subscriber_action", "date_based"]),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        await db.insert(emailWorkflows).values({
+          name: input.name,
+          description: input.description,
+          triggerType: input.triggerType,
+          status: "draft",
+          isActive: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+
+        return { success: true };
+      }),
+
+    addStep: protectedProcedure
+      .input(
+        z.object({
+          workflowId: z.number(),
+          name: z.string(),
+          subject: z.string(),
+          emailTemplate: z.string(),
+          delayDays: z.number().default(0),
+          delayHours: z.number().default(0),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        // Get current step count to determine order
+        const [stepCount] = await db
+          .select({ count: sql<number>`count(*)` })
+          .from(workflowSteps)
+          .where(eq(workflowSteps.workflowId, input.workflowId));
+
+        const stepOrder = Number(stepCount?.count || 0) + 1;
+
+        await db.insert(workflowSteps).values({
+          workflowId: input.workflowId,
+          stepOrder,
+          name: input.name,
+          subject: input.subject,
+          emailTemplate: input.emailTemplate,
+          delayDays: input.delayDays,
+          delayHours: input.delayHours,
+          createdAt: new Date(),
+        });
+
+        return { success: true };
+      }),
+
+    toggle: protectedProcedure
+      .input(z.object({ workflowId: z.number() }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        const [workflow] = await db
+          .select()
+          .from(emailWorkflows)
+          .where(eq(emailWorkflows.id, input.workflowId))
+          .limit(1);
+
+        if (!workflow) throw new Error("Workflow not found");
+
+        const newIsActive = workflow.isActive === 1 ? 0 : 1;
+        const newStatus = newIsActive === 1 ? "active" : "paused";
+
+        await db
+          .update(emailWorkflows)
+          .set({ isActive: newIsActive, status: newStatus as any })
+          .where(eq(emailWorkflows.id, input.workflowId));
+
+        return { success: true, isActive: newIsActive === 1 };
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ workflowId: z.number() }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        await db.delete(emailWorkflows).where(eq(emailWorkflows.id, input.workflowId));
+
+        return { success: true };
+      }),
+  }),
+
+  templates: router({
+    list: protectedProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      const templates = await db
+        .select()
+        .from(emailTemplateLibrary)
+        .orderBy(desc(emailTemplateLibrary.createdAt));
+
+      return templates;
+    }),
+
+    create: protectedProcedure
+      .input(
+        z.object({
+          name: z.string(),
+          description: z.string().optional(),
+          category: z.string(),
+          htmlContent: z.string(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        await db.insert(emailTemplateLibrary).values({
+          name: input.name,
+          description: input.description,
+          category: input.category,
+          htmlContent: input.htmlContent,
+          usageCount: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+
+        return { success: true };
+      }),
+
+    duplicate: protectedProcedure
+      .input(z.object({ templateId: z.number() }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        const [template] = await db
+          .select()
+          .from(emailTemplateLibrary)
+          .where(eq(emailTemplateLibrary.id, input.templateId))
+          .limit(1);
+
+        if (!template) throw new Error("Template not found");
+
+        await db.insert(emailTemplateLibrary).values({
+          name: `${template.name} (Copy)`,
+          description: template.description,
+          category: template.category,
+          htmlContent: template.htmlContent,
+          usageCount: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+
+        return { success: true };
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ templateId: z.number() }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        await db.delete(emailTemplateLibrary).where(eq(emailTemplateLibrary.id, input.templateId));
+
+        return { success: true };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

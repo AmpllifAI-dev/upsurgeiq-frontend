@@ -75,6 +75,9 @@ import { CaseStudies } from "./pages/CaseStudies";
 import { NewsletterAdmin } from "./pages/NewsletterAdmin";
 import { AnalyticsDashboard } from "./pages/AnalyticsDashboard";
 import { EmailCampaigns } from "./pages/EmailCampaigns";
+import { EmailAnalytics } from "./pages/EmailAnalytics";
+import { EmailWorkflows } from "./pages/EmailWorkflows";
+import { EmailTemplateLibrary } from "./pages/EmailTemplateLibrary";
 import { SubscriberPreferences } from "./pages/SubscriberPreferences";
 
 function Router() {
@@ -151,6 +154,9 @@ function Router() {
         <Route path="/newsletter-admin" component={NewsletterAdmin} />
         <Route path="/analytics" component={AnalyticsDashboard} />
         <Route path="/email-campaigns" component={EmailCampaigns} />
+        <Route path="/email-analytics" component={EmailAnalytics} />
+        <Route path="/email-workflows" component={EmailWorkflows} />
+        <Route path="/email-template-library" component={EmailTemplateLibrary} />
         <Route path="/preferences" component={SubscriberPreferences} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

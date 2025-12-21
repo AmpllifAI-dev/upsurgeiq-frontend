@@ -2319,3 +2319,21 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 
 ## V2 Features (Future)
 - [ ] Add testimonials carousel on homepage with client quotes and logos
+
+## Email Admin Features (Dec 21, 2025 - Current Work)
+- [x] Email Analytics Dashboard
+- [x] Campaign performance metrics (open rate, CTR, bounce rate)
+- [x] Real-time engagement tracking
+- [x] Visual charts and graphs for analytics
+- [x] Campaign comparison and trends
+- [x] Automated Campaign Workflows
+- [x] Drip campaign builder
+- [x] Time-based triggers
+- [x] Action-based triggers (subscriber actions)
+- [x] Workflow templates (welcome series, re-engagement)
+- [x] Email Template Library
+- [x] Template categories and search
+- [x] Template preview and HTML editing
+- [x] Template duplication
+- [x] Template library management
+- [x] Write tests for all new features
