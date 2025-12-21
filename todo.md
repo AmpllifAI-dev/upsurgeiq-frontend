@@ -53,33 +53,33 @@
 - [ ] Add platform-specific social media post generation
 
 ## Social Media Distribution System
-- [ ] Create social media post composer
-- [ ] Implement scheduled posting functionality
-- [ ] Build channel-specific tone customization
-- [ ] Create social media calendar view
-- [ ] Implement post status tracking (draft/scheduled/published)
-- [ ] Build analytics dashboard for post performance
-- [ ] Add engagement metrics tracking
-- [ ] Create cross-platform campaign management (Scale tier)
+- [x] Create social media post composer
+- [x] Implement scheduled posting functionality
+- [x] Build channel-specific tone customization
+- [x] Create social media calendar view
+- [x] Implement post status tracking (draft/scheduled/published)
+- [x] Build analytics dashboard for post performance
+- [x] Add engagement metrics tracking
+- [x] Create cross-platform campaign management (Scale tier)
 
 ## Journalist Media List Management
-- [ ] Create default media lists by industry/region/geography
-- [ ] Build custom media list creation UI
-- [ ] Implement CSV upload for journalist contacts
-- [ ] Create AI verification system for contacts
-- [ ] Build GDPR-compliant opt-in email system
-- [ ] Implement email distribution for press releases
-- [ ] Create "Share & Earn" program (£0.10 per verified contact)
-- [ ] Add media list purchase flow (£4 per list per release)
+- [x] Create default media lists by industry/region/geography
+- [x] Build custom media list creation UI
+- [x] Implement CSV upload for journalist contacts
+- [x] Create AI verification system for contacts
+- [x] Build GDPR-compliant opt-in email system
+- [x] Implement email distribution for press releases
+- [x] Create "Share & Earn" program (£0.10 per verified contact)
+- [x] Add media list purchase flow (£4 per list per release)
 
 ## Conversational AI Assistant
-- [ ] Create text-based AI chat interface
-- [ ] Implement conversational content generation
-- [ ] Build real-time content refinement through conversation
-- [ ] Integrate Twilio for voice call-in feature (Pro/Scale)
-- [ ] Implement Whisper transcription for voice input
-- [ ] Create email delivery system for voice-drafted content
-- [ ] Add AI assistant access control by subscription tier
+- [x] Create text-based AI chat interface
+- [x] Implement conversational content generation
+- [x] Build real-time content refinement through conversation
+- [x] Integrate Twilio for voice call-in feature (Pro/Scale)
+- [x] Implement Whisper transcription for voice input
+- [x] Create email delivery system for voice-drafted content
+- [x] Add AI assistant access control by subscription tier
 
 ## Intelligent Campaign Lab
 - [x] Create campaign creation wizard
