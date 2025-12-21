@@ -2055,3 +2055,31 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
   - [x] Display days until limit reached
   - [x] Add confidence indicator for predictions
   - [x] Integrated into main Dashboard page
+
+## New Features - Calendar, Notifications & Onboarding (Dec 21, 2024)
+- [x] Calendar View for Scheduled Content
+  - [x] Create calendar component with month/week views (already exists)
+  - [x] Display scheduled press releases on calendar
+  - [x] Display scheduled social posts on calendar
+  - [x] Show event details on hover/click
+  - [x] Create dedicated calendar page route
+  - [ ] Add drag-and-drop rescheduling functionality (enhancement)
+  - [ ] Display scheduled campaigns on calendar (enhancement)
+-- [x] Notification Preferences Page
+  - [x] Create notification preferences schema in database (extended existing schema)
+  - [x] Add backend procedures for preferences CRUD (updated existing procedures)
+  - [x] Build preferences UI with toggle switches
+  - [x] Add customizable threshold settings (usage limits, advance notice)
+  - [x] Add weekly summary day selector
+  - [x] Create notification preferences routen settings
+  - [ ] Integrate with existing notification system
+- [x] Interactive Onboarding Tutorial Flow
+  - [x] Create tutorial step component with highlights (using react-joyride)
+  - [x] Add tutorial progress tracking (localStorage-based)
+  - [x] Build step-by-step walkthrough for press release creation
+  - [x] Add campaign setup tutorial steps
+  - [x] Include white-label configuration guide
+  - [x] Add skip/restart tutorial options
+  - [x] Show tutorial on first visit (localStorage check)
+  - [ ] Add "Help" menu to restart tutorial anytime (future enhancement)
+  - [ ] Integrate tours into actual pages with class name targets

@@ -439,13 +439,35 @@ export type InsertUsageTracking = typeof usageTracking.$inferInsert;
 // Notification Preferences
 export const notificationPreferences = mysqlTable("notification_preferences", {
   id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }).unique(),
   emailNotifications: int("emailNotifications").default(1).notNull(), // Boolean as int
   pressReleaseNotifications: int("pressReleaseNotifications").default(1).notNull(),
   campaignNotifications: int("campaignNotifications").default(1).notNull(),
   socialMediaNotifications: int("socialMediaNotifications").default(1).notNull(),
   weeklyDigest: int("weeklyDigest").default(1).notNull(),
   marketingEmails: int("marketingEmails").default(0).notNull(),
+  
+  // Usage limit notifications
+  usageLimitAlertsEnabled: int("usageLimitAlertsEnabled").default(1).notNull(),
+  usageLimitThreshold: int("usageLimitThreshold").default(80).notNull(), // Percentage (0-100)
+  
+  // Scheduled publish notifications
+  scheduledPublishAlertsEnabled: int("scheduledPublishAlertsEnabled").default(1).notNull(),
+  scheduledPublishAdvanceNotice: int("scheduledPublishAdvanceNotice").default(60).notNull(), // Minutes before publish
+  
+  // Campaign milestone notifications
+  campaignMilestoneAlertsEnabled: int("campaignMilestoneAlertsEnabled").default(1).notNull(),
+  
+  // Weekly summary reports
+  weeklySummaryEnabled: int("weeklySummaryEnabled").default(1).notNull(),
+  weeklySummaryDay: mysqlEnum("weeklySummaryDay", ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]).default("monday").notNull(),
+  
+  // Monthly analytics reports
+  monthlyAnalyticsEnabled: int("monthlyAnalyticsEnabled").default(1).notNull(),
+  
+  // Distribution success/failure notifications
+  distributionAlertsEnabled: int("distributionAlertsEnabled").default(1).notNull(),
+  
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -1185,3 +1207,4 @@ export const aiUsageLog = mysqlTable("ai_usage_log", {
 
 export type AiUsageLog = typeof aiUsageLog.$inferSelect;
 export type InsertAiUsageLog = typeof aiUsageLog.$inferInsert;
+

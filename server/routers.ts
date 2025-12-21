@@ -2508,7 +2508,7 @@ Generate a comprehensive campaign strategy that includes:
     get: protectedProcedure.query(async ({ ctx }) => {
       const preferences = await getNotificationPreferences(ctx.user.id);
       
-      // Return with boolean values
+      // Return with boolean values and defaults
       if (!preferences) {
         return {
           emailNotifications: true,
@@ -2517,6 +2517,15 @@ Generate a comprehensive campaign strategy that includes:
           socialMediaNotifications: true,
           weeklyDigest: true,
           marketingEmails: false,
+          usageLimitAlertsEnabled: true,
+          usageLimitThreshold: 80,
+          scheduledPublishAlertsEnabled: true,
+          scheduledPublishAdvanceNotice: 60,
+          campaignMilestoneAlertsEnabled: true,
+          weeklySummaryEnabled: true,
+          weeklySummaryDay: "monday" as const,
+          monthlyAnalyticsEnabled: true,
+          distributionAlertsEnabled: true,
         };
       }
 
@@ -2527,6 +2536,15 @@ Generate a comprehensive campaign strategy that includes:
         socialMediaNotifications: !!preferences.socialMediaNotifications,
         weeklyDigest: !!preferences.weeklyDigest,
         marketingEmails: !!preferences.marketingEmails,
+        usageLimitAlertsEnabled: !!preferences.usageLimitAlertsEnabled,
+        usageLimitThreshold: preferences.usageLimitThreshold || 80,
+        scheduledPublishAlertsEnabled: !!preferences.scheduledPublishAlertsEnabled,
+        scheduledPublishAdvanceNotice: preferences.scheduledPublishAdvanceNotice || 60,
+        campaignMilestoneAlertsEnabled: !!preferences.campaignMilestoneAlertsEnabled,
+        weeklySummaryEnabled: !!preferences.weeklySummaryEnabled,
+        weeklySummaryDay: preferences.weeklySummaryDay || "monday",
+        monthlyAnalyticsEnabled: !!preferences.monthlyAnalyticsEnabled,
+        distributionAlertsEnabled: !!preferences.distributionAlertsEnabled,
       };
     }),
 
@@ -2539,6 +2557,15 @@ Generate a comprehensive campaign strategy that includes:
           socialMediaNotifications: z.boolean().optional(),
           weeklyDigest: z.boolean().optional(),
           marketingEmails: z.boolean().optional(),
+          usageLimitAlertsEnabled: z.boolean().optional(),
+          usageLimitThreshold: z.number().min(50).max(100).optional(),
+          scheduledPublishAlertsEnabled: z.boolean().optional(),
+          scheduledPublishAdvanceNotice: z.number().min(15).max(1440).optional(),
+          campaignMilestoneAlertsEnabled: z.boolean().optional(),
+          weeklySummaryEnabled: z.boolean().optional(),
+          weeklySummaryDay: z.enum(["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]).optional(),
+          monthlyAnalyticsEnabled: z.boolean().optional(),
+          distributionAlertsEnabled: z.boolean().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
