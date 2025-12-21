@@ -5612,7 +5612,18 @@ Generate a comprehensive campaign strategy that includes:
       }))
       .mutation(async ({ ctx, input }) => {
         const { createIssue } = await import("./issueTracker");
-        return await createIssue({ userId: ctx.user.id, ...input });
+        const issue = await createIssue({ userId: ctx.user.id, ...input });
+        
+        // Send email notification for high-priority issues
+        if (input.priority === "high" || input.priority === "critical") {
+          const { notifyOwner } = await import("./_core/notification");
+          await notifyOwner({
+            title: `🚨 ${input.priority.toUpperCase()} Priority Issue: ${input.title}`,
+            content: `**Type:** ${input.type.replace("_", " ")}\n**Priority:** ${input.priority}\n**Reporter:** ${ctx.user.name} (${ctx.user.email})\n\n**Description:**\n${input.description}${input.pageUrl ? `\n\n**Page:** ${input.pageUrl}` : ""}${input.reproSteps ? `\n\n**Steps to Reproduce:**\n${input.reproSteps}` : ""}`,
+          });
+        }
+        
+        return issue;
       }),
 
     list: protectedProcedure
@@ -5654,6 +5665,32 @@ Generate a comprehensive campaign strategy that includes:
       .query(async () => {
         const { getIssueStats } = await import("./issueTracker");
         return await getIssueStats();
+      }),
+
+    addComment: protectedProcedure
+      .input(z.object({
+        issueId: z.number(),
+        comment: z.string().min(1),
+        isInternal: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { addIssueComment } = await import("./issueTracker");
+        return await addIssueComment({ userId: ctx.user.id, ...input });
+      }),
+
+    getComments: protectedProcedure
+      .input(z.object({ issueId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const { getIssueComments } = await import("./issueTracker");
+        const includeInternal = ctx.user.role === "admin";
+        return await getIssueComments(input.issueId, includeInternal);
+      }),
+
+    deleteComment: protectedProcedure
+      .input(z.object({ commentId: z.number() }))
+      .mutation(async ({ input }) => {
+        const { deleteIssueComment } = await import("./issueTracker");
+        return await deleteIssueComment(input.commentId);
       }),
   }),
 });

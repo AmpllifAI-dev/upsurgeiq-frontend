@@ -2364,3 +2364,17 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Spam complaint monitoring
 - [x] Sender reputation metrics
 - [x] Write tests for new features (core functionality verified)
+
+
+## Issue Tracker Enhancements
+- [x] Create issue comments database table
+- [x] Add backend helpers for comments (create, list, delete)
+- [x] Add tRPC procedures for comments
+- [x] Create IssueDetail page with full issue information
+- [x] Add comments section to IssueDetail page
+- [x] Implement status update functionality in detail view
+- [x] Add email notification system for high-priority issues
+- [x] Configure SendGrid integration for notifications
+- [x] Test issue detail view navigation
+- [x] Test comments creation and display
+- [x] Test email notifications for critical/high priority issues

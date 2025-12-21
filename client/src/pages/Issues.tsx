@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { IssueReportDialog } from "@/components/IssueReportDialog";
 import { formatDistanceToNow } from "date-fns";
 
 export default function Issues() {
+  const [, setLocation] = useLocation();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -101,7 +103,7 @@ export default function Issues() {
             ) : filteredIssues && filteredIssues.length > 0 ? (
               <div className="space-y-4">
                 {filteredIssues.map((issue) => (
-                  <div key={issue.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                  <div key={issue.id} onClick={() => setLocation(`/issues/${issue.id}`)} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors cursor-pointer">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 space-y-2">
                         <div className="flex items-center gap-2 flex-wrap">

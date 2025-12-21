@@ -110,6 +110,55 @@ export async function updateIssueStatus(
 }
 
 // Get issue statistics
+// Add comment to issue
+export async function addIssueComment(data: {
+  issueId: number;
+  userId: number;
+  comment: string;
+  isInternal?: boolean;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [comment] = await db.execute(
+    `INSERT INTO issue_comments (issueId, userId, comment, isInternal, createdAt, updatedAt) VALUES (?, ?, ?, ?, NOW(), NOW())`,
+    [data.issueId, data.userId, data.comment, data.isInternal || false]
+  );
+  
+  return comment;
+}
+
+// Get comments for an issue
+export async function getIssueComments(issueId: number, includeInternal: boolean = false) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  let query = `
+    SELECT c.*, u.name as userName, u.email as userEmail
+    FROM issue_comments c
+    JOIN users u ON c.userId = u.id
+    WHERE c.issueId = ?
+  `;
+  
+  if (!includeInternal) {
+    query += " AND c.isInternal = FALSE";
+  }
+  
+  query += " ORDER BY c.createdAt ASC";
+  
+  const [comments] = await db.execute(query, [issueId]);
+  return comments;
+}
+
+// Delete comment
+export async function deleteIssueComment(commentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.execute(`DELETE FROM issue_comments WHERE id = ?`, [commentId]);
+  return { success: true };
+}
+
 export async function getIssueStats() {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
