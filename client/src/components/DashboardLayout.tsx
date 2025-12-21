@@ -40,6 +40,7 @@ const menuItems = [
   { icon: Mail, label: "Media Lists", path: "/media-lists" },
   { icon: BarChart3, label: "Analytics", path: "/analytics" },
   { icon: Bug, label: "Issue Tracker", path: "/issues" },
+  { icon: BarChart3, label: "Issue Analytics", path: "/issue-analytics" },
   { icon: Sparkles, label: "AI Add-ons", path: "/dashboard/ai-addons" },
   { icon: Image, label: "Image Packs", path: "/dashboard/image-packs" },
   { icon: Link2, label: "Social Connections", path: "/dashboard/social-connections" },

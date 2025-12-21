@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Upload, X } from "lucide-react";
 
 interface IssueReportDialogProps {
   open: boolean;
@@ -28,6 +28,8 @@ export function IssueReportDialog({ open, onOpenChange, defaultType = "bug" }: I
     expectedBehavior: "",
     actualBehavior: "",
   });
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   const createIssueMutation = trpc.issues.create.useMutation({
     onSuccess: () => {
@@ -41,13 +43,47 @@ export function IssueReportDialog({ open, onOpenChange, defaultType = "bug" }: I
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    createIssueMutation.mutate({
-      ...formData,
-      browserInfo: navigator.userAgent,
-      pageUrl: window.location.href,
-    });
+    setUploading(true);
+    
+    try {
+      // Upload attachments if any
+      let screenshotUrl = "";
+      if (attachments.length > 0) {
+        const formData = new FormData();
+        attachments.forEach(file => formData.append('files', file));
+        
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          screenshotUrl = data.urls.join(',');
+        }
+      }
+      
+      createIssueMutation.mutate({
+        ...formData,
+        browserInfo: navigator.userAgent,
+        pageUrl: window.location.href,
+        screenshotUrl,
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+  
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setAttachments(Array.from(e.target.files));
+    }
+  };
+  
+  const removeAttachment = (index: number) => {
+    setAttachments(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -93,6 +129,29 @@ export function IssueReportDialog({ open, onOpenChange, defaultType = "bug" }: I
           <div className="space-y-2">
             <Label htmlFor="description">Description *</Label>
             <Textarea id="description" placeholder="Detailed information" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} required minLength={10} rows={4} />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="attachments">Attachments (Screenshots, Logs)</Label>
+            <div className="space-y-2">
+              <label htmlFor="file-upload" className="flex items-center justify-center w-full px-4 py-2 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                <Upload className="mr-2 h-4 w-4" />
+                <span className="text-sm">Click to upload files</span>
+                <input id="file-upload" type="file" multiple accept="image/*,.pdf,.txt,.log" onChange={handleFileChange} className="hidden" />
+              </label>
+              {attachments.length > 0 && (
+                <div className="space-y-1">
+                  {attachments.map((file, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 bg-muted rounded text-sm">
+                      <span className="truncate">{file.name}</span>
+                      <button type="button" onClick={() => removeAttachment(index)} className="ml-2 text-muted-foreground hover:text-foreground">
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {formData.type === "bug" && (

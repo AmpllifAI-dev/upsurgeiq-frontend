@@ -159,6 +159,71 @@ export async function deleteIssueComment(commentId: number) {
   return { success: true };
 }
 
+// Assign issue to team member
+export async function assignIssue(issueId: number, assignedTo: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const techIssues = await getTechIssuesTable();
+  
+  await db.update(techIssues).set({ assignedTo, updatedAt: new Date() }).where(eq(techIssues.id, issueId));
+  return await getIssueById(issueId);
+}
+
+// Get support team members
+export async function getSupportTeam() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [users] = await db.execute(
+    `SELECT id, name, email, support_role FROM users WHERE support_role != 'none' ORDER BY support_role, name`
+  );
+  
+  return users;
+}
+
+// Auto-assign issue based on type and priority
+export async function autoAssignIssue(issueId: number, issueType: string, priority: string) {
+  const team = await getSupportTeam();
+  if (!Array.isArray(team) || team.length === 0) return null;
+  
+  let targetRole: string[] = [];
+  
+  // Type-based routing
+  if (issueType === 'bug') {
+    // Technical bugs go to tech team
+    targetRole = priority === 'critical' || priority === 'high' 
+      ? ['tech_lead', 'admin'] 
+      : ['support_agent', 'tech_lead'];
+  } else if (issueType === 'feature_request') {
+    // Feature requests need strategic decisions - route to admin/product
+    targetRole = ['admin'];
+  } else if (issueType === 'improvement') {
+    // Improvements can be handled by support, escalate if high priority
+    targetRole = priority === 'critical' || priority === 'high'
+      ? ['tech_lead', 'admin']
+      : ['support_agent', 'tech_lead'];
+  } else if (issueType === 'question') {
+    // Questions go to first-line support
+    targetRole = ['support_agent', 'tech_lead'];
+  }
+  
+  // If no specific routing, use priority-based fallback
+  if (targetRole.length === 0) {
+    targetRole = priority === 'critical' || priority === 'high'
+      ? ['tech_lead', 'admin']
+      : ['support_agent'];
+  }
+  
+  const availableAgents = team.filter((u: any) => targetRole.includes(u.support_role));
+  if (availableAgents.length === 0) return null;
+  
+  // Round-robin assignment (simple load balancing)
+  const randomAgent = availableAgents[Math.floor(Math.random() * availableAgents.length)];
+  await assignIssue(issueId, randomAgent.id);
+  
+  return randomAgent;
+}
+
 export async function getIssueStats() {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

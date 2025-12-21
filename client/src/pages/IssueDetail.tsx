@@ -24,6 +24,7 @@ export default function IssueDetail() {
   
   const { data: issue, isLoading } = trpc.issues.getById.useQuery({ id: issueId });
   const { data: comments = [] } = trpc.issues.getComments.useQuery({ issueId });
+  const { data: supportTeam = [] } = trpc.issues.getSupportTeam.useQuery();
   
   const updateStatusMutation = trpc.issues.updateStatus.useMutation({
     onSuccess: () => {
@@ -33,6 +34,17 @@ export default function IssueDetail() {
     },
     onError: (error) => {
       toast({ title: "Failed to update status", description: error.message, variant: "destructive" });
+    },
+  });
+  
+  const assignIssueMutation = trpc.issues.assignIssue.useMutation({
+    onSuccess: () => {
+      toast({ title: "Issue assigned successfully" });
+      utils.issues.getById.invalidate({ id: issueId });
+      utils.issues.list.invalidate();
+    },
+    onError: (error) => {
+      toast({ title: "Failed to assign issue", description: error.message, variant: "destructive" });
     },
   });
   
@@ -61,6 +73,11 @@ export default function IssueDetail() {
   
   const handleStatusChange = (status: string) => {
     updateStatusMutation.mutate({ id: issueId, status: status as any });
+  };
+  
+  const handleAssignment = (assignedTo: string) => {
+    if (assignedTo === "unassigned") return;
+    assignIssueMutation.mutate({ issueId, assignedTo: parseInt(assignedTo) });
   };
   
   const getStatusBadge = (status: string) => {
@@ -167,6 +184,19 @@ export default function IssueDetail() {
                     <p className="text-sm text-muted-foreground">{issue.browserInfo}</p>
                   </div>
                 )}
+                
+                {issue.screenshotUrls && (
+                  <div>
+                    <h3 className="font-semibold mb-2">Attachments</h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      {issue.screenshotUrls.split(',').map((url: string, index: number) => (
+                        <a key={index} href={url} target="_blank" rel="noopener noreferrer" className="border rounded-lg overflow-hidden hover:opacity-80 transition-opacity">
+                          <img src={url} alt={`Attachment ${index + 1}`} className="w-full h-32 object-cover" onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Ctext x="50%" y="50%" text-anchor="middle" dy=".3em"%3EFile%3C/text%3E%3C/svg%3E'; }} />
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
             
@@ -222,6 +252,21 @@ export default function IssueDetail() {
                     </SelectContent>
                   </Select>
                 </div>
+                
+                {user?.role === "admin" && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Assign To</label>
+                    <Select value={issue.assignedTo?.toString() || "unassigned"} onValueChange={handleAssignment} disabled={assignIssueMutation.isPending}>
+                      <SelectTrigger><SelectValue placeholder="Unassigned" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="unassigned">Unassigned</SelectItem>
+                        {Array.isArray(supportTeam) && supportTeam.map((member: any) => (
+                          <SelectItem key={member.id} value={member.id.toString()}>{member.name} ({member.support_role})</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </CardContent>
             </Card>
             

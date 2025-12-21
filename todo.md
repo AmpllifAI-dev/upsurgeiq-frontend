@@ -2378,3 +2378,39 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Test issue detail view navigation
 - [x] Test comments creation and display
 - [x] Test email notifications for critical/high priority issues
+
+
+## Tiered Support System
+- [ ] Add file upload support to issue creation dialog
+- [ ] Store attachment URLs in tech_issues table
+- [ ] Display attachments in issue detail view
+- [ ] Add team member roles (support_agent, tech_lead, admin)
+- [ ] Create issue assignment functionality
+- [ ] Implement auto-routing rules by issue type and priority
+- [ ] Build analytics dashboard with issue metrics
+- [ ] Add resolution time tracking
+- [ ] Create issue trend visualizations
+- [ ] Implement auto-triage logic for intelligent routing
+- [ ] Add escalation workflow for unresolved issues
+- [ ] Test complete support workflow from creation to resolution
+
+
+## Enhanced Issue Routing Strategy
+- [x] Bugs (technical) → Tech Lead or Support Agents based on priority
+- [x] Feature Requests → Admin only (strategic product decisions)
+- [x] Improvements → Support Agents (low/medium) or Tech Lead/Admin (high/critical)
+- [x] Questions → Support Agents (first-line support)
+- [x] Critical/High Priority → Always escalate to senior roles
+
+
+## Autonomous Agent Workflow
+- [x] Create analytics dashboard page with charts
+- [x] Add resolution time tracking
+- [x] Show issue trends by type and priority
+- [x] Display team performance metrics (when applicable)
+- [x] Build autonomous agent investigation system
+- [x] Implement auto-fix analysis for issues
+- [x] Add agent comment posting to issues
+- [x] Create escalation logic for complex issues
+- [x] Integrate owner notifications for escalations only
+- [x] Trigger autonomous workflow on issue creation

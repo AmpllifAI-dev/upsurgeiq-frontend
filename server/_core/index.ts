@@ -58,6 +58,10 @@ async function startServer() {
   // Social media OAuth routes
   const oauthRoutes = (await import("../oauthRoutes")).default;
   app.use("/api/oauth", oauthRoutes);
+  
+  // File upload route
+  const uploadRouter = (await import("../upload")).default;
+  app.use(uploadRouter);
   // tRPC API
   app.use(
     "/api/trpc",

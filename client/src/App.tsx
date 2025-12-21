@@ -50,6 +50,7 @@ import AdminCreditManagement from "./pages/AdminCreditManagement";
 import Purchases from "./pages/Purchases";
 import Issues from "./pages/Issues";
 import IssueDetail from "./pages/IssueDetail";
+import IssueAnalytics from "./pages/IssueAnalytics";
 import PurchaseSuccess from "./pages/PurchaseSuccess";
 import PurchaseCancel from "./pages/PurchaseCancel";
 import SportsTeams from "./pages/SportsTeams";
@@ -121,6 +122,7 @@ function Router() {
       <Route path="/error-logs" component={ErrorLogs} />
       <Route path="/issues" component={Issues} />
       <Route path="/issues/:id" component={IssueDetail} />
+      <Route path="/issue-analytics" component={IssueAnalytics} />
       <Route path="/analytics" component={Analytics} />
       <Route path="/profile" component={Profile} />
       <Route path="/content-calendar" component={ContentCalendar} />

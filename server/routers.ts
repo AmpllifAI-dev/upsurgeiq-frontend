@@ -5609,13 +5609,51 @@ Generate a comprehensive campaign strategy that includes:
         reproSteps: z.string().optional(),
         expectedBehavior: z.string().optional(),
         actualBehavior: z.string().optional(),
+        screenshotUrl: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const { createIssue } = await import("./issueTracker");
+        const { createIssue, autoAssignIssue } = await import("./issueTracker");
         const issue = await createIssue({ userId: ctx.user.id, ...input });
         
-        // Send email notification for high-priority issues
-        if (input.priority === "high" || input.priority === "critical") {
+        // Auto-assign to team member
+        const assignedAgent = await autoAssignIssue(issue.id || 0, input.type, input.priority || "medium");
+        
+        // Trigger autonomous investigation in background
+        if (issue.id) {
+          const { investigateIssue, attemptAutoFix } = await import("./autonomousAgent");
+          setImmediate(async () => {
+            try {
+              const analysis = await investigateIssue({
+                id: issue.id!,
+                title: input.title,
+                description: input.description,
+                issueType: input.type,
+                priority: input.priority || "medium",
+                pageUrl: input.pageUrl,
+                browserInfo: input.browserInfo,
+                stepsToReproduce: input.reproSteps,
+                expectedBehavior: input.expectedBehavior,
+                actualBehavior: input.actualBehavior,
+                screenshotUrls: input.screenshotUrl,
+              });
+              
+              if (analysis?.autoFixable) {
+                await attemptAutoFix({
+                  id: issue.id!,
+                  title: input.title,
+                  description: input.description,
+                  issueType: input.type,
+                  priority: input.priority || "medium",
+                }, analysis);
+              }
+            } catch (error) {
+              console.error("Autonomous investigation error:", error);
+            }
+          });
+        }
+        
+        // Send email notification for high-priority issues (only if not assigned to team)
+        if ((input.priority === "high" || input.priority === "critical") && !assignedAgent) {
           const { notifyOwner } = await import("./_core/notification");
           await notifyOwner({
             title: `🚨 ${input.priority.toUpperCase()} Priority Issue: ${input.title}`,
@@ -5691,6 +5729,19 @@ Generate a comprehensive campaign strategy that includes:
       .mutation(async ({ input }) => {
         const { deleteIssueComment } = await import("./issueTracker");
         return await deleteIssueComment(input.commentId);
+      }),
+
+    assignIssue: protectedProcedure
+      .input(z.object({ issueId: z.number(), assignedTo: z.number() }))
+      .mutation(async ({ input }) => {
+        const { assignIssue } = await import("./issueTracker");
+        return await assignIssue(input.issueId, input.assignedTo);
+      }),
+
+    getSupportTeam: protectedProcedure
+      .query(async () => {
+        const { getSupportTeam } = await import("./issueTracker");
+        return await getSupportTeam();
       }),
   }),
 });
