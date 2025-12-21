@@ -71,6 +71,8 @@ import BlogPost from "./pages/BlogPost";
 import PricingCalculator from "./pages/PricingCalculator";
 import Testimonials from "./pages/Testimonials";
 import FAQ from "./pages/FAQ";
+import { CaseStudies } from "./pages/CaseStudies";
+import { NewsletterAdmin } from "./pages/NewsletterAdmin";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -142,6 +144,8 @@ function Router() {
       <Route path="/testimonials" component={Testimonials} />
       <Route path="/faq" component={FAQ} />
       <Route path="/resources" component={Resources} />
+      <Route path="/case-studies" component={CaseStudies} />
+      <Route path="/newsletter-admin" component={NewsletterAdmin} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

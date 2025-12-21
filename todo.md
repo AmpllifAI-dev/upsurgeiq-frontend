@@ -2206,3 +2206,39 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Update Resources page with download links
 - [x] Configure WordPress permalinks to use trailing slash format
 - [x] Add featured images to all 4 blog posts in WordPress
+
+
+## Content Enhancement (Dec 21, 2025)
+- [ ] Add blog post categories in WordPress (PR Strategy, Marketing, Best Practices, AI & Technology)
+- [ ] Add relevant tags to all 4 blog posts
+- [ ] Create Case Studies page with client success stories
+- [ ] Design case study cards with metrics and testimonials
+- [ ] Add navigation link to Case Studies page
+
+
+## Newsletter System (Dec 21, 2025)
+- [x] Create database schema for newsletter subscribe- [x] Build newsletter subscription form componentources page
+-- [x] Create tRPC procedures for newsletter managementt
+- [x] Build admin dashboard for subscriber management
+- [ ] Implement email campaign functionality with SendGrid (Future enhancement)
+- [x] Add unsubscribe functionality
+- [x] Write tests for newsletter system
+
+
+## British English Conversion (Dec 21, 2025)
+- [x] Convert Case Studies page to British English
+- [x] Convert Resources page to British English
+- [x] Convert Home page to British English
+- [x] Convert About page to British English
+- [ ] Convert all other marketing pages to British English
+- [ ] Update WordPress blog posts to British English
+- [ ] Review and update all UI text for British English
+
+
+## IMPORTANT: British English Standard
+**ALL future content must use British English spelling and terminology:**
+- Use -ise not -ize (organise, optimise, specialise)
+- Use -our not -or (colour, favour, behaviour)
+- Use -re not -er (centre, theatre)
+- Use -ogue not -og (catalogue, dialogue)
+- This applies to ALL AI-generated content, press releases, social media posts, emails, and UI text

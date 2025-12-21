@@ -4900,6 +4900,50 @@ Generate a comprehensive campaign strategy that includes:
         return { success: true };
       }),
   }),
+
+  newsletter: router({ subscribe: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+        source: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { subscribeToNewsletter } = await import("./newsletter");
+        return await subscribeToNewsletter(input.email, input.source);
+      }),
+
+    unsubscribe: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+      }))
+      .mutation(async ({ input }) => {
+        const { unsubscribeFromNewsletter } = await import("./newsletter");
+        return await unsubscribeFromNewsletter(input.email);
+      }),
+
+    getAll: protectedProcedure
+      .input(z.object({
+        status: z.enum(["active", "unsubscribed"]).optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const { getAllSubscribers } = await import("./newsletter");
+        return await getAllSubscribers(input?.status);
+      }),
+
+    getStats: protectedProcedure
+      .query(async () => {
+        const { getSubscriberStats } = await import("./newsletter");
+        return await getSubscriberStats();
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        const { deleteSubscriber } = await import("./newsletter");
+        return await deleteSubscriber(input.id);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

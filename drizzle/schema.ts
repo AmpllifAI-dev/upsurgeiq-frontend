@@ -1404,3 +1404,40 @@ export const emailCaptures = mysqlTable("email_captures", {
 
 export type EmailCapture = typeof emailCaptures.$inferSelect;
 export type InsertEmailCapture = typeof emailCaptures.$inferInsert;
+
+
+// Newsletter Subscribers
+export const newsletterSubscribers = mysqlTable("newsletter_subscribers", {
+  id: int("id").autoincrement().primaryKey(),
+  email: varchar("email", { length: 320 }).notNull().unique(),
+  name: varchar("name", { length: 255 }),
+  source: varchar("source", { length: 100 }).default("resources_page"), // Where they subscribed from
+  status: mysqlEnum("status", ["active", "unsubscribed"]).default("active").notNull(),
+  subscribedAt: timestamp("subscribedAt").defaultNow().notNull(),
+  unsubscribedAt: timestamp("unsubscribedAt"),
+  tags: text("tags"), // JSON array of tags for segmentation
+});
+
+export type NewsletterSubscriber = typeof newsletterSubscribers.$inferSelect;
+export type InsertNewsletterSubscriber = typeof newsletterSubscribers.$inferInsert;
+
+// Newsletter Campaigns
+export const newsletterCampaigns = mysqlTable("newsletter_campaigns", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  subject: varchar("subject", { length: 500 }).notNull(),
+  content: text("content").notNull(), // HTML content
+  status: mysqlEnum("status", ["draft", "scheduled", "sending", "sent"]).default("draft").notNull(),
+  scheduledFor: timestamp("scheduledFor"),
+  sentAt: timestamp("sentAt"),
+  totalRecipients: int("totalRecipients").default(0),
+  successfulSends: int("successfulSends").default(0),
+  failedSends: int("failedSends").default(0),
+  opens: int("opens").default(0),
+  clicks: int("clicks").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type NewsletterCampaign = typeof newsletterCampaigns.$inferSelect;
+export type InsertNewsletterCampaign = typeof newsletterCampaigns.$inferInsert;

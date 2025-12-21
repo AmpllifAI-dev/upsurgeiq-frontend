@@ -21,23 +21,23 @@ export default function About() {
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm">
-        <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between py-4 gap-4">
-          <a href="/" className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
-            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
+        <div className="container mx-auto flex flex-col sm:flex-row items-centre justify-between py-4 gap-4">
+          <a href="/" className="flex items-centre gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+            <div className="flex items-centre justify-centre w-10 h-10 rounded-lg bg-primary">
               <Zap className="w-6 h-6 text-primary-foreground" />
             </div>
             <span className="text-2xl font-bold text-foreground">UpsurgeIQ</span>
           </a>
-          <div className="flex items-center gap-4">
+          <div className="flex items-centre gap-4">
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-6">
-              <a href="/#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            <div className="hidden md:flex items-centre gap-6">
+              <a href="/#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colours">
                 Features
               </a>
-              <a href="/#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              <a href="/#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colours">
                 Pricing
               </a>
-              <a href="/about" className="text-sm font-medium text-foreground transition-colors">
+              <a href="/about" className="text-sm font-medium text-foreground transition-colours">
                 About
               </a>
             </div>
@@ -68,21 +68,21 @@ export default function About() {
             <div className="space-y-3">
               <a
                 href="/#features"
-                className="block text-sm font-medium text-foreground hover:text-primary transition-colors"
+                className="block text-sm font-medium text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Features
               </a>
               <a
                 href="/#pricing"
-                className="block text-sm font-medium text-foreground hover:text-primary transition-colors"
+                className="block text-sm font-medium text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Pricing
               </a>
               <a
                 href="/about"
-                className="block text-sm font-medium text-primary transition-colors"
+                className="block text-sm font-medium text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 About
@@ -94,21 +94,21 @@ export default function About() {
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Product</h3>
               <a
                 href="/#features"
-                className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block text-sm text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Features
               </a>
               <a
                 href="/#pricing"
-                className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block text-sm text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Pricing
               </a>
               <a
                 href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block text-sm text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Integrations
@@ -120,28 +120,28 @@ export default function About() {
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Company</h3>
               <a
                 href="/about"
-                className="block text-sm text-primary transition-colors"
+                className="block text-sm text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 About
               </a>
               <a
                 href="/contact"
-                className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block text-sm text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Contact
               </a>
               <a
                 href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block text-sm text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Blog
               </a>
               <a
                 href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block text-sm text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Careers
@@ -153,21 +153,21 @@ export default function About() {
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Legal</h3>
               <a
                 href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block text-sm text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Privacy
               </a>
               <a
                 href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block text-sm text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Terms
               </a>
               <a
                 href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block text-sm text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Security
@@ -186,7 +186,7 @@ export default function About() {
 
       <div className="container mx-auto py-16 space-y-20">
         {/* Hero Section */}
-        <div className="text-center space-y-6 max-w-3xl mx-auto">
+        <div className="text-centre space-y-6 max-w-3xl mx-auto">
           <Badge variant="secondary" className="w-fit mx-auto">
             About UpsurgeIQ
           </Badge>
@@ -205,7 +205,7 @@ export default function About() {
             <CardContent className="p-0">
               <div className="grid md:grid-cols-2 gap-0">
                 {/* Founder Photo */}
-                <div className="bg-gradient-to-br from-primary/20 to-secondary/20 p-12 flex items-center justify-center min-h-[400px]">
+                <div className="bg-gradient-to-br from-primary/20 to-secondary/20 p-12 flex items-centre justify-centre min-h-[400px]">
                   <img 
                     src="/christopher-lembke.jpg" 
                     alt="Christopher Lembke, Founder & CEO of UpsurgeIQ"
@@ -230,7 +230,7 @@ export default function About() {
                     <p>
                       My background is in pattern recognition and systems thinking. As the founder of The Alchemy Experience, I developed 
                       a methodology I call Fractal Analysis—identifying hidden patterns and leverage points that create multiplying effects 
-                      throughout organizations. I've helped a boutique letting agency become a national leader without expanding headcount, 
+                      throughout organisations. I've helped a boutique letting agency become a national leader without expanding headcount, 
                       enabled a company to achieve 1000% revenue growth in under a decade, and rescued businesses from the brink of collapse.
                     </p>
                     <p>
@@ -259,7 +259,7 @@ export default function About() {
 
         {/* Mission & Values */}
         <div className="max-w-5xl mx-auto space-y-12">
-          <div className="text-center space-y-4">
+          <div className="text-centre space-y-4">
             <h2 className="text-3xl font-bold text-foreground">Our Mission & Values</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               We're guided by principles that put your success first
@@ -269,7 +269,7 @@ export default function About() {
           <div className="grid md:grid-cols-3 gap-8">
             <Card>
               <CardContent className="pt-6 space-y-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-centre justify-centre">
                   <Award className="w-6 h-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-bold text-foreground">Quality First</h3>
@@ -282,7 +282,7 @@ export default function About() {
 
             <Card>
               <CardContent className="pt-6 space-y-4">
-                <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-centre justify-centre">
                   <Target className="w-6 h-6 text-secondary" />
                 </div>
                 <h3 className="text-xl font-bold text-foreground">Your Success</h3>
@@ -295,7 +295,7 @@ export default function About() {
 
             <Card>
               <CardContent className="pt-6 space-y-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-centre justify-centre">
                   <Sparkles className="w-6 h-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-bold text-foreground">Innovation</h3>
@@ -309,12 +309,12 @@ export default function About() {
         </div>
 
         {/* CTA Section */}
-        <div className="text-center space-y-6 max-w-2xl mx-auto py-12">
+        <div className="text-centre space-y-6 max-w-2xl mx-auto py-12">
           <h2 className="text-3xl font-bold text-foreground">Ready to Amplify Your Brand?</h2>
           <p className="text-lg text-muted-foreground">
             Join hundreds of businesses using UpsurgeIQ to scale their PR and marketing efforts with confidence.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-centre">
             <Button onClick={() => setLocation("/subscribe")} size="lg" variant="default">
               Start Free Trial
             </Button>
@@ -332,38 +332,38 @@ export default function About() {
             <div>
               <h3 className="font-semibold text-foreground mb-4">Product</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/#features" className="hover:text-foreground transition-colors">Features</a></li>
-                <li><a href="/#pricing" className="hover:text-foreground transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Integrations</a></li>
+                <li><a href="/#features" className="hover:text-foreground transition-colours">Features</a></li>
+                <li><a href="/#pricing" className="hover:text-foreground transition-colours">Pricing</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colours">Integrations</a></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold text-foreground mb-4">Company</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/about" className="hover:text-foreground transition-colors">About</a></li>
-                <li><a href="/contact" className="hover:text-foreground transition-colors">Contact</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Careers</a></li>
+                <li><a href="/about" className="hover:text-foreground transition-colours">About</a></li>
+                <li><a href="/contact" className="hover:text-foreground transition-colours">Contact</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colours">Blog</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colours">Careers</a></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold text-foreground mb-4">Legal</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Terms</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Security</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colours">Privacy</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colours">Terms</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colours">Security</a></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold text-foreground mb-4">Support</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/contact" className="hover:text-foreground transition-colors">Contact Us</a></li>
-                <li><a href="/status" className="hover:text-foreground transition-colors">Status</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Documentation</a></li>
+                <li><a href="/contact" className="hover:text-foreground transition-colours">Contact Us</a></li>
+                <li><a href="/status" className="hover:text-foreground transition-colours">Status</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colours">Documentation</a></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
+          <div className="border-t border-border mt-8 pt-8 text-centre text-sm text-muted-foreground">
             <p>&copy; {new Date().getFullYear()} UpsurgeIQ. All rights reserved.</p>
           </div>
         </div>

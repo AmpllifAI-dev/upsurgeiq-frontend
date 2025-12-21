@@ -145,20 +145,20 @@ export default function Home() {
       />
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between py-4 gap-4">
-          <a href="/" className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
-            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
+        <div className="container mx-auto flex flex-col sm:flex-row items-centre justify-between py-4 gap-4">
+          <a href="/" className="flex items-centre gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+            <div className="flex items-centre justify-centre w-10 h-10 rounded-lg bg-primary">
               <Zap className="w-6 h-6 text-primary-foreground" />
             </div>
             <span className="text-2xl font-bold text-foreground">UpsurgeIQ</span>
           </a>
-          <div className="flex items-center gap-4">
+          <div className="flex items-centre gap-4">
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-6">
-              <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            <div className="hidden md:flex items-centre gap-6">
+              <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colours">
                 Features
               </a>
-              <a href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              <a href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colours">
                 Pricing
               </a>
             </div>
@@ -195,14 +195,14 @@ export default function Home() {
             <div className="space-y-3">
               <a
                 href="#features"
-                className="block text-sm font-medium text-foreground hover:text-primary transition-colors"
+                className="block text-sm font-medium text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Features
               </a>
               <a
                 href="#pricing"
-                className="block text-sm font-medium text-foreground hover:text-primary transition-colors"
+                className="block text-sm font-medium text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Pricing
@@ -214,21 +214,21 @@ export default function Home() {
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Product</h3>
               <a
                 href="#features"
-                className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block text-sm text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Features
               </a>
               <a
                 href="#pricing"
-                className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block text-sm text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Pricing
               </a>
               <a
                 href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block text-sm text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Integrations
@@ -240,21 +240,21 @@ export default function Home() {
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Company</h3>
               <a
                 href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block text-sm text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 About
               </a>
               <a
                 href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block text-sm text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Blog
               </a>
               <a
                 href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block text-sm text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Careers
@@ -266,21 +266,21 @@ export default function Home() {
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Legal</h3>
               <a
                 href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block text-sm text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Privacy
               </a>
               <a
                 href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block text-sm text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Terms
               </a>
               <a
                 href="#"
-                className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block text-sm text-foreground hover:text-primary transition-colours"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Security
@@ -305,7 +305,7 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="container mx-auto py-24 lg:py-32">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-centre">
           <div className="space-y-8">
             <Badge variant="secondary" className="w-fit text-sm px-4 py-1.5">
               Intelligence That Drives Growth
@@ -322,20 +322,20 @@ export default function Home() {
                 Start Free Trial
                 <Sparkles className="ml-2 w-5 h-5" />
               </Button>
-              <Button size="lg" variant="outline" onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })}>
+              <Button size="lg" variant="outline" onClick={() => document.getElementById("features")?.scrollIntoView({ behaviour: "smooth" })}>
                 Learn More
               </Button>
             </div>
-            <div className="flex items-center gap-8 pt-4">
-              <div className="text-center">
+            <div className="flex items-centre gap-8 pt-4">
+              <div className="text-centre">
                 <div className="text-3xl font-bold text-foreground">2x</div>
                 <div className="text-sm text-muted-foreground">Faster Content</div>
               </div>
-              <div className="text-center">
+              <div className="text-centre">
                 <div className="text-3xl font-bold text-foreground">4+</div>
                 <div className="text-sm text-muted-foreground">Platforms</div>
               </div>
-              <div className="text-center">
+              <div className="text-centre">
                 <div className="text-3xl font-bold text-foreground">95%</div>
                 <div className="text-sm text-muted-foreground">Cost Savings</div>
               </div>
@@ -357,7 +357,7 @@ export default function Home() {
       {/* Features Section */}
       <section id="features" className="py-24 bg-muted/30">
         <div className="container mx-auto">
-          <div className="text-center space-y-4 mb-16">
+          <div className="text-centre space-y-4 mb-16">
             <Badge variant="secondary" className="w-fit mx-auto">
               Features
             </Badge>
@@ -372,9 +372,9 @@ export default function Home() {
           {/* Feature Cards with Images */}
           <div className="space-y-24">
             {features.map((feature, index) => (
-              <div key={index} className={`grid lg:grid-cols-2 gap-12 items-center ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
+              <div key={index} className={`grid lg:grid-cols-2 gap-12 items-centre ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
                 <div className={`space-y-6 ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
-                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-centre justify-centre">
                     <feature.icon className="w-7 h-7 text-primary" />
                   </div>
                   <h3 className="text-3xl font-bold text-foreground">{feature.title}</h3>
@@ -409,7 +409,7 @@ export default function Home() {
       {/* Pricing Section */}
       <section id="pricing" className="py-24">
         <div className="container mx-auto">
-          <div className="text-center space-y-4 mb-16">
+          <div className="text-centre space-y-4 mb-16">
             <Badge variant="secondary" className="w-fit mx-auto">
               Pricing
             </Badge>
@@ -435,7 +435,7 @@ export default function Home() {
                     <Badge className="bg-secondary text-secondary-foreground">Most Popular</Badge>
                   </div>
                 )}
-                <CardHeader className="text-center pb-8">
+                <CardHeader className="text-centre pb-8">
                   <CardTitle className="text-2xl mb-2">{tier.name}</CardTitle>
                   <CardDescription className="text-sm">{tier.description}</CardDescription>
                   <div className="mt-6">
@@ -452,7 +452,7 @@ export default function Home() {
                       return (
                         <div 
                           key={featureIndex} 
-                          className={`flex items-start gap-3 ${isClickable ? 'cursor-pointer hover:bg-muted/50 -mx-2 px-2 py-1 rounded-md transition-colors' : ''}`}
+                          className={`flex items-start gap-3 ${isClickable ? 'cursor-pointer hover:bg-muted/50 -mx-2 px-2 py-1 rounded-md transition-colours' : ''}`}
                           onClick={() => isClickable && setActiveModal(featureKey)}
                         >
                           <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
@@ -464,7 +464,7 @@ export default function Home() {
                   </div>
                   {tier.addOns && tier.addOns.length > 0 && (
                     <div className="pt-4 border-t border-border space-y-3">
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-centre gap-2 mb-2">
                         <Badge variant="outline" className="text-xs">Optional Add-ons</Badge>
                       </div>
                       {tier.addOns.map((addOn, addOnIndex) => {
@@ -474,7 +474,7 @@ export default function Home() {
                         return (
                           <div 
                             key={addOnIndex} 
-                            className={`flex items-start gap-3 ${isClickable ? 'cursor-pointer hover:bg-muted/50 -mx-2 px-2 py-1 rounded-md transition-colors' : ''}`}
+                            className={`flex items-start gap-3 ${isClickable ? 'cursor-pointer hover:bg-muted/50 -mx-2 px-2 py-1 rounded-md transition-colours' : ''}`}
                             onClick={() => isClickable && setActiveModal(`addon_${addOnKey}`)}
                           >
                             <span className="text-xs text-muted-foreground">•</span>
@@ -502,11 +502,11 @@ export default function Home() {
           {/* White Label Section */}
           <div className="mt-16 max-w-4xl mx-auto">
             <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5">
-              <CardHeader className="text-center pb-6">
+              <CardHeader className="text-centre pb-6">
                 <Badge variant="secondary" className="w-fit mx-auto mb-4">For Organizations</Badge>
                 <CardTitle className="text-3xl">White Label Solution</CardTitle>
                 <CardDescription className="text-base mt-2">
-                  Standalone product for agencies and organizations. Offer upsurgeIQ under your own brand.
+                  Standalone product for agencies and organisations. Offer upsurgeIQ under your own brand.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -559,8 +559,8 @@ export default function Home() {
                 <Button className="w-full" size="lg" onClick={() => window.location.href = 'mailto:partners@upsurgeiq.com?subject=White Label Inquiry'}>
                   Contact Sales
                 </Button>
-                <p className="text-xs text-center text-muted-foreground">
-                  Perfect for agencies, consultancies, and organizations serving multiple clients
+                <p className="text-xs text-centre text-muted-foreground">
+                  Perfect for agencies, consultancies, and organisations serving multiple clients
                 </p>
               </CardFooter>
             </Card>
@@ -570,7 +570,7 @@ export default function Home() {
 
       {/* CTA Section */}
       <section className="py-24 bg-primary text-primary-foreground">
-        <div className="container mx-auto text-center space-y-8">
+        <div className="container mx-auto text-centre space-y-8">
           <h2 className="text-4xl lg:text-5xl font-bold">
             Ready to Amplify Your Brand?
           </h2>
@@ -589,8 +589,8 @@ export default function Home() {
         <div className="container mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary">
+              <div className="flex items-centre gap-2">
+                <div className="flex items-centre justify-centre w-8 h-8 rounded-lg bg-primary">
                   <Zap className="w-5 h-5 text-primary-foreground" />
                 </div>
                 <span className="text-lg font-bold">UpsurgeIQ</span>
@@ -602,29 +602,29 @@ export default function Home() {
             <div>
               <h3 className="font-semibold mb-4">Product</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#features" className="hover:text-foreground transition-colors">Features</a></li>
-                <li><a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Integrations</a></li>
+                <li><a href="#features" className="hover:text-foreground transition-colours">Features</a></li>
+                <li><a href="#pricing" className="hover:text-foreground transition-colours">Pricing</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colours">Integrations</a></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Company</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Careers</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colours">About</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colours">Blog</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colours">Careers</a></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Legal</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Terms</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Security</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colours">Privacy</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colours">Terms</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colours">Security</a></li>
               </ul>
             </div>
           </div>
-          <div className="mt-12 pt-8 border-t border-border text-center text-sm text-muted-foreground">
+          <div className="mt-12 pt-8 border-t border-border text-centre text-sm text-muted-foreground">
             © 2025 UpsurgeIQ. All rights reserved.
           </div>
         </div>
@@ -697,7 +697,7 @@ export default function Home() {
                     ))}
                   </ul>
                 </div>
-                <div className="flex items-center justify-between pt-4 border-t">
+                <div className="flex items-centre justify-between pt-4 border-t">
                   <div>
                     <p className="text-sm text-muted-foreground">Pricing</p>
                     <p className="text-2xl font-bold text-foreground">{addOn.pricing}</p>

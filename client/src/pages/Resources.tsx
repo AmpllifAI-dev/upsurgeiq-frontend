@@ -3,6 +3,7 @@ import { SEO } from '../components/SEO';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Link } from 'wouter';
+import { NewsletterSignup } from '../components/NewsletterSignup';
 
 export function Resources() {
   const resources = [
@@ -96,21 +97,21 @@ export function Resources() {
 
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between">
+        <div className="container flex h-16 items-centre justify-between">
           <Link href="/">
-            <a className="flex items-center space-x-2">
+            <a className="flex items-centre space-x-2">
               <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 UpsurgeIQ
               </span>
             </a>
           </Link>
 
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link href="/about"><a className="text-sm font-medium hover:text-primary transition-colors">About</a></Link>
-            <Link href="/blog"><a className="text-sm font-medium hover:text-primary transition-colors">Blog</a></Link>
-            <Link href="/pricing-calculator"><a className="text-sm font-medium hover:text-primary transition-colors">Pricing</a></Link>
+          <nav className="hidden md:flex items-centre space-x-6">
+            <Link href="/about"><a className="text-sm font-medium hover:text-primary transition-colours">About</a></Link>
+            <Link href="/blog"><a className="text-sm font-medium hover:text-primary transition-colours">Blog</a></Link>
+            <Link href="/pricing-calculator"><a className="text-sm font-medium hover:text-primary transition-colours">Pricing</a></Link>
             <Link href="/resources"><a className="text-sm font-medium text-primary">Resources</a></Link>
-            <Link href="/contact"><a className="text-sm font-medium hover:text-primary transition-colors">Contact</a></Link>
+            <Link href="/contact"><a className="text-sm font-medium hover:text-primary transition-colours">Contact</a></Link>
             <Link href="/dashboard">
               <Button size="sm">Dashboard</Button>
             </Link>
@@ -128,7 +129,7 @@ export function Resources() {
 
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-b from-muted/50 to-background">
-        <div className="container max-w-4xl text-center">
+        <div className="container max-w-4xl text-centre">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
             Free PR Resources & Templates
           </h1>
@@ -167,7 +168,7 @@ export function Resources() {
                   ))}
                 </ul>
 
-                <div className="flex items-center justify-between pt-4 border-t">
+                <div className="flex items-centre justify-between pt-4 border-t">
                   <span className="text-xs text-muted-foreground">{resource.fileSize}</span>
                   <a href={resource.downloadUrl} download>
                     <Button size="sm" className="gap-2">
@@ -184,14 +185,14 @@ export function Resources() {
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-primary to-accent">
-        <div className="container max-w-4xl text-center text-primary-foreground">
+        <div className="container max-w-4xl text-centre text-primary-foreground">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready for AI-Powered PR Automation?
           </h2>
           <p className="text-lg mb-8 opacity-90">
-            These templates are just the beginning. UpsurgeIQ automates your entire PR workflow with AI-powered content generation, intelligent media targeting, and campaign optimization.
+            These templates are just the beginning. UpsurgeIQ automates your entire PR workflow with AI-powered content generation, intelligent media targeting, and campaign optimisation.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-centre">
             <Link href="/subscribe">
               <Button size="lg" variant="secondary" className="gap-2">
                 Start Free Trial
@@ -206,44 +207,53 @@ export function Resources() {
         </div>
       </section>
 
+      {/* Newsletter Signup */}
+      <section className="container py-16">
+        <NewsletterSignup 
+          source="resources_page"
+          title="Get More Free PR & Marketing Resources"
+          description="Join thousands of PR professionals receiving exclusive templates, guides, and industry insights. No spam, unsubscribe anytime."
+        />
+      </section>
+
       {/* Footer */}
-      <footer className="border-t py-12 bg-muted/30">
+      <footer className="bg-muted/30 border-t mt-24">
         <div className="container">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <h3 className="font-semibold mb-4">Product</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/"><a className="hover:text-primary transition-colors">Features</a></Link></li>
-                <li><Link href="/pricing-calculator"><a className="hover:text-primary transition-colors">Pricing</a></Link></li>
-                <li><Link href="/testimonials"><a className="hover:text-primary transition-colors">Testimonials</a></Link></li>
+                <li><Link href="/"><a className="hover:text-primary transition-colours">Features</a></Link></li>
+                <li><Link href="/pricing-calculator"><a className="hover:text-primary transition-colours">Pricing</a></Link></li>
+                <li><Link href="/testimonials"><a className="hover:text-primary transition-colours">Testimonials</a></Link></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Company</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/about"><a className="hover:text-primary transition-colors">About Us</a></Link></li>
-                <li><Link href="/blog"><a className="hover:text-primary transition-colors">Blog</a></Link></li>
-                <li><Link href="/contact"><a className="hover:text-primary transition-colors">Contact</a></Link></li>
+                <li><Link href="/about"><a className="hover:text-primary transition-colours">About Us</a></Link></li>
+                <li><Link href="/blog"><a className="hover:text-primary transition-colours">Blog</a></Link></li>
+                <li><Link href="/contact"><a className="hover:text-primary transition-colours">Contact</a></Link></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Legal</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/privacy"><a className="hover:text-primary transition-colors">Privacy Policy</a></Link></li>
-                <li><Link href="/terms"><a className="hover:text-primary transition-colors">Terms of Service</a></Link></li>
-                <li><Link href="/cookie-policy"><a className="hover:text-primary transition-colors">Cookie Policy</a></Link></li>
+                <li><Link href="/privacy"><a className="hover:text-primary transition-colours">Privacy Policy</a></Link></li>
+                <li><Link href="/terms"><a className="hover:text-primary transition-colours">Terms of Service</a></Link></li>
+                <li><Link href="/cookie-policy"><a className="hover:text-primary transition-colours">Cookie Policy</a></Link></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Support</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/faq"><a className="hover:text-primary transition-colors">FAQ</a></Link></li>
-                <li><Link href="/status"><a className="hover:text-primary transition-colors">Status</a></Link></li>
-                <li><Link href="/report-issue"><a className="hover:text-primary transition-colors">Report Issue</a></Link></li>
+                <li><Link href="/faq"><a className="hover:text-primary transition-colours">FAQ</a></Link></li>
+                <li><Link href="/status"><a className="hover:text-primary transition-colours">Status</a></Link></li>
+                <li><Link href="/report-issue"><a className="hover:text-primary transition-colours">Report Issue</a></Link></li>
               </ul>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
+          <div className="mt-8 pt-8 border-t text-centre text-sm text-muted-foreground">
             <p>© 2025 Life's Passions Ltd. All rights reserved.</p>
           </div>
         </div>
