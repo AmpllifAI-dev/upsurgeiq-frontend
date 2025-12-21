@@ -92,8 +92,14 @@ export default function Home() {
   const features = [
     {
       icon: Sparkles,
-      title: "AI-Powered Content",
-      description: "Generate professional press releases and social media posts in seconds with our advanced AI.",
+      title: "Multilingual AI Content",
+      description: "Generate professional content in 16 languages including English, Spanish, French, German, Chinese, Japanese, and more. AI adapts to your preferred language automatically.",
+      image: null,
+    },
+    {
+      icon: Users,
+      title: "Know-Your-Client Dossier",
+      description: "Build comprehensive client profiles with calendar integration. AI tailors every press release and campaign to your client's unique business context and schedule.",
       image: null,
     },
     {
@@ -115,7 +121,7 @@ export default function Home() {
       image: null,
     },
     {
-      icon: Users,
+      icon: Globe,
       title: "Journalist Networks",
       description: "Access curated media lists by industry and region, or upload your own contacts.",
       image: "/images/feature-media-relations.jpg",

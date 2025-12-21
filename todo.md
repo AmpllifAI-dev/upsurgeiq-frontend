@@ -1814,3 +1814,7 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Add AI generation warning dialog before generating content (shows credit usage, can be dismissed permanently with "don't show again" option)
 - [x] Integrate preferredLanguage field into AI generation prompts (use user's selected language for all AI-generated content)
 - [x] Add language preference to user settings/profile page (allow users to change preferred language after onboarding)
+
+## Homepage Updates (Current Session)
+- [x] Add multilingual AI text generation feature to selling points (16 languages supported)
+- [x] Add "Know-Your-Client" Dossier and calendar feature to selling points
