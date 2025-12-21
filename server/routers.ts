@@ -247,13 +247,12 @@ export const appRouter = router({
 
   aiCredits: router({
     getUsage: protectedProcedure.query(async ({ ctx }) => {
-      // Check if user has AI Chat or AI Call-in add-ons
-      // For now, return mock data - will be replaced with actual subscription check
-      const subscription = await getUserSubscription(ctx.user.id);
+      const { getCurrentCreditsUsage, getUserAddonSubscriptions } = await import("./addonSubscriptions");
       
-      // TODO: Check actual add-on subscriptions from Stripe
-      const aiChatEnabled = false; // Will be true if user has AI Chat subscription
-      const aiCallInEnabled = false; // Will be true if user has AI Call-in subscription
+      // Check active add-on subscriptions
+      const addons = await getUserAddonSubscriptions(ctx.user.id);
+      const aiChatEnabled = addons.some(a => a.addonType === "aiChat");
+      const aiCallInEnabled = addons.some(a => a.addonType === "aiCallIn");
       
       if (!aiChatEnabled && !aiCallInEnabled) {
         return {
@@ -268,16 +267,18 @@ export const appRouter = router({
         };
       }
       
-      // TODO: Track actual usage in database
+      // Get actual usage from database
+      const usage = await getCurrentCreditsUsage(ctx.user.id);
+      
       return {
         aiChatEnabled,
         aiCallInEnabled,
-        aiChatTotal: aiChatEnabled ? 32 : 0,
-        aiChatUsed: 0, // TODO: Get from usage tracking
-        aiChatRemaining: aiChatEnabled ? 32 : 0,
-        aiCallInTotal: aiCallInEnabled ? 32 : 0,
-        aiCallInUsed: 0, // TODO: Get from usage tracking
-        aiCallInRemaining: aiCallInEnabled ? 32 : 0,
+        aiChatTotal: usage.aiChat?.creditsTotal || 0,
+        aiChatUsed: usage.aiChat?.creditsUsed || 0,
+        aiChatRemaining: usage.aiChat?.creditsRemaining || 0,
+        aiCallInTotal: usage.aiCallIn?.creditsTotal || 0,
+        aiCallInUsed: usage.aiCallIn?.creditsUsed || 0,
+        aiCallInRemaining: usage.aiCallIn?.creditsRemaining || 0,
       };
     }),
   }),

@@ -101,8 +101,8 @@ export const ADDITIONAL_PRODUCTS = {
     price: 3900, // £39.00 in pence
     currency: "gbp",
     interval: "month" as const,
-    stripeProductId: "prod_PLACEHOLDER_AI_CHAT", // TODO: Create in Stripe Dashboard
-    stripePriceId: "price_PLACEHOLDER_AI_CHAT", // TODO: Create in Stripe Dashboard
+    stripeProductId: "prod_TdssygSTn4yCgE",
+    stripePriceId: "price_1Sgb6bIEVr3V21Je8XP27Y5W",
     description: "Conversational AI assistant for content generation (32 messages/month)",
     credits: 32,
   },
@@ -111,8 +111,8 @@ export const ADDITIONAL_PRODUCTS = {
     price: 5900, // £59.00 in pence
     currency: "gbp",
     interval: "month" as const,
-    stripeProductId: "prod_PLACEHOLDER_AI_CALL", // TODO: Create in Stripe Dashboard
-    stripePriceId: "price_PLACEHOLDER_AI_CALL", // TODO: Create in Stripe Dashboard
+    stripeProductId: "prod_Tdsspb7TDwtOpS",
+    stripePriceId: "price_1Sgb6cIEVr3V21JeSjoqSrib",
     description: "Voice call-in with Whisper transcription (32 messages/month)",
     credits: 32,
   },

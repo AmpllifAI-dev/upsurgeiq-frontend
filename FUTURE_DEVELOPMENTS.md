@@ -114,3 +114,45 @@ Implementation notes:
 - Configurable optimization thresholds per campaign
 - Manual override option for user control
 - Activity logging for all automated actions
+
+
+## AI Usage Tracking Integration
+
+**Status:** Infrastructure complete, integration pending
+
+**What's Done:**
+- Database tables created (ai_usage_log, ai_credits_usage)
+- Usage tracking functions implemented (logAiUsage in addonSubscriptions.ts)
+- Real-time usage display working (AICreditsUsage component)
+
+**What's Needed:**
+- Integrate `logAiUsage()` calls into AI Assistant chat message handler
+- Integrate `logAiUsage()` calls into AI Call-in transcription handler
+- Add credit check before AI operations (prevent usage when credits exhausted)
+- Add user-facing error messages when credits run out
+
+**Implementation Pattern:**
+```typescript
+// In AI Chat handler
+import { logAiUsage } from "./addonSubscriptions";
+
+// Before processing AI request
+const usage = await getCurrentCreditsUsage(userId);
+if (!usage.aiChat || usage.aiChat.creditsRemaining <= 0) {
+  throw new TRPCError({
+    code: "FORBIDDEN",
+    message: "AI Chat credits exhausted. Please upgrade or wait for next billing cycle.",
+  });
+}
+
+// After successful AI interaction
+await logAiUsage({
+  userId,
+  addonType: "aiChat",
+  action: "chat_message",
+  creditsConsumed: 1,
+  metadata: { messageLength: message.length },
+});
+```
+
+**Priority:** Medium - System works without this, but users can't track actual usage yet

@@ -95,13 +95,25 @@ export async function handleStripeWebhook(req: Request, res: Response) {
       case "customer.subscription.created":
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
-        await handleSubscriptionUpdate(subscription);
+        // Check if this is an add-on subscription
+        const isAddon = subscription.metadata?.addon_type;
+        if (isAddon) {
+          await handleAddonSubscriptionUpdate(subscription);
+        } else {
+          await handleSubscriptionUpdate(subscription);
+        }
         break;
       }
 
       case "customer.subscription.deleted": {
         const subscription = event.data.object as Stripe.Subscription;
-        await handleSubscriptionCanceled(subscription);
+        // Check if this is an add-on subscription
+        const isAddon = subscription.metadata?.addon_type;
+        if (isAddon) {
+          await handleAddonSubscriptionCanceled(subscription);
+        } else {
+          await handleSubscriptionCanceled(subscription);
+        }
         break;
       }
 
@@ -743,4 +755,86 @@ async function handleAddOnPurchase(session: Stripe.Checkout.Session) {
     });
     throw error;
   }
+}
+
+/**
+ * Handle add-on subscription update (AI Chat, AI Call-in, Campaign Lab)
+ */
+async function handleAddonSubscriptionUpdate(subscription: Stripe.Subscription) {
+  logger.info("Add-on subscription updated", {
+    action: "handleAddonSubscriptionUpdate",
+    metadata: { subscriptionId: subscription.id },
+  });
+
+  const { upsertAddonSubscription } = await import("../addonSubscriptions");
+  
+  // Get user ID from metadata
+  const userId = parseInt(subscription.metadata?.userId || "0");
+  if (!userId) {
+    logger.error("No user ID in subscription metadata", undefined, {
+      action: "handleAddonSubscriptionUpdate",
+      metadata: { subscriptionId: subscription.id },
+    });
+    return;
+  }
+
+  // Get addon type from metadata
+  const addonType = subscription.metadata?.addon_type as "aiChat" | "aiCallIn" | "intelligentCampaignLab";
+  if (!addonType) {
+    logger.error("No addon type in subscription metadata", undefined, {
+      action: "handleAddonSubscriptionUpdate",
+      metadata: { subscriptionId: subscription.id },
+    });
+    return;
+  }
+
+  // Map Stripe status to our status
+  let status: "active" | "canceled" | "past_due";
+  if (subscription.status === "active" || subscription.status === "trialing") {
+    status = "active";
+  } else if (subscription.status === "past_due") {
+    status = "past_due";
+  } else {
+    status = "canceled";
+  }
+
+  // Get price ID
+  const stripePriceId = subscription.items.data[0]?.price.id || "";
+
+  // Upsert subscription
+  await upsertAddonSubscription({
+    userId,
+    addonType,
+    status,
+    stripeSubscriptionId: subscription.id,
+    stripePriceId,
+    currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+    currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+    cancelAtPeriodEnd: subscription.cancel_at_period_end,
+  });
+
+  logger.info("Add-on subscription updated successfully", {
+    action: "handleAddonSubscriptionUpdate",
+    userId,
+    metadata: { addonType, status, subscriptionId: subscription.id },
+  });
+}
+
+/**
+ * Handle add-on subscription cancellation
+ */
+async function handleAddonSubscriptionCanceled(subscription: Stripe.Subscription) {
+  logger.info("Add-on subscription canceled", {
+    action: "handleAddonSubscriptionCanceled",
+    metadata: { subscriptionId: subscription.id },
+  });
+
+  const { cancelAddonSubscription } = await import("../addonSubscriptions");
+  
+  await cancelAddonSubscription(subscription.id);
+
+  logger.info("Add-on subscription canceled successfully", {
+    action: "handleAddonSubscriptionCanceled",
+    metadata: { subscriptionId: subscription.id },
+  });
 }

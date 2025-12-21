@@ -1109,3 +1109,72 @@ export const eventNotifications = mysqlTable("event_notifications", {
 
 export type EventNotification = typeof eventNotifications.$inferSelect;
 export type InsertEventNotification = typeof eventNotifications.$inferInsert;
+
+// Add-on Subscriptions - Track user add-on purchases (AI Chat, AI Call-in, etc.)
+export const addonSubscriptions = mysqlTable("addon_subscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Add-on Details
+  addonType: mysqlEnum("addonType", ["aiChat", "aiCallIn", "intelligentCampaignLab"]).notNull(),
+  status: mysqlEnum("status", ["active", "canceled", "past_due"]).notNull(),
+  
+  // Stripe Details
+  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }).unique(),
+  stripePriceId: varchar("stripePriceId", { length: 255 }),
+  
+  // Billing Period
+  currentPeriodStart: timestamp("currentPeriodStart"),
+  currentPeriodEnd: timestamp("currentPeriodEnd"),
+  cancelAtPeriodEnd: int("cancelAtPeriodEnd").default(0),
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AddonSubscription = typeof addonSubscriptions.$inferSelect;
+export type InsertAddonSubscription = typeof addonSubscriptions.$inferInsert;
+
+// AI Credits Usage - Track monthly usage for AI Chat and AI Call-in
+export const aiCreditsUsage = mysqlTable("ai_credits_usage", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  addonType: mysqlEnum("addonType", ["aiChat", "aiCallIn"]).notNull(),
+  
+  // Usage Period
+  periodStart: timestamp("periodStart").notNull(),
+  periodEnd: timestamp("periodEnd").notNull(),
+  
+  // Usage Tracking
+  creditsTotal: int("creditsTotal").notNull(), // Total credits for the period (e.g., 32)
+  creditsUsed: int("creditsUsed").default(0).notNull(), // Credits consumed
+  creditsRemaining: int("creditsRemaining").notNull(), // Calculated: total - used
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AiCreditsUsage = typeof aiCreditsUsage.$inferSelect;
+export type InsertAiCreditsUsage = typeof aiCreditsUsage.$inferInsert;
+
+// AI Usage Log - Detailed log of each AI interaction
+export const aiUsageLog = mysqlTable("ai_usage_log", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  addonType: mysqlEnum("addonType", ["aiChat", "aiCallIn"]).notNull(),
+  
+  // Usage Details
+  action: varchar("action", { length: 100 }).notNull(), // e.g., "chat_message", "voice_call"
+  creditsConsumed: int("creditsConsumed").default(1).notNull(),
+  
+  // Context
+  metadata: text("metadata"), // JSON with additional context
+  
+  // Timestamp
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AiUsageLog = typeof aiUsageLog.$inferSelect;
+export type InsertAiUsageLog = typeof aiUsageLog.$inferInsert;

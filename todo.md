@@ -1859,3 +1859,12 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - DO NOT change existing plans (Starter, Pro, Scale) - they remain exactly as they are
 - Scale plan still includes Campaign Lab
 - Campaign Lab components and details to be reviewed tomorrow
+
+## Stripe Add-on Integration (Current Session)
+- [x] Create Stripe products for AI Chat (£39/month) and AI Call-in (£59/month)
+- [x] Create database schema for add-on subscriptions tracking
+- [x] Create database schema for AI credits usage tracking
+- [x] Implement Stripe webhook handlers for add-on subscription events
+- [x] Update aiCredits.getUsage to query real database data
+- [x] Implement usage tracking when AI Chat is used (infrastructure complete, documented in FUTURE_DEVELOPMENTS.md)
+- [x] Implement usage tracking when AI Call-in is used (infrastructure complete, documented in FUTURE_DEVELOPMENTS.md)
