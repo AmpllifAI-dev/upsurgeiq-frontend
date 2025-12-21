@@ -213,7 +213,7 @@ export const appRouter = router({
         // Create Stripe checkout session for add-on
         const stripe = (await import("stripe")).default;
         const stripeClient = new stripe(process.env.STRIPE_SECRET_KEY!, {
-          apiVersion: "2024-11-20.acacia",
+          apiVersion: "2025-12-15.clover",
         });
 
         const session = await stripeClient.checkout.sessions.create({
@@ -4543,6 +4543,52 @@ Generate a comprehensive campaign strategy that includes:
       const { exportCreditUsageToCSV } = await import("./adminCreditManagement");
       const csv = await exportCreditUsageToCSV();
       return { csv };
+    }),
+  }),
+
+  // Billing router
+  billing: router({
+    getInvoices: protectedProcedure.query(async ({ ctx }) => {
+      const subscription = await getUserSubscription(ctx.user.id);
+      if (!subscription?.stripeCustomerId) {
+        return [];
+      }
+      const { getCustomerInvoices } = await import("./billing");
+      return await getCustomerInvoices(subscription.stripeCustomerId);
+    }),
+
+    getPaymentMethods: protectedProcedure.query(async ({ ctx }) => {
+      const subscription = await getUserSubscription(ctx.user.id);
+      if (!subscription?.stripeCustomerId) {
+        return [];
+      }
+      const { getCustomerPaymentMethods, getCustomerDefaultPaymentMethod } = await import("./billing");
+      const paymentMethods = await getCustomerPaymentMethods(subscription.stripeCustomerId);
+      const defaultPmId = await getCustomerDefaultPaymentMethod(subscription.stripeCustomerId);
+      
+      return paymentMethods.map((pm) => ({
+        ...pm,
+        isDefault: pm.id === defaultPmId,
+      }));
+    }),
+
+    createBillingPortalSession: protectedProcedure.mutation(async ({ ctx }) => {
+      const subscription = await getUserSubscription(ctx.user.id);
+      if (!subscription?.stripeCustomerId) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "No Stripe customer found" });
+      }
+      const { createBillingPortalSession } = await import("./billing");
+      const origin = ctx.req.headers.origin || "http://localhost:3000";
+      return await createBillingPortalSession(subscription.stripeCustomerId, `${origin}/dashboard/billing`);
+    }),
+
+    getUpcomingInvoice: protectedProcedure.query(async ({ ctx }) => {
+      const subscription = await getUserSubscription(ctx.user.id);
+      if (!subscription?.stripeCustomerId) {
+        return null;
+      }
+      const { getUpcomingInvoice } = await import("./billing");
+      return await getUpcomingInvoice(subscription.stripeCustomerId);
     }),
   }),
 });

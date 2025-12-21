@@ -546,3 +546,371 @@ export function exportBulkPressReleasesToPDF(pressReleases: PressReleaseData[]) 
   // Download the PDF
   doc.save(filename);
 }
+
+
+/**
+ * Enhanced Campaign PDF Export with Analytics and Charts
+ */
+export interface EnhancedCampaignData {
+  campaign: {
+    name: string;
+    status: string;
+    goal?: string;
+    targetAudience?: string;
+    aiGeneratedStrategy?: string;
+    keyMessages?: string;
+    successMetrics?: string;
+    budget?: string;
+    startDate?: string;
+    endDate?: string;
+    createdAt: Date;
+  };
+  milestones?: Array<{
+    title: string;
+    status: string;
+    dueDate?: string;
+  }>;
+  deliverables?: Array<{
+    title: string;
+    type: string;
+    status: string;
+  }>;
+  analytics?: Array<{
+    date: Date;
+    impressions: number;
+    clicks: number;
+    conversions: number;
+    spend: number;
+  }>;
+}
+
+export function exportEnhancedCampaignToPDF(data: EnhancedCampaignData) {
+  const doc = new jsPDF();
+  
+  // Set up colors
+  const tealColor = [0, 128, 128] as [number, number, number];
+  const limeColor = [127, 255, 0] as [number, number, number];
+  const darkGray = [51, 51, 51] as [number, number, number];
+  const lightGray = [128, 128, 128] as [number, number, number];
+  
+  let yPosition = 20;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 20;
+  const contentWidth = pageWidth - (margin * 2);
+  
+  // Add upsurgeIQ branding header
+  doc.setFillColor(...tealColor);
+  doc.rect(0, 0, pageWidth, 15, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text("UpsurgeIQ", margin, 10);
+  
+  yPosition = 30;
+  
+  // Add report title
+  doc.setTextColor(...darkGray);
+  doc.setFontSize(22);
+  doc.setFont("helvetica", "bold");
+  doc.text("Campaign Performance Report", margin, yPosition);
+  yPosition += 15;
+  
+  // Add campaign name
+  doc.setFontSize(18);
+  doc.setTextColor(...tealColor);
+  const nameLines = doc.splitTextToSize(data.campaign.name, contentWidth);
+  doc.text(nameLines, margin, yPosition);
+  yPosition += (nameLines.length * 8) + 10;
+  
+  // Add separator line
+  doc.setDrawColor(...limeColor);
+  doc.setLineWidth(2);
+  doc.line(margin, yPosition, pageWidth - margin, yPosition);
+  yPosition += 15;
+  
+  // Campaign Overview Section
+  doc.setTextColor(...darkGray);
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text("Campaign Overview", margin, yPosition);
+  yPosition += 10;
+  
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "normal");
+  
+  // Status
+  doc.setFont("helvetica", "bold");
+  doc.text("Status:", margin, yPosition);
+  doc.setFont("helvetica", "normal");
+  const statusColor = data.campaign.status === 'active' ? [0, 200, 0] : lightGray;
+  doc.setTextColor(...statusColor);
+  doc.text(data.campaign.status.toUpperCase(), margin + 35, yPosition);
+  doc.setTextColor(...darkGray);
+  yPosition += 7;
+  
+  // Timeline
+  if (data.campaign.startDate && data.campaign.endDate) {
+    doc.setFont("helvetica", "bold");
+    doc.text("Timeline:", margin, yPosition);
+    doc.setFont("helvetica", "normal");
+    const startDate = new Date(data.campaign.startDate).toLocaleDateString('en-GB');
+    const endDate = new Date(data.campaign.endDate).toLocaleDateString('en-GB');
+    doc.text(`${startDate} - ${endDate}`, margin + 35, yPosition);
+    yPosition += 7;
+  }
+  
+  // Budget
+  if (data.campaign.budget) {
+    doc.setFont("helvetica", "bold");
+    doc.text("Budget:", margin, yPosition);
+    doc.setFont("helvetica", "normal");
+    doc.text(`£${parseFloat(data.campaign.budget).toLocaleString()}`, margin + 35, yPosition);
+    yPosition += 7;
+  }
+  
+  yPosition += 8;
+  
+  // Campaign Goal
+  if (data.campaign.goal) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Campaign Goal", margin, yPosition);
+    yPosition += 7;
+    
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    const goalLines = doc.splitTextToSize(data.campaign.goal, contentWidth);
+    doc.text(goalLines, margin, yPosition);
+    yPosition += (goalLines.length * 5) + 10;
+  }
+  
+  // Target Audience
+  if (data.campaign.targetAudience) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Target Audience", margin, yPosition);
+    yPosition += 7;
+    
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    const audienceLines = doc.splitTextToSize(data.campaign.targetAudience, contentWidth);
+    doc.text(audienceLines, margin, yPosition);
+    yPosition += (audienceLines.length * 5) + 10;
+  }
+  
+  // Check if we need a new page
+  if (yPosition > 220) {
+    doc.addPage();
+    yPosition = 20;
+  }
+  
+  // AI-Generated Strategy
+  if (data.campaign.aiGeneratedStrategy) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("AI-Generated Strategy", margin, yPosition);
+    yPosition += 7;
+    
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    const strategyLines = doc.splitTextToSize(data.campaign.aiGeneratedStrategy, contentWidth);
+    doc.text(strategyLines, margin, yPosition);
+    yPosition += (strategyLines.length * 5) + 10;
+  }
+  
+  // Key Messages
+  if (data.campaign.keyMessages) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Key Messages", margin, yPosition);
+    yPosition += 7;
+    
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    const messagesLines = doc.splitTextToSize(data.campaign.keyMessages, contentWidth);
+    doc.text(messagesLines, margin, yPosition);
+    yPosition += (messagesLines.length * 5) + 10;
+  }
+  
+  // Performance Analytics Section
+  if (data.analytics && data.analytics.length > 0) {
+    // Check if we need a new page
+    if (yPosition > 200) {
+      doc.addPage();
+      yPosition = 20;
+    }
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.setTextColor(...tealColor);
+    doc.text("Performance Analytics", margin, yPosition);
+    yPosition += 10;
+    
+    // Calculate totals
+    const totals = data.analytics.reduce((acc, entry) => ({
+      impressions: acc.impressions + entry.impressions,
+      clicks: acc.clicks + entry.clicks,
+      conversions: acc.conversions + entry.conversions,
+      spend: acc.spend + entry.spend,
+    }), { impressions: 0, clicks: 0, conversions: 0, spend: 0 });
+    
+    const ctr = totals.impressions > 0 ? (totals.clicks / totals.impressions * 100).toFixed(2) : '0.00';
+    const cvr = totals.clicks > 0 ? (totals.conversions / totals.clicks * 100).toFixed(2) : '0.00';
+    const cpc = totals.clicks > 0 ? (totals.spend / totals.clicks).toFixed(2) : '0.00';
+    const cpa = totals.conversions > 0 ? (totals.spend / totals.conversions).toFixed(2) : '0.00';
+    
+    // Create summary boxes
+    const boxWidth = (contentWidth - 10) / 2;
+    const boxHeight = 25;
+    
+    // Impressions box
+    doc.setFillColor(245, 245, 245);
+    doc.rect(margin, yPosition, boxWidth, boxHeight, 'F');
+    doc.setTextColor(...darkGray);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Total Impressions", margin + 5, yPosition + 8);
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text(totals.impressions.toLocaleString(), margin + 5, yPosition + 18);
+    
+    // Clicks box
+    doc.setFillColor(245, 245, 245);
+    doc.rect(margin + boxWidth + 10, yPosition, boxWidth, boxHeight, 'F');
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Total Clicks", margin + boxWidth + 15, yPosition + 8);
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text(totals.clicks.toLocaleString(), margin + boxWidth + 15, yPosition + 18);
+    
+    yPosition += boxHeight + 5;
+    
+    // Conversions box
+    doc.setFillColor(245, 245, 245);
+    doc.rect(margin, yPosition, boxWidth, boxHeight, 'F');
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Total Conversions", margin + 5, yPosition + 8);
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text(totals.conversions.toLocaleString(), margin + 5, yPosition + 18);
+    
+    // Spend box
+    doc.setFillColor(245, 245, 245);
+    doc.rect(margin + boxWidth + 10, yPosition, boxWidth, boxHeight, 'F');
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Total Spend", margin + boxWidth + 15, yPosition + 8);
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text(`£${totals.spend.toLocaleString()}`, margin + boxWidth + 15, yPosition + 18);
+    
+    yPosition += boxHeight + 10;
+    
+    // Key Metrics
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...darkGray);
+    doc.text(`Click-Through Rate (CTR): ${ctr}%`, margin, yPosition);
+    yPosition += 6;
+    doc.text(`Conversion Rate (CVR): ${cvr}%`, margin, yPosition);
+    yPosition += 6;
+    doc.text(`Cost Per Click (CPC): £${cpc}`, margin, yPosition);
+    yPosition += 6;
+    doc.text(`Cost Per Acquisition (CPA): £${cpa}`, margin, yPosition);
+    yPosition += 15;
+  }
+  
+  // Milestones Section
+  if (data.milestones && data.milestones.length > 0) {
+    // Check if we need a new page
+    if (yPosition > 200) {
+      doc.addPage();
+      yPosition = 20;
+    }
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.setTextColor(...tealColor);
+    doc.text("Campaign Milestones", margin, yPosition);
+    yPosition += 10;
+    
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...darkGray);
+    
+    data.milestones.forEach((milestone, index) => {
+      if (yPosition > 270) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      
+      const statusSymbol = milestone.status === 'completed' ? '✓' : 
+                          milestone.status === 'in_progress' ? '◐' : '○';
+      
+      doc.text(`${statusSymbol} ${milestone.title}`, margin + 5, yPosition);
+      if (milestone.dueDate) {
+        doc.setTextColor(...lightGray);
+        doc.text(`Due: ${new Date(milestone.dueDate).toLocaleDateString('en-GB')}`, margin + 100, yPosition);
+        doc.setTextColor(...darkGray);
+      }
+      yPosition += 6;
+    });
+    
+    yPosition += 10;
+  }
+  
+  // Deliverables Section
+  if (data.deliverables && data.deliverables.length > 0) {
+    // Check if we need a new page
+    if (yPosition > 200) {
+      doc.addPage();
+      yPosition = 20;
+    }
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.setTextColor(...tealColor);
+    doc.text("Campaign Deliverables", margin, yPosition);
+    yPosition += 10;
+    
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...darkGray);
+    
+    data.deliverables.forEach((deliverable) => {
+      if (yPosition > 270) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      
+      const statusSymbol = deliverable.status === 'completed' ? '✓' : 
+                          deliverable.status === 'in_progress' ? '◐' : '○';
+      
+      doc.text(`${statusSymbol} ${deliverable.title}`, margin + 5, yPosition);
+      doc.setTextColor(...lightGray);
+      doc.text(`[${deliverable.type}]`, margin + 100, yPosition);
+      doc.setTextColor(...darkGray);
+      yPosition += 6;
+    });
+  }
+  
+  // Add footer to all pages
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    const footerY = doc.internal.pageSize.getHeight() - 15;
+    doc.setTextColor(...lightGray);
+    doc.setFontSize(9);
+    const generatedText = `Generated by UpsurgeIQ on ${new Date().toLocaleDateString('en-GB')} at ${new Date().toLocaleTimeString('en-GB')}`;
+    doc.text(generatedText, pageWidth / 2, footerY, { align: 'center' });
+    doc.text(`Page ${i} of ${pageCount}`, pageWidth - margin, footerY, { align: 'right' });
+  }
+  
+  // Generate filename
+  const filename = `campaign-report-${data.campaign.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`;
+  
+  // Download the PDF
+  doc.save(filename);
+}

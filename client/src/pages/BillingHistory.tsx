@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { DashboardLayout } from "@/components/DashboardLayout";
+import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,26 +18,31 @@ export default function BillingHistory() {
     enabled: !!user,
   });
 
-  const { data: paymentMethod } = trpc.billing.getPaymentMethod.useQuery(undefined, {
+  const { data: paymentMethods } = trpc.billing.getPaymentMethods.useQuery(undefined, {
     enabled: !!user,
   });
 
-  const downloadInvoiceMutation = trpc.billing.downloadInvoice.useMutation({
+  const { data: upcomingInvoice } = trpc.billing.getUpcomingInvoice.useQuery(undefined, {
+    enabled: !!user,
+  });
+
+  const createPortalSession = trpc.billing.createBillingPortalSession.useMutation({
     onSuccess: (data) => {
-      // Open invoice URL in new tab
       window.open(data.url, "_blank");
-      setDownloadingInvoice(null);
-      toast.success("Invoice opened in new tab");
+      toast.success("Opening Stripe billing portal...");
     },
     onError: (error) => {
-      toast.error(`Failed to download invoice: ${error.message}`);
-      setDownloadingInvoice(null);
+      toast.error(`Failed to open billing portal: ${error.message}`);
     },
   });
 
-  const handleDownloadInvoice = (invoiceId: string) => {
-    setDownloadingInvoice(invoiceId);
-    downloadInvoiceMutation.mutate({ invoiceId });
+  const handleManagePaymentMethods = () => {
+    createPortalSession.mutate();
+  };
+
+  const handleDownloadInvoice = (invoiceUrl: string) => {
+    window.open(invoiceUrl, "_blank");
+    toast.success("Invoice opened in new tab");
   };
 
   if (authLoading) {
@@ -70,23 +75,34 @@ export default function BillingHistory() {
                 </CardTitle>
                 <CardDescription>Your default payment method for subscriptions</CardDescription>
               </div>
-              <Button variant="outline">Update Payment Method</Button>
+              <Button variant="outline" onClick={handleManagePaymentMethods} disabled={createPortalSession.isPending}>
+                {createPortalSession.isPending ? "Opening..." : "Manage Payment Methods"}
+              </Button>
             </div>
           </CardHeader>
           <CardContent>
-            {paymentMethod ? (
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-muted rounded-lg">
-                  <CreditCard className="h-6 w-6" />
-                </div>
-                <div>
-                  <p className="font-medium">
-                    {paymentMethod.brand.toUpperCase()} •••• {paymentMethod.last4}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Expires {paymentMethod.expMonth}/{paymentMethod.expYear}
-                  </p>
-                </div>
+            {paymentMethods && paymentMethods.length > 0 ? (
+              <div className="space-y-3">
+                {paymentMethods.map((pm: any) => (
+                  <div key={pm.id} className="flex items-center gap-4">
+                    <div className="p-3 bg-muted rounded-lg">
+                      <CreditCard className="h-6 w-6" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">
+                        {pm.brand?.toUpperCase()} •••• {pm.last4}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Expires {pm.expMonth}/{pm.expYear}
+                      </p>
+                    </div>
+                    {pm.isDefault && (
+                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+                        Default
+                      </Badge>
+                    )}
+                  </div>
+                ))}
               </div>
             ) : (
               <p className="text-muted-foreground">No payment method on file</p>
@@ -151,21 +167,16 @@ export default function BillingHistory() {
                         )}
                       </div>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDownloadInvoice(invoice.id)}
-                      disabled={downloadingInvoice === invoice.id}
-                    >
-                      {downloadingInvoice === invoice.id ? (
-                        "Opening..."
-                      ) : (
-                        <>
-                          <Download className="h-4 w-4 mr-2" />
-                          Download
-                        </>
-                      )}
-                    </Button>
+                    {invoice.invoicePdf && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDownloadInvoice(invoice.invoicePdf)}
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Download
+                      </Button>
+                    )}
                   </div>
                 ))}
               </div>

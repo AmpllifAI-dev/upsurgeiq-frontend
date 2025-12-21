@@ -1888,3 +1888,30 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [ ] Audit Additional Features section against existing implementations
 - [ ] Implement new Additional Features (avoiding duplication)
 - [ ] Test all new implementations
+
+
+## High-Priority Missing Features (Current Work)
+- [x] Invoice/Billing History page with Stripe integration
+  - [x] Create backend procedure to fetch Stripe invoices
+  - [x] Create backend procedure to fetch payment methods
+  - [x] Build BillingHistory page with invoices list
+  - [x] Add invoice download functionality
+  - [x] Add payment method management UI
+- [x] Usage Tracking Dashboard with tier limits visualization
+  - [x] Create UsageTrackingDashboard component
+  - [x] Show press releases used vs. tier limit (2/5/15)
+  - [x] Show campaigns used vs. tier limit (5/20/unlimited)
+  - [x] Show social posts used (unlimited for all tiers)
+  - [x] Add visual progress bars for metered features
+  - [x] Add upgrade prompts when approaching limits
+- [x] Campaign PDF Export with charts and metrics
+  - [x] Create exportEnhancedCampaignToPDF function
+  - [x] Include campaign overview and strategy
+  - [x] Add performance charts (impressions, clicks, conversions)
+  - [x] Include milestone progress and deliverables
+  - [x] Add analytics summary and insights
+- [ ] Analytics CSV Export functionality
+  - [ ] Create CSV export for press release analytics
+  - [ ] Create CSV export for campaign analytics
+  - [ ] Create CSV export for social media analytics
+  - [ ] Add date range filtering for exports

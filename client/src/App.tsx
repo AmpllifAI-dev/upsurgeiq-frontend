@@ -54,6 +54,8 @@ import SportsTeams from "./pages/SportsTeams";
 import AIAddons from "./pages/AIAddons";
 import SocialMediaConnections from "./pages/SocialMediaConnections";
 import ImagePacks from "./pages/ImagePacks";
+import UsageTracking from "./pages/UsageTracking";
+import BillingHistory from "./pages/BillingHistory";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -108,6 +110,8 @@ function Router() {
       <Route path="/dashboard/ai-addons" component={AIAddons} />
       <Route path="/dashboard/social-connections" component={SocialMediaConnections} />
       <Route path="/dashboard/image-packs" component={ImagePacks} />
+      <Route path="/dashboard/usage" component={UsageTracking} />
+      <Route path="/dashboard/billing" component={BillingHistory} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
