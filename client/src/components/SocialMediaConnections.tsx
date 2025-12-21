@@ -37,13 +37,6 @@ const platforms: SocialPlatform[] = [
     color: "text-blue-700",
     description: "Publish professional content to your LinkedIn Company Page",
   },
-  {
-    id: "x",
-    name: "X (Twitter)",
-    icon: Twitter,
-    color: "text-gray-900",
-    description: "Post updates and engage with your audience on X",
-  },
 ];
 
 export function SocialMediaConnections() {

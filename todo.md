@@ -2478,3 +2478,23 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [ ] Fix upgrade button 404 error at bottom of dashboard
 - [ ] Add service promotion CTAs to dashboard (AI Add-ons, Image Packs, Campaign Lab)
 - [ ] Verify admin dashboard shows more than just credit monitoring
+
+
+## Current Session - Dec 21 Fixes (Part 2)
+- [ ] Add mobile hamburger menu to DashboardLayout
+- [ ] Fix profile persistence issue (name changes don't stick)
+- [ ] Create floating issue report button (bottom-right, fixed position)
+- [ ] Test mobile menu functionality
+- [ ] Test profile save and navigation
+- [ ] Test issue report button from multiple pages
+
+
+## Session Dec 21 - Bug Fixes Round 2
+- [x] Fix profile persistence (added auth.updateProfile mutation and form initialization with useEffect)
+- [x] Remove Twitter/X references from SocialMediaConnections and SocialMediaNew pages
+- [x] Add back button to Profile page header
+- [x] Fix FloatingIssueButton not appearing on Dashboard (added directly to Dashboard.tsx since it doesn't use DashboardLayout)
+- [x] Mobile hamburger menu (already implemented with SidebarTrigger in DashboardLayout)
+- [x] Rich text editor rendering (fixed placeholder visibility)
+- [x] MediaLists hooks error (moved useMemo before early returns)
+- [x] Press release creation dialog working correctly

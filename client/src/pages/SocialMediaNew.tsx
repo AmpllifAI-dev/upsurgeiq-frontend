@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Zap, Share2, ArrowLeft, Sparkles, Calendar, Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
+import { Zap, Share2, ArrowLeft, Sparkles, Calendar, Facebook, Instagram, Linkedin } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CharacterCounter } from "@/components/CharacterCounter";
 import { useLocation } from "wouter";
@@ -98,7 +98,6 @@ export default function SocialMediaNew() {
     { id: "facebook", name: "Facebook", icon: Facebook, limit: ["starter", "pro", "scale"] },
     { id: "instagram", name: "Instagram", icon: Instagram, limit: ["pro", "scale"] },
     { id: "linkedin", name: "LinkedIn", icon: Linkedin, limit: ["pro", "scale"] },
-    { id: "x", name: "X (Twitter)", icon: Twitter, limit: ["scale"] },
   ];
 
   const canUsePlatform = (platformLimits: string[]) => {
@@ -221,13 +220,12 @@ export default function SocialMediaNew() {
               </CardHeader>
               <CardContent>
                 <Tabs defaultValue="facebook" className="w-full">
-                  <TabsList className="grid w-full grid-cols-4">
+                  <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="facebook">Facebook</TabsTrigger>
                     <TabsTrigger value="instagram">Instagram</TabsTrigger>
                     <TabsTrigger value="linkedin">LinkedIn</TabsTrigger>
-                    <TabsTrigger value="x">X</TabsTrigger>
                   </TabsList>
-                  {["facebook", "instagram", "linkedin", "x"].map((platform) => (
+                  {["facebook", "instagram", "linkedin"].map((platform) => (
                     <TabsContent key={platform} value={platform} className="space-y-4">
                       <div className="space-y-2">
                         <Label>Tone for {platform.charAt(0).toUpperCase() + platform.slice(1)}</Label>

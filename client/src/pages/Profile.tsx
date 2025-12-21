@@ -10,7 +10,7 @@ import { SocialMediaConnections } from "@/components/SocialMediaConnections";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Mail, Building, Calendar, Shield, Bell, Download } from "lucide-react";
+import { User, Mail, Building, Calendar, Shield, Bell, Download, ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
@@ -44,6 +44,14 @@ export default function Profile() {
       setMarketingEmails(notificationPrefs.marketingEmails);
     }
   }, [notificationPrefs]);
+
+  // Update user fields when user data loads
+  useEffect(() => {
+    if (user) {
+      setName(user.name || "");
+      setEmail(user.email || "");
+    }
+  }, [user]);
 
   // Update language preference when business data loads
   useEffect(() => {
@@ -97,6 +105,20 @@ export default function Profile() {
     onError: (error) => {
       toast.error("Failed to start checkout", {
         description: error.message,
+      });
+    },
+  });
+
+  const updateProfileMutation = trpc.auth.updateProfile.useMutation({
+    onSuccess: () => {
+      toast.success("Profile updated!", {
+        description: "Your profile information has been saved successfully."
+      });
+      setIsEditing(false);
+    },
+    onError: (error) => {
+      toast.error("Failed to update profile", {
+        description: error.message
       });
     },
   });
@@ -190,11 +212,7 @@ export default function Profile() {
   }
 
   const handleSaveProfile = () => {
-    // TODO: Implement profile update mutation
-    toast.success("Profile updated!", {
-      description: "Your profile information has been saved successfully."
-    });
-    setIsEditing(false);
+    updateProfileMutation.mutate({ name, email });
   };
 
   const handleSaveNotifications = () => {
@@ -220,6 +238,17 @@ export default function Profile() {
       {/* Header */}
       <div className="bg-white border-b">
         <div className="container py-6">
+          <div className="flex items-center gap-4 mb-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => window.history.back()}
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+          </div>
           <h1 className="text-3xl font-bold text-gray-900">Profile & Settings</h1>
           <p className="text-gray-600 mt-1">Manage your account and preferences</p>
         </div>

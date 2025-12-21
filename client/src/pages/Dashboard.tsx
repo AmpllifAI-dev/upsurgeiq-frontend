@@ -29,6 +29,7 @@ import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { UsageDashboard } from "@/components/UsageDashboard";
 import { AICreditsUsage } from "@/components/AICreditsUsage";
 import { UsageForecastWidget } from "@/components/UsageForecastWidget";
+import { FloatingIssueButton } from "@/components/FloatingIssueButton";
 
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -436,6 +437,7 @@ export default function Dashboard() {
           </div>
         </section>
       </div>
+      <FloatingIssueButton />
     </div>
   );
 }

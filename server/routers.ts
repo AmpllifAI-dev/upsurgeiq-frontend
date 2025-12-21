@@ -183,6 +183,24 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    updateProfile: protectedProcedure
+      .input(z.object({
+        name: z.string().optional(),
+        email: z.string().email().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const updates: any = {};
+        if (input.name !== undefined) updates.name = input.name;
+        if (input.email !== undefined) updates.email = input.email;
+        
+        if (Object.keys(updates).length > 0) {
+          await db.update(users)
+            .set(updates)
+            .where(eq(users.id, ctx.user.id));
+        }
+        
+        return { success: true };
+      }),
   }),
 
   subscription: router({
