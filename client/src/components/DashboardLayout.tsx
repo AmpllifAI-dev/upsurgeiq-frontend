@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { trpc } from "@/lib/trpc";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -21,7 +22,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, Share2, Megaphone, BarChart3, Mail, Trophy, Sparkles, Image, Link2 } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, Share2, Megaphone, BarChart3, Mail, Trophy, Sparkles, Image, Link2, Settings } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -40,6 +41,10 @@ const menuItems = [
   { icon: Sparkles, label: "AI Add-ons", path: "/dashboard/ai-addons" },
   { icon: Image, label: "Image Packs", path: "/dashboard/image-packs" },
   { icon: Link2, label: "Social Connections", path: "/dashboard/social-connections" },
+];
+
+const adminMenuItems = [
+  { icon: Settings, label: "White Label Settings", path: "/dashboard/white-label-settings", adminOnly: true },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -124,6 +129,14 @@ function DashboardLayoutContent({
   const sidebarRef = useRef<HTMLDivElement>(null);
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
+  
+  // Get white label settings
+  const { data: business } = trpc.business.get.useQuery();
+  const isWhiteLabeled = business?.whiteLabelEnabled === 1;
+  const whiteLabelLogo = business?.whiteLabelLogoUrl;
+  const whiteLabelName = business?.whiteLabelCompanyName;
+  const whiteLabelPrimary = business?.whiteLabelPrimaryColor;
+  const whiteLabelSecondary = business?.whiteLabelSecondaryColor;
 
   useEffect(() => {
     if (isCollapsed) {
@@ -180,9 +193,17 @@ function DashboardLayoutContent({
               </button>
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-semibold tracking-tight truncate">
-                    Navigation
-                  </span>
+                  {isWhiteLabeled && whiteLabelLogo ? (
+                    <img 
+                      src={whiteLabelLogo} 
+                      alt={whiteLabelName || "Logo"} 
+                      className="h-8 object-contain"
+                    />
+                  ) : (
+                    <span className="font-semibold tracking-tight truncate">
+                      {isWhiteLabeled && whiteLabelName ? whiteLabelName : "UpsurgeIQ"}
+                    </span>
+                  )}
                 </div>
               ) : null}
             </div>
@@ -191,6 +212,24 @@ function DashboardLayoutContent({
           <SidebarContent className="gap-0">
             <SidebarMenu className="px-2 py-1">
               {menuItems.map(item => {
+                const isActive = location === item.path;
+                return (
+                  <SidebarMenuItem key={item.path}>
+                    <SidebarMenuButton
+                      isActive={isActive}
+                      onClick={() => setLocation(item.path)}
+                      tooltip={item.label}
+                      className={`h-10 transition-all font-normal`}
+                    >
+                      <item.icon
+                        className={`h-4 w-4 ${isActive ? "text-primary" : ""}`}
+                      />
+                      <span>{item.label}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+              {user?.role === "admin" && adminMenuItems.map(item => {
                 const isActive = location === item.path;
                 return (
                   <SidebarMenuItem key={item.path}>
@@ -274,7 +313,14 @@ function DashboardLayoutContent({
             <HelpCenter />
           </div>
         )}
-        <main className="flex-1 p-4">{children}</main>
+        <main className="flex-1 p-4">
+          {children}
+          {isWhiteLabeled && (
+            <div className="mt-8 pt-4 border-t text-center text-xs text-muted-foreground">
+              Delivered by UpsurgeIQ
+            </div>
+          )}
+        </main>
       </SidebarInset>
     </>
   );

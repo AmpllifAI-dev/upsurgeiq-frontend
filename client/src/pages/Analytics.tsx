@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Link } from "wouter";
 import { useState } from "react";
 import { AnalyticsCharts } from "@/components/AnalyticsCharts";
-import { exportAnalyticsToCSV } from "@/lib/csvExport";
+import { toast } from "sonner";
 
 export default function Analytics() {
   const { user, loading: authLoading } = useAuth();
@@ -92,10 +92,35 @@ export default function Analytics() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => exportAnalyticsToCSV({ pressReleases: pressReleases || [], socialPosts: socialPosts || [], campaigns: campaigns || [] })}
+                onClick={async () => {
+                  try {
+                    const startDateStr = dateRange === "custom" && startDate ? startDate : undefined;
+                    const endDateStr = dateRange === "custom" && endDate ? endDate : undefined;
+                    
+                    const result = await trpc.csvExport.exportAnalyticsSummary.mutate({
+                      startDate: startDateStr,
+                      endDate: endDateStr,
+                    });
+                    
+                    // Create and download CSV file
+                    const blob = new Blob([result.csv], { type: 'text/csv' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `analytics-summary-${new Date().toISOString().split('T')[0]}.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    toast.success("Analytics exported successfully");
+                  } catch (error: any) {
+                    toast.error(`Export failed: ${error.message}`);
+                  }
+                }}
               >
                 <Download className="w-4 h-4 mr-2" />
-                Export CSV
+                Export Summary
               </Button>
             </div>
           </div>

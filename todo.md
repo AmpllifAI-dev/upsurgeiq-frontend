@@ -1952,3 +1952,21 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [ ] Multi-Language Support
 - [ ] Video Content Generation
 - [ ] Advanced Journalist Database
+
+
+## Frontend Integration - CSV, White Label & Navigation (Dec 21, 2024)
+- [x] CSV Export Download Buttons
+  - [x] Add export buttons to Analytics dashboard
+  - [x] Create download helper function for CSV files
+  - [x] Add date range picker for filtered exports (uses existing custom range)
+  - [x] Integrated backend CSV export with proper error handling
+- [x] White Label Header Integration
+  - [x] Update DashboardLayout to read white label settings
+  - [x] Conditionally display client logo when whiteLabelEnabled
+  - [x] Show client company name when logo not available
+  - [x] Show "Delivered by UpsurgeIQ" footer on all pages
+  - [ ] Apply primary/secondary colors to UI elements (optional enhancement)
+- [x] White Label Settings Navigation
+  - [x] Add White Label Settings link to admin sidebar
+  - [x] Restrict access to admin users only (role check in DashboardLayout)
+  - [x] Add route to App.tsx
