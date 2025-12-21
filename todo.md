@@ -2097,3 +2097,37 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 
 ## Documentation (December 21, 2025)
 - [x] Document V2 website builder idea in ROADMAP_V2.md for future development
+
+
+## New Tasks (December 21, 2025 - Phase 2)
+- [ ] Research Christopher's background from LinkedIn and website
+- [ ] Write professional founder bio based on research
+- [ ] Upload Christopher's professional photo to About page
+- [ ] Create Privacy Policy page
+- [ ] Create Terms of Service page
+- [ ] Create Cookie Policy page
+- [ ] Design non-intrusive feedback system with voice recording
+- [ ] Implement customer feedback rating system
+- [ ] Create tech issue and improvement reporting system
+- [ ] Add testimonials section to V2 roadmap
+
+
+## December 21, 2025 - Legal Pages & Feedback System
+- [x] Research Christopher's background from LinkedIn and website
+- [x] Write professional bio for About page
+- [x] Upload Christopher's professional photo to About page
+- [x] Create comprehensive Privacy Policy page
+- [x] Create Terms of Service page
+- [x] Create Cookie Policy page
+- [x] Design non-intrusive feedback widget with voice recording
+- [x] Create tech issue reporting system
+- [x] Add feedback and issue reporting routes
+- [x] Implement feedback backend (tRPC routers)
+- [x] Document V2 website builder vision in ROADMAP_V2.md
+- [x] Fix 404 errors on dashboard stat cards
+- [x] Add hamburger menu to all public pages
+
+## Pending Database Migration
+- [ ] Run database migration for feedback and issue tracking tables
+- [ ] Test feedback submission with database storage
+- [ ] Test issue reporting with database storage

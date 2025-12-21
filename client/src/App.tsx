@@ -61,6 +61,10 @@ import NotificationPreferences from "@/pages/NotificationPreferences";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Status from "./pages/Status";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import CookiePolicy from "./pages/CookiePolicy";
+import ReportIssue from "./pages/ReportIssue";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -122,6 +126,10 @@ function Router() {
       <Route path="/about" component={About} />
       <Route path="/contact" component={Contact} />
       <Route path="/status" component={Status} />
+      <Route path="/privacy" component={Privacy} />
+      <Route path="/terms" component={Terms} />
+      <Route path="/cookie-policy" component={CookiePolicy} />
+      <Route path="/report-issue" component={ReportIssue} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

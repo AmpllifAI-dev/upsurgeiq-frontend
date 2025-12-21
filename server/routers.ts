@@ -4727,6 +4727,77 @@ Generate a comprehensive campaign strategy that includes:
       }),
   }),
 
+  feedback: router({
+    submit: protectedProcedure
+      .input(
+        z.object({
+          feedbackType: z.enum(["rating", "voice", "text", "suggestion"]),
+          rating: z.number().min(1).max(5).optional(),
+          feedbackText: z.string().optional(),
+          voiceRecordingUrl: z.string().optional(),
+          voiceRecordingDuration: z.number().optional(),
+          context: z.string().optional(),
+          pageUrl: z.string().optional(),
+          userAgent: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        const { notifyOwner } = await import("./_core/notification");
+        try {
+          // TODO: Implement database insert once schema is migrated
+          // For now, just log and notify owner
+          await notifyOwner({
+            title: `New ${input.feedbackType} feedback from ${ctx.user.name}`,
+            content: `Rating: ${input.rating || "N/A"}\nFeedback: ${input.feedbackText || "Voice recording"}\nContext: ${input.context || "N/A"}\nPage: ${input.pageUrl || "N/A"}`,
+          });
+
+          return { success: true };
+        } catch (error) {
+          console.error("Error submitting feedback:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to submit feedback",
+          });
+        }
+      }),
+  }),
+
+  issues: router({
+    submit: protectedProcedure
+      .input(
+        z.object({
+          issueType: z.enum(["bug", "feature_request", "improvement", "question"]),
+          title: z.string().min(1),
+          description: z.string().min(1),
+          stepsToReproduce: z.string().optional(),
+          expectedBehavior: z.string().optional(),
+          actualBehavior: z.string().optional(),
+          browserInfo: z.string().optional(),
+          deviceInfo: z.string().optional(),
+          pageUrl: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        const { notifyOwner } = await import("./_core/notification");
+        try {
+          // TODO: Implement database insert once schema is migrated
+          // For now, just log and notify owner
+          await notifyOwner({
+            title: `New ${input.issueType} from ${ctx.user.name}: ${input.title}`,
+            content: `Description: ${input.description}\n\nSteps: ${input.stepsToReproduce || "N/A"}\n\nExpected: ${input.expectedBehavior || "N/A"}\n\nActual: ${input.actualBehavior || "N/A"}\n\nBrowser: ${input.browserInfo || "N/A"}\nDevice: ${input.deviceInfo || "N/A"}\nPage: ${input.pageUrl || "N/A"}`,
+          });
+
+          return { success: true };
+        } catch (error) {
+          console.error("Error submitting issue:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to submit issue",
+          });
+        }
+      }),
+  }),
+
   contact: router({
     submit: publicProcedure
       .input(

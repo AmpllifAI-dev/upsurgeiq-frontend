@@ -196,38 +196,45 @@ export default function About() {
           <Card className="overflow-hidden">
             <CardContent className="p-0">
               <div className="grid md:grid-cols-2 gap-0">
-                {/* Photo Placeholder */}
+                {/* Founder Photo */}
                 <div className="bg-gradient-to-br from-primary/20 to-secondary/20 p-12 flex items-center justify-center min-h-[400px]">
-                  <div className="text-center space-y-4">
-                    <div className="w-48 h-48 mx-auto rounded-full bg-primary/30 flex items-center justify-center">
-                      <Users2 className="w-24 h-24 text-primary" />
-                    </div>
-                    <p className="text-sm text-muted-foreground italic">
-                      Photo placeholder - Upload your professional headshot
-                    </p>
-                  </div>
+                  <img 
+                    src="/christopher-lembke.jpg" 
+                    alt="Christopher Lembke, Founder & CEO of UpsurgeIQ"
+                    className="w-full h-full object-cover rounded-lg shadow-lg"
+                  />
                 </div>
 
                 {/* Bio Content */}
                 <div className="p-8 md:p-12 space-y-6">
                   <div>
-                    <h2 className="text-3xl font-bold text-foreground mb-2">Christopher [Last Name]</h2>
+                    <h2 className="text-3xl font-bold text-foreground mb-2">Christopher Lembke</h2>
                     <p className="text-lg text-primary font-medium">Founder & CEO</p>
                   </div>
 
                   <div className="space-y-4 text-muted-foreground">
                     <p>
-                      I founded UpsurgeIQ with a simple mission: to democratize professional PR and marketing for businesses of all sizes. 
-                      Having worked in communications for over [X] years, I've seen firsthand how expensive and inaccessible traditional 
-                      PR agencies can be for small and medium-sized businesses.
+                      I founded UpsurgeIQ with a mission to democratize professional PR and marketing for businesses of all sizes. 
+                      With nearly two decades of experience transforming businesses through strategic innovation, I've witnessed how 
+                      traditional PR agencies price out the very businesses that need them most—small and medium-sized enterprises 
+                      with ambitious growth goals.
                     </p>
                     <p>
-                      With UpsurgeIQ, I'm putting my reputation on the line to deliver a platform that combines cutting-edge AI technology 
-                      with the human touch that great marketing requires. Every feature we build is designed with your success in mind.
+                      My background is in pattern recognition and systems thinking. As the founder of The Alchemy Experience, I developed 
+                      a methodology I call Fractal Analysis—identifying hidden patterns and leverage points that create multiplying effects 
+                      throughout organizations. I've helped a boutique letting agency become a national leader without expanding headcount, 
+                      enabled a company to achieve 1000% revenue growth in under a decade, and rescued businesses from the brink of collapse.
                     </p>
                     <p>
-                      I believe in transparency, quality, and building long-term relationships with our clients. When you use UpsurgeIQ, 
-                      you're not just getting software—you're getting a partner who cares about your growth.
+                      With UpsurgeIQ, I'm applying that same systems-thinking approach to AI-powered marketing. I'm putting my reputation 
+                      on the line to deliver a platform that combines cutting-edge technology with strategic precision. Every feature we 
+                      build is designed to create those multiplying effects—small, smart changes that ripple through your entire marketing 
+                      ecosystem to drive real growth.
+                    </p>
+                    <p>
+                      When you use UpsurgeIQ, you're not just getting software—you're getting a partner who understands business transformation 
+                      and is committed to your success. I believe in transparency, quality, and building long-term relationships. Let's disrupt 
+                      your marketing before someone else does it for you.
                     </p>
                   </div>
 

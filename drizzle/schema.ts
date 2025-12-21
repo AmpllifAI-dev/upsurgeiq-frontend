@@ -1208,3 +1208,109 @@ export const aiUsageLog = mysqlTable("ai_usage_log", {
 export type AiUsageLog = typeof aiUsageLog.$inferSelect;
 export type InsertAiUsageLog = typeof aiUsageLog.$inferInsert;
 
+
+// Customer Feedback - Non-intrusive feedback collection
+export const customerFeedback = mysqlTable("customer_feedback", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Feedback Type
+  feedbackType: mysqlEnum("feedbackType", ["rating", "voice", "text", "suggestion"]).notNull(),
+  
+  // Rating (1-5 stars)
+  rating: int("rating"), // 1-5 stars, null if not a rating feedback
+  
+  // Context - what feature/page was the feedback about
+  context: varchar("context", { length: 255 }), // e.g., "press_release_creation", "dashboard", "ai_assistant"
+  
+  // Feedback Content
+  feedbackText: text("feedbackText"), // Text feedback or transcription of voice feedback
+  voiceRecordingUrl: varchar("voiceRecordingUrl", { length: 500 }), // S3 URL for voice recordings
+  voiceRecordingDuration: int("voiceRecordingDuration"), // Duration in seconds
+  
+  // Metadata
+  userAgent: varchar("userAgent", { length: 500 }), // Browser/device info
+  pageUrl: varchar("pageUrl", { length: 500 }), // Where feedback was submitted
+  
+  // Admin Response
+  status: mysqlEnum("status", ["new", "reviewed", "in_progress", "resolved", "archived"]).default("new").notNull(),
+  adminNotes: text("adminNotes"),
+  resolvedAt: timestamp("resolvedAt"),
+  resolvedBy: int("resolvedBy").references(() => users.id),
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CustomerFeedback = typeof customerFeedback.$inferSelect;
+export type InsertCustomerFeedback = typeof customerFeedback.$inferInsert;
+
+// Tech Issues & Improvement Requests
+export const techIssues = mysqlTable("tech_issues", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Issue Type
+  issueType: mysqlEnum("issueType", ["bug", "feature_request", "improvement", "question"]).notNull(),
+  
+  // Priority (auto-assigned based on keywords, can be changed by admin)
+  priority: mysqlEnum("priority", ["low", "medium", "high", "critical"]).default("medium").notNull(),
+  
+  // Issue Details
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  stepsToReproduce: text("stepsToReproduce"), // For bugs
+  expectedBehavior: text("expectedBehavior"), // For bugs
+  actualBehavior: text("actualBehavior"), // For bugs
+  
+  // Attachments
+  screenshotUrls: text("screenshotUrls"), // JSON array of S3 URLs
+  voiceRecordingUrl: varchar("voiceRecordingUrl", { length: 500 }), // Optional voice description
+  
+  // Technical Context
+  browserInfo: varchar("browserInfo", { length: 255 }),
+  deviceInfo: varchar("deviceInfo", { length: 255 }),
+  pageUrl: varchar("pageUrl", { length: 500 }),
+  errorMessage: text("errorMessage"), // If there was an error
+  
+  // Status Tracking
+  status: mysqlEnum("status", ["new", "acknowledged", "in_progress", "resolved", "closed", "wont_fix"]).default("new").notNull(),
+  assignedTo: int("assignedTo").references(() => users.id), // Admin user
+  
+  // Admin Response
+  adminResponse: text("adminResponse"),
+  internalNotes: text("internalNotes"), // Not visible to user
+  
+  // Resolution
+  resolvedAt: timestamp("resolvedAt"),
+  resolutionNotes: text("resolutionNotes"), // Visible to user
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TechIssue = typeof techIssues.$inferSelect;
+export type InsertTechIssue = typeof techIssues.$inferInsert;
+
+// Issue Comments - For communication between users and admins
+export const issueComments = mysqlTable("issue_comments", {
+  id: int("id").autoincrement().primaryKey(),
+  issueId: int("issueId").notNull().references(() => techIssues.id, { onDelete: "cascade" }),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Comment Content
+  comment: text("comment").notNull(),
+  isInternal: int("isInternal").default(0), // 1 = only visible to admins, 0 = visible to user
+  
+  // Attachments
+  attachmentUrls: text("attachmentUrls"), // JSON array of S3 URLs
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type IssueComment = typeof issueComments.$inferSelect;
+export type InsertIssueComment = typeof issueComments.$inferInsert;
