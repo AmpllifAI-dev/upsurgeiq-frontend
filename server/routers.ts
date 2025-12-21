@@ -409,6 +409,45 @@ export const appRouter = router({
 
         return { success: true };
       }),
+
+    updateWhiteLabel: protectedProcedure
+      .input(
+        z.object({
+          businessId: z.number(),
+          whiteLabelEnabled: z.number(),
+          whiteLabelLogoUrl: z.string().optional(),
+          whiteLabelPrimaryColor: z.string().optional(),
+          whiteLabelSecondaryColor: z.string().optional(),
+          whiteLabelCompanyName: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { businessId, ...updates } = input;
+        
+        // Verify user owns this business
+        const business = await getUserBusiness(ctx.user.id);
+        if (!business || business.id !== businessId) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You do not have permission to update this business",
+          });
+        }
+
+        await updateBusiness(businessId, updates);
+
+        // Log activity
+        const { logActivity } = await import("./activityLog");
+        await logActivity({
+          userId: ctx.user.id,
+          action: "update",
+          entityType: "business_white_label",
+          entityId: businessId,
+          description: `White label settings ${updates.whiteLabelEnabled ? 'enabled' : 'disabled'}`,
+          metadata: updates,
+        });
+
+        return { success: true };
+      }),
   }),
 
   dashboard: router({
@@ -4590,6 +4629,69 @@ Generate a comprehensive campaign strategy that includes:
       const { getUpcomingInvoice } = await import("./billing");
       return await getUpcomingInvoice(subscription.stripeCustomerId);
     }),
+  }),
+
+  // CSV Export router
+  csvExport: router({
+    exportPressReleaseAnalytics: protectedProcedure
+      .input(
+        z.object({
+          startDate: z.string().optional(),
+          endDate: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { exportPressReleaseAnalytics } = await import("./csvExport");
+        const startDate = input.startDate ? new Date(input.startDate) : undefined;
+        const endDate = input.endDate ? new Date(input.endDate) : undefined;
+        const csv = await exportPressReleaseAnalytics(ctx.user.id, startDate, endDate);
+        return { csv };
+      }),
+
+    exportCampaignAnalytics: protectedProcedure
+      .input(
+        z.object({
+          startDate: z.string().optional(),
+          endDate: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { exportCampaignAnalytics } = await import("./csvExport");
+        const startDate = input.startDate ? new Date(input.startDate) : undefined;
+        const endDate = input.endDate ? new Date(input.endDate) : undefined;
+        const csv = await exportCampaignAnalytics(ctx.user.id, startDate, endDate);
+        return { csv };
+      }),
+
+    exportSocialMediaAnalytics: protectedProcedure
+      .input(
+        z.object({
+          startDate: z.string().optional(),
+          endDate: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { exportSocialMediaAnalytics } = await import("./csvExport");
+        const startDate = input.startDate ? new Date(input.startDate) : undefined;
+        const endDate = input.endDate ? new Date(input.endDate) : undefined;
+        const csv = await exportSocialMediaAnalytics(ctx.user.id, startDate, endDate);
+        return { csv };
+      }),
+
+    exportAnalyticsSummary: protectedProcedure
+      .input(
+        z.object({
+          startDate: z.string().optional(),
+          endDate: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { exportAnalyticsSummary } = await import("./csvExport");
+        const startDate = input.startDate ? new Date(input.startDate) : undefined;
+        const endDate = input.endDate ? new Date(input.endDate) : undefined;
+        const csv = await exportAnalyticsSummary(ctx.user.id, startDate, endDate);
+        return { csv };
+      }),
   }),
 });
 

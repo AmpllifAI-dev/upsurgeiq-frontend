@@ -61,6 +61,12 @@ export const businesses = mysqlTable("businesses", {
   aiImageMood: varchar("aiImageMood", { length: 100 }),
   aiImageColorPalette: varchar("aiImageColorPalette", { length: 255 }),
   preferredLanguage: varchar("preferredLanguage", { length: 10 }).default("en-GB"),
+  // White label branding
+  whiteLabelEnabled: int("whiteLabelEnabled").default(0),
+  whiteLabelLogoUrl: varchar("whiteLabelLogoUrl", { length: 500 }),
+  whiteLabelPrimaryColor: varchar("whiteLabelPrimaryColor", { length: 7 }), // Hex color #RRGGBB
+  whiteLabelSecondaryColor: varchar("whiteLabelSecondaryColor", { length: 7 }),
+  whiteLabelCompanyName: varchar("whiteLabelCompanyName", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

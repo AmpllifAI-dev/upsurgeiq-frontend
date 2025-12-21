@@ -82,6 +82,9 @@ async function startServer() {
     
     // Initialize credit alert scheduler
     initializeAlertScheduler();
+    
+    // Initialize usage notifications job (daily at 9 AM)
+    import("../jobs/usageNotificationsJob").catch(console.error);
   });
 }
 

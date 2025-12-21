@@ -1915,3 +1915,40 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
   - [ ] Create CSV export for campaign analytics
   - [ ] Create CSV export for social media analytics
   - [ ] Add date range filtering for exports
+
+
+## Current Session - CSV Export, Notifications & White Label (Dec 21, 2024)
+- [x] CSV Export Functionality
+  - [x] Create backend procedure for press release analytics CSV export
+  - [x] Create backend procedure for campaign analytics CSV export
+  - [x] Create backend procedure for social media analytics CSV export
+  - [x] Add date range filtering for exports
+  - [x] Create CSV generation utility function
+  - [ ] Add download buttons to Analytics page (frontend integration needed)
+- [x] Email Notifications for Usage Limits
+  - [x] Create notification logic for 80% usage warning
+  - [x] Create notification logic for 90% usage warning
+  - [x] Create notification logic for 100% limit reached
+  - [x] Implement backend check for usage thresholds
+  - [x] Schedule daily usage check job (runs at 9 AM)
+  - [x] Send notifications via existing notification system
+  - [ ] Add notification preferences to user settings (optional enhancement)
+- [x] White Label Branding System
+  - [x] Add white label settings to database schema (logo URL, primary color, secondary color, company name)
+  - [x] Create white label configuration page for admin
+  - [x] Create updateWhiteLabel backend procedure
+  - [ ] Update app header to use white label logo and colors (frontend integration)
+  - [ ] Update email templates to use white label branding
+  - [ ] Update PDF exports to use white label branding
+  - [x] Add "Delivered by UpsurgeIQ" footer to white label instances (in preview)
+  - [x] Create white label preview functionality
+  - [ ] Test white label switching without cache issues
+
+## Version 2.0 Features (V2_FEATURES.md)
+- [ ] Billing Forecast Widget (moved from current work)
+- [ ] Google Ads Integration for Campaign Lab
+- [ ] LinkedIn Ads Integration for Campaign Lab
+- [ ] Advanced Analytics Dashboard
+- [ ] Multi-Language Support
+- [ ] Video Content Generation
+- [ ] Advanced Journalist Database
