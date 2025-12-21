@@ -4901,6 +4901,76 @@ Generate a comprehensive campaign strategy that includes:
       }),
   }),
 
+  analytics: router({
+    trackEvent: publicProcedure
+      .input(z.object({
+        sessionId: z.string(),
+        userId: z.number().optional(),
+        eventType: z.enum([
+          "page_view",
+          "resource_download",
+          "blog_read",
+          "case_study_view",
+          "newsletter_signup",
+          "form_submit",
+          "cta_click",
+          "video_play",
+          "external_link_click"
+        ]),
+        eventData: z.record(z.any()).optional(),
+        pageUrl: z.string().optional(),
+        referrer: z.string().optional(),
+        userAgent: z.string().optional(),
+        ipAddress: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { trackEvent } = await import("./analytics");
+        return await trackEvent(input);
+      }),
+
+    getUserJourney: protectedProcedure
+      .input(z.object({
+        sessionId: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const { getUserJourney } = await import("./analytics");
+        return await getUserJourney(input.sessionId);
+      }),
+
+    getLeadScore: protectedProcedure
+      .input(z.object({
+        sessionId: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const { getLeadScore } = await import("./analytics");
+        return await getLeadScore(input.sessionId);
+      }),
+
+    getUserSegments: protectedProcedure
+      .input(z.object({
+        sessionId: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const { getUserSegments } = await import("./analytics");
+        return await getUserSegments(input.sessionId);
+      }),
+
+    getSummary: protectedProcedure
+      .query(async () => {
+        const { getAnalyticsSummary } = await import("./analytics");
+        return await getAnalyticsSummary();
+      }),
+
+    getTopPages: protectedProcedure
+      .input(z.object({
+        limit: z.number().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const { getTopPages } = await import("./analytics");
+        return await getTopPages(input?.limit);
+      }),
+  }),
+
   newsletter: router({ subscribe: publicProcedure
       .input(z.object({
         email: z.string().email(),

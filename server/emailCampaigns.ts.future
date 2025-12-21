@@ -1,0 +1,393 @@
+import { getDb } from "./db";
+import {
+  emailTriggers,
+  emailCampaignHistory,
+  segmentMembers,
+  userSegments,
+  leadScores,
+  newsletterSubscribers,
+} from "../drizzle/schema";
+import { eq, and, gte } from "drizzle-orm";
+import { sendEmail } from "./_core/email";
+
+/**
+ * Create a new email trigger
+ */
+export async function createEmailTrigger(params: {
+  name: string;
+  description?: string;
+  triggerType: "behaviour_based" | "segment_entry" | "lead_score_threshold" | "time_based" | "blog_published";
+  conditions: Record<string, any>;
+  emailTemplate: string;
+  subject: string;
+  isActive?: boolean;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  await db.insert(emailTriggers).values({
+    name: params.name,
+    description: params.description,
+    triggerType: params.triggerType,
+    conditions: params.conditions,
+    emailTemplate: params.emailTemplate,
+    subject: params.subject,
+    isActive: params.isActive ?? 1,
+  });
+
+  return { success: true };
+}
+
+/**
+ * Get all active email triggers
+ */
+export async function getActiveEmailTriggers() {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  return await db
+    .select()
+    .from(emailTriggers)
+    .where(eq(emailTriggers.isActive, 1));
+}
+
+/**
+ * Check and execute email triggers for a segment entry
+ */
+export async function checkSegmentTriggers(segmentId: number, email: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  // Get all active triggers for segment entry
+  const triggers = await db
+    .select()
+    .from(emailTriggers)
+    .where(
+      and(
+        eq(emailTriggers.triggerType, "segment_entry"),
+        eq(emailTriggers.isActive, 1)
+      )
+    );
+
+  for (const trigger of triggers) {
+    const conditions = trigger.conditions as any;
+    
+    // Check if this trigger is for the segment that was just entered
+    if (conditions.segmentId === segmentId) {
+      await sendTriggeredEmail(trigger.id, email, trigger.subject, trigger.emailTemplate);
+    }
+  }
+}
+
+/**
+ * Check and execute email triggers for lead score threshold
+ */
+export async function checkLeadScoreTriggers(sessionId: string, newScore: number, email?: string) {
+  const db = await getDb();
+  if (!db) return;
+  if (!email) return; // Need email to send
+
+  // Get all active triggers for lead score threshold
+  const triggers = await db
+    .select()
+    .from(emailTriggers)
+    .where(
+      and(
+        eq(emailTriggers.triggerType, "lead_score_threshold"),
+        eq(emailTriggers.isActive, 1)
+      )
+    );
+
+  for (const trigger of triggers) {
+    const conditions = trigger.conditions as any;
+    
+    // Check if the new score crosses the threshold
+    if (newScore >= conditions.threshold) {
+      // Check if we've already sent this trigger to this email
+      const history = await db
+        .select()
+        .from(emailCampaignHistory)
+        .where(
+          and(
+            eq(emailCampaignHistory.triggerId, trigger.id),
+            eq(emailCampaignHistory.email, email)
+          )
+        )
+        .limit(1);
+
+      if (history.length === 0) {
+        await sendTriggeredEmail(trigger.id, email, trigger.subject, trigger.emailTemplate);
+      }
+    }
+  }
+}
+
+/**
+ * Send triggered email
+ */
+async function sendTriggeredEmail(
+  triggerId: number,
+  email: string,
+  subject: string,
+  template: string
+) {
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    // Send email via SendGrid
+    await sendEmail({
+      to: email,
+      subject,
+      html: template,
+    });
+
+    // Record in campaign history
+    await db.insert(emailCampaignHistory).values({
+      triggerId,
+      email,
+      subject,
+      status: "sent",
+      sentAt: new Date(),
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to send triggered email:", error);
+
+    // Record failure
+    await db.insert(emailCampaignHistory).values({
+      triggerId,
+      email,
+      subject,
+      status: "failed",
+      sentAt: new Date(),
+    });
+
+    return { success: false, error };
+  }
+}
+
+/**
+ * Send email to all members of a segment
+ */
+export async function sendSegmentCampaign(params: {
+  segmentId: number;
+  subject: string;
+  emailTemplate: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  // Get all members of the segment
+  const members = await db
+    .select()
+    .from(segmentMembers)
+    .where(eq(segmentMembers.segmentId, params.segmentId));
+
+  const results = {
+    total: members.length,
+    sent: 0,
+    failed: 0,
+  };
+
+  for (const member of members) {
+    if (!member.email) continue;
+
+    try {
+      await sendEmail({
+        to: member.email,
+        subject: params.subject,
+        html: params.emailTemplate,
+      });
+
+      await db.insert(emailCampaignHistory).values({
+        email: member.email,
+        subject: params.subject,
+        status: "sent",
+        sentAt: new Date(),
+      });
+
+      results.sent++;
+    } catch (error) {
+      console.error(`Failed to send to ${member.email}:`, error);
+
+      await db.insert(emailCampaignHistory).values({
+        email: member.email,
+        subject: params.subject,
+        status: "failed",
+        sentAt: new Date(),
+      });
+
+      results.failed++;
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Send email to all hot/qualified leads
+ */
+export async function sendLeadCampaign(params: {
+  minScore: number;
+  subject: string;
+  emailTemplate: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  // Get all leads above the score threshold with email addresses
+  const leads = await db
+    .select()
+    .from(leadScores)
+    .where(gte(leadScores.score, params.minScore));
+
+  const results = {
+    total: leads.length,
+    sent: 0,
+    failed: 0,
+  };
+
+  for (const lead of leads) {
+    if (!lead.email) continue;
+
+    try {
+      await sendEmail({
+        to: lead.email,
+        subject: params.subject,
+        html: params.emailTemplate,
+      });
+
+      await db.insert(emailCampaignHistory).values({
+        email: lead.email,
+        subject: params.subject,
+        status: "sent",
+        sentAt: new Date(),
+      });
+
+      results.sent++;
+    } catch (error) {
+      console.error(`Failed to send to ${lead.email}:`, error);
+
+      await db.insert(emailCampaignHistory).values({
+        email: lead.email,
+        subject: params.subject,
+        status: "failed",
+        sentAt: new Date(),
+      });
+
+      results.failed++;
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Send new blog post notification to all newsletter subscribers
+ */
+export async function sendBlogNotification(params: {
+  blogTitle: string;
+  blogExcerpt: string;
+  blogUrl: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  // Get all active newsletter subscribers
+  const subscribers = await db
+    .select()
+    .from(newsletterSubscribers)
+    .where(eq(newsletterSubscribers.status, "active"));
+
+  const emailTemplate = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${params.blogTitle}</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; colour: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background-colour: #f8f9fa; padding: 30px; border-radius: 10px;">
+        <h1 style="colour: #2563eb; margin-bottom: 20px;">New Blog Post from UpsurgeIQ</h1>
+        
+        <h2 style="colour: #1e40af; margin-bottom: 15px;">${params.blogTitle}</h2>
+        
+        <p style="colour: #6b7280; font-size: 16px; margin-bottom: 25px;">
+          ${params.blogExcerpt}
+        </p>
+        
+        <a href="${params.blogUrl}" style="display: inline-block; background-colour: #2563eb; colour: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+          Read Full Article
+        </a>
+        
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+        
+        <p style="colour: #9ca3af; font-size: 14px; margin-bottom: 10px;">
+          You're receiving this because you subscribed to UpsurgeIQ updates.
+        </p>
+        
+        <p style="colour: #9ca3af; font-size: 14px;">
+          <a href="${process.env.FRONTEND_URL}/unsubscribe?email={{email}}" style="colour: #6b7280;">Unsubscribe</a>
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const results = {
+    total: subscribers.length,
+    sent: 0,
+    failed: 0,
+  };
+
+  for (const subscriber of subscribers) {
+    try {
+      const personalizedTemplate = emailTemplate.replace("{{email}}", subscriber.email);
+
+      await sendEmail({
+        to: subscriber.email,
+        subject: `New Post: ${params.blogTitle}`,
+        html: personalizedTemplate,
+      });
+
+      await db.insert(emailCampaignHistory).values({
+        email: subscriber.email,
+        subject: `New Post: ${params.blogTitle}`,
+        status: "sent",
+        sentAt: new Date(),
+      });
+
+      results.sent++;
+    } catch (error) {
+      console.error(`Failed to send to ${subscriber.email}:`, error);
+
+      await db.insert(emailCampaignHistory).values({
+        email: subscriber.email,
+        subject: `New Post: ${params.blogTitle}`,
+        status: "failed",
+        sentAt: new Date(),
+      });
+
+      results.failed++;
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Get campaign history
+ */
+export async function getCampaignHistory(limit: number = 50) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  return await db
+    .select()
+    .from(emailCampaignHistory)
+    .orderBy(emailCampaignHistory.sentAt)
+    .limit(limit);
+}

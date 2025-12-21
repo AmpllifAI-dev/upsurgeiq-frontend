@@ -2242,3 +2242,52 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - Use -re not -er (centre, theatre)
 - Use -ogue not -og (catalogue, dialogue)
 - This applies to ALL AI-generated content, press releases, social media posts, emails, and UI text
+
+
+## Blog Navigation Widget (Dec 21, 2025)
+- [ ] Create category navigation component for WordPress blog
+- [ ] Create tag cloud component for WordPress blog
+- [ ] Add sidebar widget to blog pages
+- [ ] Style widgets to match brand design
+- [ ] Test category and tag filtering
+- [ ] Add post counts to categories and tags
+
+## Future Enhancements
+- [ ] V2: Add testimonials carousel on homepage
+- [ ] Email campaign builder with automated blog notifications
+
+
+## User Behaviour Tracking & Segmentation (Dec 21, 2025) - HIGH PRIORITY
+- [ ] Create database schema for user events tracking
+- [ ] Create database schema for lead scoring
+- [ ] Create database schema for user segments
+- [ ] Build event tracking middleware for page views
+- [ ] Track resource downloads (templates, PDFs)
+- [ ] Track blog post reads and engagement
+- [ ] Track case study views
+- [ ] Implement lead scoring algorithm
+- [ ] Create automated segmentation rules engine
+- [ ] Build email trigger system based on behaviour
+- [ ] Create analytics dashboard for user journeys
+- [ ] Add journey visualization components
+- [ ] Implement segment-based email campaigns
+- [ ] Write tests for tracking and segmentation
+
+## User Behaviour Tracking & Analytics System (Dec 21, 2025)
+- [x] Create database schema for user behaviour tracking
+- [x] Build tracking hooks and tRPC procedures
+- [x] Implement lead scoring engine with tiers (Cold/Warm/Hot/Qualified)
+- [x] Create email segmentation system
+- [x] Build automated email triggers for behaviour-based campaigns
+- [x] Create analytics dashboard page at /analytics
+- [x] Add blog category/tag navigation (categories and tags visible on posts)
+- [x] Integrate tracking on Resources, Case Studies, and other key pages
+- [x] Build blog notification system for newsletter subscribers
+
+## Content Enhancement (Dec 21, 2025)
+- [x] Add WordPress blog categories (PR Strategy, Marketing, Best Practices, AI & Technology)
+- [x] Add tags to all 4 blog posts
+- [x] Create Case Studies section with 4 success stories
+- [x] Convert all marketing pages to British English
+- [x] Create downloadable PR template PDFs for Resources page
+

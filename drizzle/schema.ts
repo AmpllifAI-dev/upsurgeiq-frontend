@@ -1441,3 +1441,112 @@ export const newsletterCampaigns = mysqlTable("newsletter_campaigns", {
 
 export type NewsletterCampaign = typeof newsletterCampaigns.$inferSelect;
 export type InsertNewsletterCampaign = typeof newsletterCampaigns.$inferInsert;
+
+
+// User Behaviour Tracking & Analytics
+export const userEvents = mysqlTable("user_events", {
+  id: int("id").autoincrement().primaryKey(),
+  sessionId: varchar("sessionId", { length: 255 }).notNull(), // Anonymous session tracking
+  userId: int("userId").references(() => users.id, { onDelete: "cascade" }), // Null for anonymous users
+  eventType: mysqlEnum("eventType", [
+    "page_view",
+    "resource_download",
+    "blog_read",
+    "case_study_view",
+    "newsletter_signup",
+    "form_submit",
+    "cta_click",
+    "video_play",
+    "external_link_click"
+  ]).notNull(),
+  eventData: json("eventData"), // Flexible JSON for event-specific data
+  pageUrl: varchar("pageUrl", { length: 500 }),
+  referrer: varchar("referrer", { length: 500 }),
+  userAgent: text("userAgent"),
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type UserEvent = typeof userEvents.$inferSelect;
+export type InsertUserEvent = typeof userEvents.$inferInsert;
+
+// Lead Scoring
+export const leadScores = mysqlTable("lead_scores", {
+  id: int("id").autoincrement().primaryKey(),
+  sessionId: varchar("sessionId", { length: 255 }).notNull().unique(),
+  userId: int("userId").references(() => users.id, { onDelete: "cascade" }),
+  email: varchar("email", { length: 320 }),
+  score: int("score").default(0).notNull(),
+  tier: mysqlEnum("tier", ["cold", "warm", "hot", "qualified"]).default("cold").notNull(),
+  lastActivityAt: timestamp("lastActivityAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LeadScore = typeof leadScores.$inferSelect;
+export type InsertLeadScore = typeof leadScores.$inferInsert;
+
+// User Segments
+export const userSegments = mysqlTable("user_segments", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  rules: json("rules").notNull(), // JSON rules for segment membership
+  isActive: int("isActive").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type UserSegment = typeof userSegments.$inferSelect;
+export type InsertUserSegment = typeof userSegments.$inferInsert;
+
+// Segment Membership (many-to-many)
+export const segmentMembers = mysqlTable("segment_members", {
+  id: int("id").autoincrement().primaryKey(),
+  segmentId: int("segmentId").notNull().references(() => userSegments.id, { onDelete: "cascade" }),
+  sessionId: varchar("sessionId", { length: 255 }),
+  userId: int("userId").references(() => users.id, { onDelete: "cascade" }),
+  email: varchar("email", { length: 320 }),
+  addedAt: timestamp("addedAt").defaultNow().notNull(),
+});
+
+export type SegmentMember = typeof segmentMembers.$inferSelect;
+export type InsertSegmentMember = typeof segmentMembers.$inferInsert;
+
+// Email Campaign Triggers
+export const emailTriggers = mysqlTable("email_triggers", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  triggerType: mysqlEnum("triggerType", [
+    "behaviour_based",
+    "segment_entry",
+    "lead_score_threshold",
+    "time_based",
+    "blog_published"
+  ]).notNull(),
+  conditions: json("conditions").notNull(), // JSON conditions for triggering
+  emailTemplate: text("emailTemplate").notNull(),
+  subject: varchar("subject", { length: 255 }).notNull(),
+  isActive: int("isActive").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EmailTrigger = typeof emailTriggers.$inferSelect;
+export type InsertEmailTrigger = typeof emailTriggers.$inferInsert;
+
+// Email Campaign History
+export const emailCampaignHistory = mysqlTable("email_campaign_history", {
+  id: int("id").autoincrement().primaryKey(),
+  triggerId: int("triggerId").references(() => emailTriggers.id, { onDelete: "set null" }),
+  email: varchar("email", { length: 320 }).notNull(),
+  subject: varchar("subject", { length: 255 }).notNull(),
+  status: mysqlEnum("status", ["sent", "failed", "bounced", "opened", "clicked"]).notNull(),
+  sentAt: timestamp("sentAt").defaultNow().notNull(),
+  openedAt: timestamp("openedAt"),
+  clickedAt: timestamp("clickedAt"),
+});
+
+export type EmailCampaignHistory = typeof emailCampaignHistory.$inferSelect;
+export type InsertEmailCampaignHistory = typeof emailCampaignHistory.$inferInsert;

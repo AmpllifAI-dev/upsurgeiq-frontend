@@ -4,8 +4,10 @@ import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Link } from 'wouter';
 import { NewsletterSignup } from '../components/NewsletterSignup';
+import { usePageTracking } from '../hooks/useTracking';
 
 export function Resources() {
+  usePageTracking();
   const resources = [
     {
       title: 'Press Release Template',

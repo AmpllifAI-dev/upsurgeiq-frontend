@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, TrendingUp, Users, Target, Award } from "lucide-react";
 import { Link } from "wouter";
+import { usePageTracking } from "../hooks/useTracking";
 
 interface CaseStudy {
   id: string;
@@ -172,6 +173,7 @@ const caseStudies: CaseStudy[] = [
 ];
 
 export function CaseStudies() {
+  usePageTracking();
   const featuredStudies = caseStudies.filter((study) => study.featured);
   const otherStudies = caseStudies.filter((study) => !study.featured);
 
