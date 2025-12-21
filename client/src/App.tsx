@@ -79,6 +79,8 @@ import { EmailAnalytics } from "./pages/EmailAnalytics";
 import { EmailWorkflows } from "./pages/EmailWorkflows";
 import { EmailTemplateLibrary } from "./pages/EmailTemplateLibrary";
 import { SubscriberPreferences } from "./pages/SubscriberPreferences";
+import SendGridSetup from "./pages/SendGridSetup";
+import EmailDeliverability from "./pages/EmailDeliverability";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -158,6 +160,8 @@ function Router() {
         <Route path="/email-workflows" component={EmailWorkflows} />
         <Route path="/email-template-library" component={EmailTemplateLibrary} />
         <Route path="/preferences" component={SubscriberPreferences} />
+        <Route path="/sendgrid-setup" component={SendGridSetup} />
+        <Route path="/email-deliverability" component={EmailDeliverability} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

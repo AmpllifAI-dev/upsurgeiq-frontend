@@ -106,6 +106,11 @@ async function startServer() {
       // Run immediately on startup
       module.processDueWorkflowEmails().catch(console.error);
     }).catch(console.error);
+    
+    // Initialize welcome workflow template (only runs once)
+    import("../welcomeWorkflowTemplate").then(module => {
+      module.initializeWelcomeWorkflow().catch(console.error);
+    }).catch(console.error);
   });
 }
 
