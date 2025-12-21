@@ -2455,3 +2455,12 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [ ] Add formatting toolbar (bold, italic, headings, lists, links)
 - [ ] Convert markdown to/from HTML for storage
 - [ ] Update press release creation and editing pages
+
+
+## PRIORITY: Critical Fixes & UX Improvements (Current Session)
+- [x] Fix React hooks error in MediaLists.tsx ("Rendered more hooks than during the previous render")
+- [x] Fix React hooks error in JournalistList.tsx (useState import issues)
+- [x] Implement rich text WYSIWYG editor for press releases (replace markdown)
+- [x] Add press release creation choice dialog (AI vs Manual) with usage tracking
+- [x] Audit all pages and ensure proper dashboard navigation accessibility
+- [x] Add missing navigation links to inaccessible pages (Content Calendar, Email Campaigns, Email Analytics, AI Assistant, Profile, Notifications, Billing, Admin tools)

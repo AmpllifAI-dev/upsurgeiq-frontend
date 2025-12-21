@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, Share2, Megaphone, BarChart3, Mail, Trophy, Sparkles, Image, Link2, Settings, Bug } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, Share2, Megaphone, BarChart3, Mail, Trophy, Sparkles, Image, Link2, Settings, Bug, Calendar, Inbox, Workflow, TrendingUp, User, Bell, CreditCard, Plug, ShieldCheck } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -35,19 +35,27 @@ const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
   { icon: FileText, label: "Press Releases", path: "/press-releases" },
   { icon: Share2, label: "Social Media", path: "/social-media" },
+  { icon: Calendar, label: "Content Calendar", path: "/content-calendar" },
   { icon: Megaphone, label: "Campaigns", path: "/campaigns" },
-  { icon: Trophy, label: "Sports Teams", path: "/dashboard/sports-teams" },
+  { icon: Inbox, label: "Email Campaigns", path: "/email-campaigns" },
   { icon: Mail, label: "Media Lists", path: "/media-lists" },
-  { icon: BarChart3, label: "Analytics", path: "/analytics" },
-  { icon: Bug, label: "Issue Tracker", path: "/issues" },
-  { icon: BarChart3, label: "Issue Analytics", path: "/issue-analytics" },
-  { icon: Sparkles, label: "AI Add-ons", path: "/dashboard/ai-addons" },
-  { icon: Image, label: "Image Packs", path: "/dashboard/image-packs" },
   { icon: Link2, label: "Social Connections", path: "/dashboard/social-connections" },
+  { icon: BarChart3, label: "Analytics", path: "/analytics" },
+  { icon: TrendingUp, label: "Email Analytics", path: "/email-analytics" },
+  { icon: Bug, label: "Issue Tracker", path: "/issues" },
+  { icon: Sparkles, label: "AI Assistant", path: "/ai-assistant" },
+  { icon: Trophy, label: "Sports Teams", path: "/dashboard/sports-teams" },
+  { icon: Image, label: "Image Packs", path: "/dashboard/image-packs" },
+  { icon: User, label: "Profile", path: "/profile" },
+  { icon: Bell, label: "Notifications", path: "/notification-preferences" },
+  { icon: CreditCard, label: "Billing & Usage", path: "/billing-history" },
 ];
 
 const adminMenuItems = [
   { icon: Settings, label: "White Label Settings", path: "/dashboard/white-label-settings", adminOnly: true },
+  { icon: ShieldCheck, label: "Error Logs", path: "/error-logs", adminOnly: true },
+  { icon: CreditCard, label: "Credit Management", path: "/admin-credit-management", adminOnly: true },
+  { icon: Users, label: "Team Management", path: "/team-management", adminOnly: true },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";

@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SearchFilter } from "@/components/SearchFilter";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { PressReleaseCreationDialog } from "@/components/PressReleaseCreationDialog";
 
 export default function PressReleases() {
   const { user, loading } = useAuth();
@@ -27,6 +28,7 @@ export default function PressReleases() {
   const [bulkMode, setBulkMode] = useState(false);
   const [showSaveFilterDialog, setShowSaveFilterDialog] = useState(false);
   const [filterName, setFilterName] = useState("");
+  const [showCreationDialog, setShowCreationDialog] = useState(false);
 
   const { data: savedFilters } = trpc.savedFilters.list.useQuery({ entityType: "press_release" });
 
@@ -375,7 +377,7 @@ export default function PressReleases() {
                   <FileSpreadsheet className="w-4 h-4 mr-2" />
                   Export CSV
                 </Button>
-                <Button onClick={() => setLocation("/press-releases/new")}>
+                <Button onClick={() => setShowCreationDialog(true)}>
                   <Plus className="w-4 h-4 mr-2" />
                   New Press Release
                 </Button>
@@ -550,7 +552,7 @@ export default function PressReleases() {
               <p className="text-sm text-muted-foreground mb-6 text-center max-w-md">
                 Our AI will use your business dossier to generate professional, on-brand content in seconds.
               </p>
-              <Button onClick={() => setLocation("/press-releases/new")}>
+              <Button onClick={() => setShowCreationDialog(true)}>
                 <Plus className="w-4 h-4 mr-2" />
                 Create Press Release
               </Button>
@@ -670,6 +672,12 @@ export default function PressReleases() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Press Release Creation Dialog */}
+      <PressReleaseCreationDialog
+        open={showCreationDialog}
+        onOpenChange={setShowCreationDialog}
+      />
     </div>
   );
 }

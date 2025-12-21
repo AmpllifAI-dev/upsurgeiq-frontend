@@ -14,6 +14,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Streamdown } from "streamdown";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { RichTextEditor } from "@/components/RichTextEditor";
 import { CopyButton } from "@/components/CopyButton";
 import { CharacterCounter } from "@/components/CharacterCounter";
 import { PressReleaseImageGenerator } from "@/components/PressReleaseImageGenerator";
@@ -25,11 +26,17 @@ export default function PressReleaseNew() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
   
+  // Detect mode from URL parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const mode = urlParams.get('mode') || 'ai'; // 'ai' or 'manual'
+  const isManualMode = mode === 'manual';
+  
   const [topic, setTopic] = useState("");
   const [keyPoints, setKeyPoints] = useState("");
   const [targetAudience, setTargetAudience] = useState("");
   const [tone, setTone] = useState("");
   const [generatedContent, setGeneratedContent] = useState("");
+  const [manualTitle, setManualTitle] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
@@ -152,7 +159,14 @@ export default function PressReleaseNew() {
   const handleSave = () => {
     if (!generatedContent) {
       toast.error("No content to save", {
-        description: "Please generate press release content using the AI before saving."
+        description: isManualMode ? "Please write some content before saving." : "Please generate press release content using the AI before saving."
+      });
+      return;
+    }
+    
+    if (isManualMode && !manualTitle) {
+      toast.error("Title required", {
+        description: "Please enter a title for your press release."
       });
       return;
     }
@@ -171,7 +185,7 @@ export default function PressReleaseNew() {
     }
 
     saveMutation.mutate({
-      title: topic,
+      title: isManualMode ? manualTitle : topic,
       content: generatedContent,
       imageUrl: generatedImageUrl || uploadedImageUrl || undefined,
       status: scheduledFor ? "scheduled" : "draft",
@@ -211,14 +225,20 @@ export default function PressReleaseNew() {
             <FileText className="w-3 h-3 mr-1" />
             New Press Release
           </Badge>
-          <h1 className="text-4xl font-bold text-foreground">Create Press Release</h1>
+          <h1 className="text-4xl font-bold text-foreground">
+            {isManualMode ? "Write Press Release" : "Create Press Release"}
+          </h1>
           <p className="text-muted-foreground mt-2">
-            Use AI to generate professional press releases tailored to your brand voice
+            {isManualMode 
+              ? "Write your press release from scratch with our rich text editor" 
+              : "Use AI to generate professional press releases tailored to your brand voice"
+            }
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-          {/* Input Form */}
+          {/* Input Form - AI Mode */}
+          {!isManualMode && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -346,6 +366,64 @@ export default function PressReleaseNew() {
               )}
             </CardContent>
           </Card>
+          )}
+          
+          {/* Manual Mode Form */}
+          {isManualMode && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <PenTool className="w-5 h-5" />
+                Press Release Details
+              </CardTitle>
+              <CardDescription>
+                Enter your press release information
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="manualTitle">Title *</Label>
+                <Input
+                  id="manualTitle"
+                  placeholder="Enter press release title"
+                  value={manualTitle}
+                  onChange={(e) => setManualTitle(e.target.value)}
+                />
+                <CharacterCounter current={manualTitle.length} max={150} />
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Content *</Label>
+                <RichTextEditor
+                  content={generatedContent}
+                  onChange={setGeneratedContent}
+                  placeholder="Start writing your press release..."
+                  minHeight="400px"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="distributionType">Distribution Type</Label>
+                <Select value={distributionType} onValueChange={(val: "ai_assisted" | "manual") => setDistributionType(val)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ai_assisted">AI-Assisted (uses tier credits)</SelectItem>
+                    <SelectItem value="manual">Manual Distribution (unlimited, no credits)</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  {distributionType === "manual" ? (
+                    <span className="text-green-600 dark:text-green-400 font-medium">✓ Unlimited - No credits consumed</span>
+                  ) : (
+                    "Uses 1 press release credit from your tier allowance"
+                  )}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          )}
 
           {/* Preview/Output */}
           <Card>
@@ -427,11 +505,11 @@ export default function PressReleaseNew() {
                       </Button>
                     </div>
                   )}
-                  <Textarea
-                    value={generatedContent}
-                    onChange={(e) => setGeneratedContent(e.target.value)}
-                    rows={20}
-                    className="font-mono text-sm"
+                  <RichTextEditor
+                    content={generatedContent}
+                    onChange={setGeneratedContent}
+                    placeholder="Edit your press release content..."
+                    minHeight="500px"
                   />
                   <div className="space-y-6">
                     <div className="space-y-2">

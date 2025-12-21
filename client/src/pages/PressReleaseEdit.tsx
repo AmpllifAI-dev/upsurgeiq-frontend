@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/RichTextEditor";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Save } from "lucide-react";
 import { useLocation, useRoute } from "wouter";
@@ -131,16 +131,14 @@ export default function PressReleaseEdit() {
 
           <div className="space-y-2">
             <Label htmlFor="body">Content</Label>
-            <Textarea
-              id="body"
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              placeholder="Enter press release content (Markdown supported)"
-              rows={20}
-              className="font-mono text-sm"
+            <RichTextEditor
+              content={body}
+              onChange={setBody}
+              placeholder="Edit your press release content..."
+              minHeight="500px"
             />
             <p className="text-xs text-muted-foreground">
-              Markdown formatting is supported. Use **bold**, *italic*, # headings, etc.
+              Use the toolbar above to format your content with headings, lists, links, and more.
             </p>
           </div>
 
