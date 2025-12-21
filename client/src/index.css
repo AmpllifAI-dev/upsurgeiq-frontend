@@ -43,13 +43,21 @@
 }
 
 :root {
-  /* upsurgeIQ Brand Colors - Light Theme */
-  --primary: oklch(0.45 0.12 200); /* Deep Teal #008080 */
+  /* White-label color overrides (injected dynamically) */
+  /* When white-label is enabled, --wl-primary and --wl-secondary are set via JavaScript */
+  /* These override the default primary/secondary colors */
+  --primary: var(--wl-primary, oklch(0.45 0.12 200));
+  --secondary: var(--wl-secondary, oklch(0.88 0.22 130));
+  --sidebar-primary: var(--wl-primary, oklch(0.45 0.12 200));
+  --accent: var(--wl-secondary, oklch(0.88 0.22 130));
+  --chart-1: var(--wl-primary, oklch(0.45 0.12 200));
+  --chart-2: var(--wl-secondary, oklch(0.88 0.22 130));
+  --ring: var(--wl-primary, oklch(0.45 0.12 200));
+  --sidebar-ring: var(--wl-primary, oklch(0.45 0.12 200));
+
+  /* Original upsurgeIQ Brand Colors - Light Theme */
   --primary-foreground: oklch(1 0 0);
-  --sidebar-primary: oklch(0.45 0.12 200);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --chart-1: oklch(0.45 0.12 200);
-  --chart-2: oklch(0.88 0.22 130);
   --chart-3: oklch(0.55 0.14 210);
   --chart-4: oklch(0.50 0.13 195);
   --chart-5: oklch(0.80 0.18 140);
@@ -60,23 +68,19 @@
   --card-foreground: oklch(0.25 0.08 200);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.25 0.08 200);
-  --secondary: oklch(0.88 0.22 130); /* Lime Green #7FFF00 */
   --secondary-foreground: oklch(0.25 0.08 200);
   --muted: oklch(0.95 0.01 200);
   --muted-foreground: oklch(0.55 0.04 200);
-  --accent: oklch(0.88 0.22 130); /* Lime Green accent */
   --accent-foreground: oklch(0.25 0.08 200);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.88 0.015 200);
   --input: oklch(0.88 0.015 200);
-  --ring: oklch(0.45 0.12 200);
   --sidebar: oklch(0.985 0.002 200);
   --sidebar-foreground: oklch(0.25 0.08 200);
   --sidebar-accent: oklch(0.95 0.01 200);
   --sidebar-accent-foreground: oklch(0.25 0.08 200);
   --sidebar-border: oklch(0.88 0.015 200);
-  --sidebar-ring: oklch(0.45 0.12 200);
 }
 
 .dark {

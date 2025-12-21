@@ -2,7 +2,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Zap, FileText, Plus, Calendar, ArrowLeft, Eye, Edit, Trash2, Search, Download, Save, Star } from "lucide-react";
+import { Zap, FileText, Plus, Calendar, ArrowLeft, Eye, Edit, Trash2, Search, Download, Save, Star, FileSpreadsheet } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -201,9 +201,33 @@ export default function PressReleases() {
         date: new Date(pr.createdAt),
       }))
     );
-    toast.success(`Exported ${selectedPRs.length} press releases to PDF`);
-    setSelectedIds([]);
+    toast.success(`Exported ${selectedIds.length} press releases`);
     setBulkMode(false);
+    setSelectedIds([]);
+  };
+
+  const exportCSVMutation = trpc.csvExport.exportPressReleaseAnalytics.useMutation({
+    onSuccess: (data) => {
+      const blob = new Blob([data.csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `press-releases-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      toast.success('Press releases exported to CSV');
+    },
+    onError: (error) => {
+      toast.error('Failed to export CSV', {
+        description: error.message
+      });
+    },
+  });
+
+  const handleExportCSV = () => {
+    exportCSVMutation.mutate({});
   };
 
   const toggleSelection = (id: number) => {
@@ -277,7 +301,11 @@ export default function PressReleases() {
               <>
                 <Button variant="outline" onClick={() => setBulkMode(true)}>
                   <Download className="w-4 h-4 mr-2" />
-                  Bulk Export
+                  Bulk Export PDF
+                </Button>
+                <Button variant="outline" onClick={handleExportCSV}>
+                  <FileSpreadsheet className="w-4 h-4 mr-2" />
+                  Export CSV
                 </Button>
                 <Button onClick={() => setLocation("/press-releases/new")}>
                   <Plus className="w-4 h-4 mr-2" />

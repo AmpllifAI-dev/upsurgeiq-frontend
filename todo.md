@@ -1970,3 +1970,26 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
   - [x] Add White Label Settings link to admin sidebar
   - [x] Restrict access to admin users only (role check in DashboardLayout)
   - [x] Add route to App.tsx
+
+
+## Enhancement Session - Export Buttons, Color Theming & Preview (Dec 21, 2024)
+- [x] Individual Export Buttons on List Pages
+  - [x] Add export button to Press Releases list page
+  - [x] Add export button to Campaigns list page
+  - [x] Add export button to Social Media list page
+  - [x] Reuse existing CSV export procedures
+  - [x] Proper mutation-based implementation with error handling
+- [x] Dynamic White-Label Color Theming
+  - [x] Create CSS custom property injection system
+  - [x] Apply primary color to buttons, CTAs, and primary UI elements
+  - [x] Apply secondary color to accents, charts, and highlights
+  - [x] Update DashboardLayout to inject colors dynamically via useEffect
+  - [x] CSS fallback to default UpsurgeIQ colors when disabled
+  - [x] Automatic cleanup when white label disabled
+- [x] White-Label Preview Mode
+  - [x] Add preview toggle to WhiteLabelSettings page
+  - [x] Store preview state in local component state
+  - [x] Show live preview of logo and colors across platform
+  - [x] Add "Apply Changes" vs "Exit Preview" button modes
+  - [x] Automatic cleanup when preview disabled or navigating away
+  - [x] Visual indicator when preview mode is active

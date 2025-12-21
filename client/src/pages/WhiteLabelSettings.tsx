@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,29 @@ export default function WhiteLabelSettings() {
   const [primaryColor, setPrimaryColor] = useState(business?.whiteLabelPrimaryColor || "#0ea5e9");
   const [secondaryColor, setSecondaryColor] = useState(business?.whiteLabelSecondaryColor || "#06b6d4");
   const [companyName, setCompanyName] = useState(business?.whiteLabelCompanyName || "");
+  const [previewMode, setPreviewMode] = useState(false);
+
+  // Apply preview colors dynamically when preview mode is on
+  useEffect(() => {
+    if (previewMode && enabled) {
+      const root = document.documentElement;
+      root.style.setProperty('--wl-primary', primaryColor);
+      root.style.setProperty('--wl-secondary', secondaryColor);
+    } else if (!previewMode) {
+      // Remove preview colors (will revert to saved settings or defaults)
+      const root = document.documentElement;
+      root.style.removeProperty('--wl-primary');
+      root.style.removeProperty('--wl-secondary');
+    }
+    return () => {
+      // Cleanup on unmount
+      if (previewMode) {
+        const root = document.documentElement;
+        root.style.removeProperty('--wl-primary');
+        root.style.removeProperty('--wl-secondary');
+      }
+    };
+  }, [previewMode, enabled, primaryColor, secondaryColor]);
 
   const updateWhiteLabel = trpc.business.updateWhiteLabel.useMutation({
     onSuccess: () => {
@@ -213,8 +237,43 @@ export default function WhiteLabelSettings() {
               </div>
             )}
 
+            {/* Preview Mode Toggle */}
+            <div className="flex items-center justify-between pt-4 border-t">
+              <div className="space-y-0.5">
+                <Label htmlFor="previewMode">Live Preview Mode</Label>
+                <p className="text-sm text-muted-foreground">
+                  See changes applied across the platform in real-time
+                </p>
+              </div>
+              <Switch
+                id="previewMode"
+                checked={previewMode}
+                onCheckedChange={setPreviewMode}
+                disabled={!enabled}
+              />
+            </div>
+
+            {previewMode && (
+              <div className="p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                  Preview Mode Active
+                </p>
+                <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                  Colors are being applied across the platform. Click "Save Settings" to make these changes permanent.
+                </p>
+              </div>
+            )}
+
             {/* Save Button */}
-            <div className="flex justify-end pt-4">
+            <div className="flex justify-end gap-2 pt-4">
+              {previewMode && (
+                <Button
+                  variant="outline"
+                  onClick={() => setPreviewMode(false)}
+                >
+                  Exit Preview
+                </Button>
+              )}
               <Button
                 onClick={handleSave}
                 disabled={updateWhiteLabel.isPending}
@@ -222,7 +281,7 @@ export default function WhiteLabelSettings() {
                 {updateWhiteLabel.isPending && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                Save Settings
+                {previewMode ? "Apply Changes" : "Save Settings"}
               </Button>
             </div>
           </CardContent>

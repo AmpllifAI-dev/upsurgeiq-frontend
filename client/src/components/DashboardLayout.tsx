@@ -144,6 +144,24 @@ function DashboardLayoutContent({
     }
   }, [isCollapsed]);
 
+  // Inject white-label colors as CSS custom properties
+  useEffect(() => {
+    if (isWhiteLabeled && (whiteLabelPrimary || whiteLabelSecondary)) {
+      const root = document.documentElement;
+      if (whiteLabelPrimary) {
+        root.style.setProperty('--wl-primary', whiteLabelPrimary);
+      }
+      if (whiteLabelSecondary) {
+        root.style.setProperty('--wl-secondary', whiteLabelSecondary);
+      }
+    } else {
+      // Remove custom properties when white label is disabled
+      const root = document.documentElement;
+      root.style.removeProperty('--wl-primary');
+      root.style.removeProperty('--wl-secondary');
+    }
+  }, [isWhiteLabeled, whiteLabelPrimary, whiteLabelSecondary]);
+
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isResizing) return;
