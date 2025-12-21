@@ -46,6 +46,7 @@ import JournalistForm from "./pages/JournalistForm";
 import JournalistDetail from "./pages/JournalistDetail";
 import AdminCreditMonitoring from "./pages/AdminCreditMonitoring";
 import AdminAlertManagement from "./pages/AdminAlertManagement";
+import AdminCreditManagement from "./pages/AdminCreditManagement";
 import Purchases from "./pages/Purchases";
 import PurchaseSuccess from "./pages/PurchaseSuccess";
 import PurchaseCancel from "./pages/PurchaseCancel";
@@ -99,6 +100,7 @@ function Router() {
       <Route path="/help" component={Help} />
       <Route path="/admin/credit-monitoring" component={AdminCreditMonitoring} />
       <Route path="/admin/alerts" component={AdminAlertManagement} />
+      <Route path="/admin/credit-management" component={AdminCreditManagement} />
       <Route path="/dashboard/purchases" component={Purchases} />
       <Route path="/dashboard/purchases/success" component={PurchaseSuccess} />
       <Route path="/dashboard/purchases/cancel" component={PurchaseCancel} />

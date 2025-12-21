@@ -1868,3 +1868,15 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Update aiCredits.getUsage to query real database data
 - [x] Implement usage tracking when AI Chat is used (infrastructure complete, documented in FUTURE_DEVELOPMENTS.md)
 - [x] Implement usage tracking when AI Call-in is used (infrastructure complete, documented in FUTURE_DEVELOPMENTS.md)
+
+
+## Add-on Testing & Admin Credit Management Tool (Current Session)
+- [ ] Test Stripe checkout flow for AI Chat add-on purchase
+- [ ] Test Stripe checkout flow for AI Call-in add-on purchase
+- [x] Create admin credit management dashboard page
+- [x] Build backend API for viewing all users' credit usage
+- [x] Add manual credit adjustment functionality for admin
+- [x] Add usage analytics and export reports
+- [ ] Test admin credit management tool
+
+**IMPORTANT:** See GLOBAL_RULES.md for credits terminology - "CREDITS" = client-facing, "AI CREDITS" = system/internal (never show to customers)

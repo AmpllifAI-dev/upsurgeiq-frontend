@@ -4437,6 +4437,56 @@ Generate a comprehensive campaign strategy that includes:
         return conversations;
       }),
   }),
+
+  // Admin router
+  admin: router({
+    getAllUsersCredits: protectedProcedure.query(async ({ ctx }) => {
+      // Check if user is admin
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+      const { getAllUsersCreditsUsage } = await import("./adminCreditManagement");
+      return await getAllUsersCreditsUsage();
+    }),
+
+    getCreditStats: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+      const { getCreditUsageStats } = await import("./adminCreditManagement");
+      return await getCreditUsageStats();
+    }),
+
+    adjustCredits: protectedProcedure
+      .input(
+        z.object({
+          userId: z.number(),
+          addonType: z.enum(["aiChat", "aiCallIn"]),
+          amount: z.number(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        const { adjustUserCredits } = await import("./adminCreditManagement");
+        return await adjustUserCredits({
+          userId: input.userId,
+          addonType: input.addonType,
+          amount: input.amount,
+          adminNote: `Adjusted by admin ${ctx.user.name}`,
+        });
+      }),
+
+    exportCreditUsage: protectedProcedure.mutation(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+      const { exportCreditUsageToCSV } = await import("./adminCreditManagement");
+      const csv = await exportCreditUsageToCSV();
+      return { csv };
+    }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
