@@ -65,6 +65,7 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import CookiePolicy from "./pages/CookiePolicy";
 import ReportIssue from "./pages/ReportIssue";
+import { Resources } from "./pages/Resources";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import PricingCalculator from "./pages/PricingCalculator";
@@ -140,6 +141,7 @@ function Router() {
       <Route path="/pricing-calculator" component={PricingCalculator} />
       <Route path="/testimonials" component={Testimonials} />
       <Route path="/faq" component={FAQ} />
+      <Route path="/resources" component={Resources} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

@@ -2167,3 +2167,20 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [ ] Complete Privacy Policy page with proper legal content
 - [ ] Complete Terms of Service page with proper legal content
 - [ ] Add newsletter system to V2 roadmap
+
+
+## December 21, 2025 - Legal Updates & Resources Page
+- [x] Update Privacy Policy with Life's Passions Ltd legal information
+- [x] Update Terms of Service with company address
+- [ ] Set up WordPress REST API integration for blog posts
+- [ ] Import blog post: PR Best Practices to WordPress
+- [ ] Import blog post: AI in Marketing to WordPress
+- [ ] Import blog post: Press Release Writing Tips to WordPress
+- [ ] Import blog post: Digital Marketing Effectiveness to WordPress
+- [ ] Update Blog page to fetch from WordPress REST API
+- [ ] Create Resources/Downloads page
+- [ ] Create free PR template downloads
+- [ ] Create press release checklist guide
+- [ ] Create media pitch guide template
+- [ ] Add email capture for resource downloads
+- [ ] Test all resources and legal pages

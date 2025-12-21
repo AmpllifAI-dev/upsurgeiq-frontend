@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,42 +11,41 @@ export default function Blog() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Placeholder blog posts - will be replaced with real data from tRPC
-  const blogPosts = [
-    {
-      id: 1,
-      title: "The Future of AI in Public Relations: Trends for 2025",
-      slug: "future-of-ai-in-pr-2025",
-      excerpt: "Discover how artificial intelligence is transforming the PR industry and what it means for your business communications strategy.",
-      coverImageUrl: null,
-      category: "AI in PR",
-      publishedAt: new Date("2025-01-15"),
-      author: "Christopher Logue",
-      viewCount: 1247,
-    },
-    {
-      id: 2,
-      title: "10 Press Release Best Practices That Actually Work",
-      slug: "press-release-best-practices",
-      excerpt: "Learn the proven strategies that get your press releases noticed by journalists and published in top-tier media outlets.",
-      coverImageUrl: null,
-      category: "Best Practices",
-      publishedAt: new Date("2025-01-10"),
-      author: "Christopher Logue",
-      viewCount: 892,
-    },
-    {
-      id: 3,
-      title: "Case Study: How We Achieved 300% More Media Coverage",
-      slug: "case-study-300-percent-media-coverage",
-      excerpt: "A detailed look at how one client used UpsurgeIQ to triple their media placements in just 90 days.",
-      coverImageUrl: null,
-      category: "Case Studies",
-      publishedAt: new Date("2025-01-05"),
-      author: "Christopher Logue",
-      viewCount: 654,
-    },
-  ];
+  const [blogPosts, setBlogPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch blog posts from WordPress REST API
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch(
+          'https://amplifai.wpenginepowered.com/index.php?rest_route=/wp/v2/posts&_embed'
+        );
+        const posts = await response.json();
+        
+        // Transform WordPress posts to our format
+        const transformedPosts = posts.map((post: any) => ({
+          id: post.id,
+          title: post.title.rendered,
+          slug: post.slug,
+          excerpt: post.excerpt.rendered.replace(/<[^>]*>/g, ''), // Strip HTML tags
+          coverImageUrl: post._embedded?.['wp:featuredmedia']?.[0]?.source_url || null,
+          category: post._embedded?.['wp:term']?.[0]?.[0]?.name || 'Uncategorized',
+          publishedAt: new Date(post.date),
+          author: post._embedded?.author?.[0]?.name || 'Christopher Logue',
+          viewCount: 0, // WordPress doesn't track views by default
+        }));
+        
+        setBlogPosts(transformedPosts);
+      } catch (error) {
+        console.error('Error fetching blog posts:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   const categories = ["All", "AI in PR", "Best Practices", "Case Studies", "Industry News"];
   const [selectedCategory, setSelectedCategory] = useState("All");

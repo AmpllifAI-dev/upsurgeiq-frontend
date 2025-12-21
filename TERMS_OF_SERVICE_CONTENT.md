@@ -5,7 +5,7 @@
 
 ---
 
-These Terms of Service ("Terms") govern your access to and use of the UpsurgeIQ platform, website, and services (collectively, the "Services") provided by UpsurgeIQ ("we," "our," or "us"). By accessing or using our Services, you agree to be bound by these Terms. If you do not agree to these Terms, do not use our Services.
+These Terms of Service ("Terms") govern your access to and use of the UpsurgeIQ platform, website, and services (collectively, the "Services") provided by Life's Passions Ltd trading as UpsurgeIQ ("we," "our," or "us"). By accessing or using our Services, you agree to be bound by these Terms. If you do not agree to these Terms, do not use our Services.
 
 ## Acceptance of Terms
 
@@ -95,11 +95,11 @@ We reserve the right to assume the exclusive defense and control of any matter s
 
 ## Dispute Resolution and Governing Law
 
-These Terms shall be governed by and construed in accordance with the laws of [Jurisdiction to be specified], without regard to its conflict of law principles. Any dispute arising out of or related to these Terms or your use of our Services shall be resolved through the following process.
+These Terms shall be governed by and construed in accordance with the laws of England and Wales, without regard to its conflict of law principles. Any dispute arising out of or related to these Terms or your use of our Services shall be resolved through the following process.
 
 **Informal Resolution:** Before initiating any formal dispute resolution, you agree to contact us at legal@upsurgeiq.com to attempt to resolve the dispute informally. We will attempt to resolve the dispute through good-faith negotiations for at least thirty (30) days before either party may initiate formal proceedings.
 
-**Arbitration:** If informal resolution is unsuccessful, any dispute shall be resolved through binding arbitration administered by [Arbitration Organization to be specified] in accordance with its rules, except as modified by these Terms. The arbitration shall be conducted in [Location to be specified], and judgment on the arbitration award may be entered in any court having jurisdiction. You and UpsurgeIQ agree that arbitration will be conducted on an individual basis and not as a class action, and you waive any right to participate in a class action lawsuit or class-wide arbitration.
+**Arbitration:** If informal resolution is unsuccessful, any dispute shall be resolved through binding arbitration administered by the Centre for Effective Dispute Resolution (CEDR) in accordance with its rules, except as modified by these Terms. The arbitration shall be conducted in Oxfordshire, United Kingdom, and judgment on the arbitration award may be entered in any court having jurisdiction. You and UpsurgeIQ agree that arbitration will be conducted on an individual basis and not as a class action, and you waive any right to participate in a class action lawsuit or class-wide arbitration.
 
 **Exceptions:** Either party may seek injunctive or other equitable relief in any court of competent jurisdiction to prevent the actual or threatened infringement, misappropriation, or violation of intellectual property rights or confidential information.
 
@@ -125,7 +125,7 @@ If you have questions, concerns, or disputes regarding these Terms, please conta
 
 **Email:** legal@upsurgeiq.com  
 **Website:** [https://upsurgeiq.com/contact](https://upsurgeiq.com/contact)  
-**Mail:** UpsurgeIQ Legal Department, [Address to be provided]
+**Mail:** UpsurgeIQ Legal Department, Life's Passions Ltd, Sanders Gate, Churchfields, Stonesfield, Witney, Oxfordshire, OX29 8PP, UK
 
 ---
 

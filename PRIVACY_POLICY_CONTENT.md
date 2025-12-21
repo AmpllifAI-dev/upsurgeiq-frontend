@@ -5,7 +5,7 @@
 
 ---
 
-UpsurgeIQ ("we," "our," or "us") is committed to protecting your privacy and ensuring transparency about how we collect, use, and safeguard your personal information. This Privacy Policy explains our practices regarding data collection and processing when you use our AI-powered PR and marketing platform, including our website, services, and applications (collectively, the "Services").
+Life's Passions Ltd trading as UpsurgeIQ ("we," "our," or "us") is committed to protecting your privacy and ensuring transparency about how we collect, use, and safeguard your personal information. This Privacy Policy explains our practices regarding data collection and processing when you use our AI-powered PR and marketing platform, including our website, services, and applications (collectively, the "Services").
 
 By accessing or using our Services, you agree to the terms of this Privacy Policy. If you do not agree with our practices, please do not use our Services.
 
@@ -107,7 +107,7 @@ If you have questions, concerns, or requests regarding this Privacy Policy or ou
 
 **Email:** privacy@upsurgeiq.com  
 **Website:** [https://upsurgeiq.com/contact](https://upsurgeiq.com/contact)  
-**Mail:** UpsurgeIQ Privacy Team, [Address to be provided]
+**Mail:** UpsurgeIQ Privacy Team, Life's Passions Ltd, Sanders Gate, Churchfields, Stonesfield, Witney, Oxfordshire, OX29 8PP, UK
 
 For users in the European Economic Area, United Kingdom, or Switzerland, you also have the right to lodge a complaint with your local data protection authority if you believe we have not adequately addressed your privacy concerns.
 
