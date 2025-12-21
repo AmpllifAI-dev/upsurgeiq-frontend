@@ -58,6 +58,9 @@ import UsageTracking from "./pages/UsageTracking";
 import BillingHistory from "./pages/BillingHistory";
 import WhiteLabelSettings from "@/pages/WhiteLabelSettings";
 import NotificationPreferences from "@/pages/NotificationPreferences";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Status from "./pages/Status";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -116,6 +119,9 @@ function Router() {
       <Route path="/dashboard/billing" component={BillingHistory} />
       <Route path="/dashboard/white-label-settings" component={WhiteLabelSettings} />
       <Route path="/dashboard/notification-preferences" component={NotificationPreferences} />
+      <Route path="/about" component={About} />
+      <Route path="/contact" component={Contact} />
+      <Route path="/status" component={Status} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

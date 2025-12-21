@@ -202,7 +202,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           <Card 
             className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
-            onClick={() => setLocation("/dashboard/press-releases")}
+            onClick={() => setLocation("/press-releases")}
           >
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Press Releases</CardTitle>
@@ -219,7 +219,7 @@ export default function Dashboard() {
 
           <Card 
             className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
-            onClick={() => setLocation("/dashboard/journalists")}
+            onClick={() => setLocation("/media-lists")}
           >
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Journalists</CardTitle>
@@ -233,7 +233,7 @@ export default function Dashboard() {
 
           <Card 
             className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
-            onClick={() => setLocation("/dashboard/campaign-lab?status=active")}
+            onClick={() => setLocation("/campaigns")}
           >
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Active Campaigns</CardTitle>
@@ -247,7 +247,7 @@ export default function Dashboard() {
 
           <Card 
             className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
-            onClick={() => setLocation("/dashboard/journalists")}
+            onClick={() => setLocation("/media-lists")}
           >
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Media Outlets</CardTitle>

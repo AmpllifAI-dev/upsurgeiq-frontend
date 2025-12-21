@@ -4726,6 +4726,50 @@ Generate a comprehensive campaign strategy that includes:
         return { csv };
       }),
   }),
+
+  contact: router({
+    submit: publicProcedure
+      .input(
+        z.object({
+          name: z.string().min(1),
+          email: z.string().email(),
+          subject: z.string(),
+          message: z.string().min(10),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { sendEmail } = await import("./_core/email");
+        const { notifyOwner } = await import("./_core/notification");
+
+        // Send notification to owner
+        await notifyOwner({
+          title: `New Contact Form Submission: ${input.subject}`,
+          content: `From: ${input.name} (${input.email})\n\nSubject: ${input.subject}\n\nMessage:\n${input.message}`,
+        });
+
+        // Send confirmation email to user
+        try {
+          await sendEmail({
+            to: input.email,
+            subject: "We received your message - UpsurgeIQ",
+            html: `
+              <h2>Thank you for contacting UpsurgeIQ!</h2>
+              <p>Hi ${input.name},</p>
+              <p>We've received your message and will get back to you within 24 hours.</p>
+              <p><strong>Your message:</strong></p>
+              <p>${input.message.replace(/\n/g, '<br>')}</p>
+              <br>
+              <p>Best regards,<br>The UpsurgeIQ Team</p>
+            `,
+          });
+        } catch (error) {
+          console.error("Failed to send confirmation email:", error);
+          // Don't fail the mutation if email fails
+        }
+
+        return { success: true };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

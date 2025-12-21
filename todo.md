@@ -2083,3 +2083,17 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
   - [x] Show tutorial on first visit (localStorage check)
   - [ ] Add "Help" menu to restart tutorial anytime (future enhancement)
   - [ ] Integrate tours into actual pages with class name targets
+
+
+## Bug Fixes (December 21, 2025)
+- [x] Fix 502 server error on Subscribe page preventing Stripe checkout
+- [x] Fix 404 errors on dashboard stat cards (Press Releases, Journalists, Active Campaigns, Media Outlets)
+- [x] Add hamburger menu to all public-facing pages (Home, Subscribe, Upgrade, About, Contact, Status)
+
+## New Pages (December 21, 2025)
+- [x] Create About Us page with founder bio section and mission/values
+- [x] Create Contact Us page with form and email notifications to owner
+- [x] Create Status page for platform health monitoring with service uptime display
+
+## Documentation (December 21, 2025)
+- [x] Document V2 website builder idea in ROADMAP_V2.md for future development
