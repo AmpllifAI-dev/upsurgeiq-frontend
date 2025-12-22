@@ -15,10 +15,11 @@
 1. **`/docs/framework/AI_AGENT_START_HERE.md`** ← **START HERE**
 2. `/docs/framework/ADMINISTRATOR_DOSSIER.md`
 3. `/docs/framework/PROJECT_CONTEXT.md`
-4. `/docs/framework/WORKING_METHODOLOGY.md`
-5. `/docs/framework/CLIENT_PREFERENCES.md`
-6. `/docs/framework/DECISIONS_LOG.md`
-7. `/docs/todo.md`
+4. `/docs/framework/COMPLETE_CHAT_HISTORY.md` ← **FULL 8-DAY HISTORY**
+5. `/docs/framework/WORKING_METHODOLOGY.md`
+6. `/docs/framework/CLIENT_PREFERENCES.md`
+7. `/docs/framework/DECISIONS_LOG.md`
+8. `/docs/todo.md`
 
 **Why:** AI agents don't retain context between sessions. The framework documentation contains everything you need to know to work effectively without asking Christopher to repeat information.
 

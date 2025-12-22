@@ -57,11 +57,12 @@ Before taking any action, read these files:
 
 1. **ADMINISTRATOR_DOSSIER.md** - Who you're working with (the project manager/owner)
 2. **PROJECT_CONTEXT.md** - What this project is and why it exists
-3. **WORKING_METHODOLOGY.md** - How we work on this project
-4. **CLIENT_PREFERENCES.md** - Client-specific preferences and requirements
-5. **DECISIONS_LOG.md** - Past decisions and their rationale
-6. **docs/todo.md** - Current priorities and task list
-7. **docs/COMMON_ISSUES.md** - Known problems and solutions
+3. **COMPLETE_CHAT_HISTORY.md** - Full 8-day conversation history (518 lines)
+4. **WORKING_METHODOLOGY.md** - How we work on this project
+5. **CLIENT_PREFERENCES.md** - Client-specific preferences and requirements
+6. **DECISIONS_LOG.md** - Past decisions and their rationale
+7. **HOW_TO_GET_CONVERSATION_HISTORY.md** - How to scrape conversation history if needed
+8. **docs/todo.md** - Current priorities and task list
 
 **Estimated Reading Time:** 20-25 minutes
 
