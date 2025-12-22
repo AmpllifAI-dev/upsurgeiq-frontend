@@ -21,6 +21,8 @@ import {
   markSaveCompleted,
 } from "./distributionSaveForLater";
 import { uploadPressReleaseImageFromBase64 } from "./pressReleaseImageHosting";
+import { createCreditCheckoutSession, CreditProductId, CREDIT_PRODUCTS } from "./stripe";
+import { ENV } from "./_core/env";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -153,6 +155,39 @@ export const appRouter = router({
           input.base64Data,
           input.contentType
         );
+      }),
+  }),
+
+  // Stripe Credit Purchase
+  stripe: router({
+    // Get available credit products
+    getProducts: publicProcedure.query(() => {
+      return Object.entries(CREDIT_PRODUCTS).map(([key, product]) => ({
+        id: key,
+        ...product,
+      }));
+    }),
+
+    // Create checkout session for credit purchase
+    createCheckoutSession: protectedProcedure
+      .input(
+        z.object({
+          productId: z.enum(["STARTER", "PROFESSIONAL", "ENTERPRISE"]),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const successUrl = `${ENV.frontendUrl}/credits?success=true`;
+        const cancelUrl = `${ENV.frontendUrl}/credits?canceled=true`;
+
+        const checkoutUrl = await createCreditCheckoutSession(
+          input.productId as CreditProductId,
+          ctx.user.id,
+          ctx.user.email || "",
+          successUrl,
+          cancelUrl
+        );
+
+        return { checkoutUrl };
       }),
   }),
 });
