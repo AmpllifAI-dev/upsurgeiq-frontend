@@ -1263,6 +1263,17 @@ Generate a complete, publication-ready press release.`;
         const dossier = await getBusinessDossier(ctx.user.id);
         const business = await getUserBusiness(ctx.user.id);
         
+        // Load conversation history for continuity (last 20 turns)
+        let conversationHistory: Array<{ role: "user" | "assistant"; content: string }> = [];
+        if (dossier) {
+          const history = await getAIConversationsByDossier(dossier.id, 20);
+          // Reverse to get chronological order (oldest first)
+          conversationHistory = history.reverse().map(conv => ({
+            role: conv.role as "user" | "assistant",
+            content: conv.content
+          }));
+        }
+        
         // Build comprehensive context from dossier
         let contextInfo = "";
         if (dossier) {
@@ -1314,11 +1325,15 @@ Your role is to:
 Be concise, actionable, and professional. Use markdown formatting for clarity. Always consider their business context when providing advice.`;
 
         try {
+          // Build messages array with conversation history for continuity
+          const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
+            { role: "system", content: systemPrompt },
+            ...conversationHistory,
+            { role: "user", content: input.message },
+          ];
+
           const response = await invokeLLM({
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: input.message },
-            ],
+            messages,
           });
 
           const message = response.choices[0]?.message?.content || "I apologize, but I couldn't generate a response. Please try again.";

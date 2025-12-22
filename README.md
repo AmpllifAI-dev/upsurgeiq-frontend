@@ -2,6 +2,34 @@
 
 **Intelligence That Drives Growth**
 
+---
+
+## 🚨 ATTENTION AI AGENTS: READ THIS FIRST 🚨
+
+**If you are an AI agent working on this project, STOP and read the framework documentation before taking any action.**
+
+### Mandatory Reading for AI Agents
+
+**YOU MUST READ THESE FILES IN THIS ORDER:**
+
+1. **`/docs/framework/AI_AGENT_START_HERE.md`** ← **START HERE**
+2. `/docs/framework/ADMINISTRATOR_DOSSIER.md`
+3. `/docs/framework/PROJECT_CONTEXT.md`
+4. `/docs/framework/WORKING_METHODOLOGY.md`
+5. `/docs/framework/CLIENT_PREFERENCES.md`
+6. `/docs/framework/DECISIONS_LOG.md`
+7. `/docs/todo.md`
+
+**Why:** AI agents don't retain context between sessions. The framework documentation contains everything you need to know to work effectively without asking Christopher to repeat information.
+
+**After reading:** Confirm your understanding with Christopher before starting work.
+
+**Known Issue (Dec 22, 2025):** AI agents don't automatically know to read framework docs. This README serves as bootstrap. Proper fix needed: Manus platform should inject framework reading instruction into initial context.
+
+---
+
+## Project Overview
+
 upsurgeIQ is a comprehensive SaaS platform that empowers businesses with AI-powered press release generation, social media distribution, journalist media list management, conversational AI assistance, and intelligent campaign optimization.
 
 ---

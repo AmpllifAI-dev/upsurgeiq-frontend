@@ -1,0 +1,8 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `ai_conversations` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `userId` int NOT NULL,\n  `dossierId` int,\n  `conversationType` enum('chat', 'phone_call', 'email') NOT NULL,\n  `role` enum('user', 'assistant', 'system') NOT NULL,\n  `content` text NOT NULL,\n  `callDuration` int,\n  `transcriptUrl` varchar(500),\n  `metadata` text,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON DELETE CASCADE,\n  FOREIGN KEY (`dossierId`) REFERENCES `businesses`(`id`) ON DELETE CASCADE\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute CREATE TABLE IF NOT EXISTS `ai_conversations` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `userId` int NOT NULL,\n  `dossierId` int,\n  `conversationType` enum('chat', 'phone_call', 'email') NOT NULL,\n  `role` enum('user', 'assistant', 'system') NOT NULL,\n  `content` text NOT NULL,\n  `callDuration` int,\n  `transcriptUrl` varchar(500),\n  `metadata` text,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON DELETE CASCADE,\n  FOREIGN KEY (`dossierId`) REFERENCES `businesses`(`id`) ON DELETE CASCADE\n)",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1824 (HY000) at line 1: Failed to open the referenced table 'user'"
+  ]
+}

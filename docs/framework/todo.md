@@ -2622,13 +2622,41 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [ ] Add admin-only navigation to dashboard header
 - [ ] Ensure role-based access control (admin only)
 
+## Free Trial & Client Dossier Auto-Research (December 22, 2025)
+- [x] Add 7-day free trial to Starter plan only
+- [x] Update Stripe product configuration with trial_period_days
+- [x] Update subscription creation to handle trial periods
+- [x] Update website promotional materials to advertise free trial
+- [x] Update pricing page with trial information
+- [x] Update FAQ with trial details
+- [x] Implement Client Dossier auto-research system
+- [x] Create webhook handler for customer.subscription.created
+- [x] Build business research function using LLM
+- [x] Populate dossier field with industry insights
+- [ ] Test trial subscription flow end-to-end
+- [ ] Test dossier auto-research on subscription creation
 
-## CRITICAL: Client Dossier Conversation Memory Fix (December 22, 2025)
-- [x] Fix AI Assistant to load conversation history from database
-- [x] Implement conversation continuity across sessions
-- [x] Add token management for conversation history (limit to last 20 turns)
-- [x] Create ai_conversations table in database
-- [x] Write comprehensive test suite for conversation memory
-- [ ] Fix remaining test failures (schema alignment issues)
-- [x] Document conversation memory system in analysis document
-- [x] Add technical debt tracking to framework docs
+## Bug Report Autonomous Investigation Fix - Dec 22, 2025
+- [x] Fix autonomous investigation to trigger for ALL bug reports (not just high/critical)
+- [x] Remove priority filter from issue submission handler
+- [x] Add proper error handling to autonomous agent LLM response parsing
+- [x] Change notification to fire for ALL bugs (not just high/critical)
+- [ ] Test with medium priority bug report
+- [ ] Verify owner notification works through escalation path
+
+## Bug Report LLM Response Format Fix - Dec 22, 2025 (Afternoon)
+- [x] Changed autonomous agent to use `json_object` instead of `json_schema`
+- [x] Updated both `investigateIssue()` and `attemptAutoFix()` functions
+- [x] Added error logging and owner notification for investigation failures
+- [x] Added comment posting when investigation fails
+- [ ] Test with new bug report to verify fix works
+- [ ] Monitor server logs for LLM errors
+
+## Investigation Status Visibility & Manual Trigger - Dec 22, 2025
+- [x] Add `investigationStatus` field to tech_issues table schema
+- [ ] Add status badge to Issues list (Pending/In Progress/Completed/Failed)
+- [ ] Add manual "Trigger Investigation" button on issue detail page
+- [ ] Create tRPC procedure for manual investigation trigger
+- [ ] Debug why automatic investigation isn't running on issue creation
+- [ ] Test automatic investigation flow
+- [ ] Test manual investigation trigger
