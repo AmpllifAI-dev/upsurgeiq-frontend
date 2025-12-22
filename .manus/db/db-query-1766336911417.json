@@ -1,9 +1,0 @@
-{
-  "query": "ALTER TABLE newsletter_subscribers \nADD COLUMN IF NOT EXISTS preferPrTips INT DEFAULT 1,\nADD COLUMN IF NOT EXISTS preferMarketingInsights INT DEFAULT 1,\nADD COLUMN IF NOT EXISTS preferAiUpdates INT DEFAULT 1,\nADD COLUMN IF NOT EXISTS preferCaseStudies INT DEFAULT 1,\nADD COLUMN IF NOT EXISTS preferProductNews INT DEFAULT 1",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute ALTER TABLE newsletter_subscribers \nADD COLUMN IF NOT EXISTS preferPrTips INT DEFAULT 1,\nADD COLUMN IF NOT EXISTS preferMarketingInsights INT DEFAULT 1,\nADD COLUMN IF NOT EXISTS preferAiUpdates INT DEFAULT 1,\nADD COLUMN IF NOT EXISTS preferCaseStudies INT DEFAULT 1,\nADD COLUMN IF NOT EXISTS preferProductNews INT DEFAULT 1",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1514
-}

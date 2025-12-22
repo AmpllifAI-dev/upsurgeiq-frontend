@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS social_connections (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  userId INT NOT NULL,\n  platform ENUM('facebook', 'instagram', 'linkedin', 'x') NOT NULL,\n  platformUserId VARCHAR(255) NOT NULL,\n  platformUsername VARCHAR(255),\n  accessToken TEXT NOT NULL,\n  refreshToken TEXT,\n  tokenExpiresAt TIMESTAMP NULL,\n  profilePictureUrl TEXT,\n  isActive INT DEFAULT 1 NOT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE\n)",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute CREATE TABLE IF NOT EXISTS social_connections (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  userId INT NOT NULL,\n  platform ENUM('facebook', 'instagram', 'linkedin', 'x') NOT NULL,\n  platformUserId VARCHAR(255) NOT NULL,\n  platformUsername VARCHAR(255),\n  accessToken TEXT NOT NULL,\n  refreshToken TEXT,\n  tokenExpiresAt TIMESTAMP NULL,\n  profilePictureUrl TEXT,\n  isActive INT DEFAULT 1 NOT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE\n)",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 339
-}

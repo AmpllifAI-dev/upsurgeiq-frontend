@@ -1,9 +1,0 @@
-{
-  "query": "ALTER TABLE sports_teams \nADD COLUMN sport VARCHAR(100) NOT NULL DEFAULT 'motorsport',\nADD COLUMN league VARCHAR(255),\nADD COLUMN division VARCHAR(255),\nADD COLUMN location VARCHAR(255),\nADD COLUMN founded INT,\nADD COLUMN stadium VARCHAR(255),\nADD COLUMN website VARCHAR(500),\nADD COLUMN logo VARCHAR(500),\nADD COLUMN primaryColor VARCHAR(50),\nADD COLUMN secondaryColor VARCHAR(50),\nADD COLUMN description TEXT,\nADD COLUMN achievements JSON,\nADD COLUMN socialMedia JSON;",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute ALTER TABLE sports_teams \nADD COLUMN sport VARCHAR(100) NOT NULL DEFAULT 'motorsport',\nADD COLUMN league VARCHAR(255),\nADD COLUMN division VARCHAR(255),\nADD COLUMN location VARCHAR(255),\nADD COLUMN founded INT,\nADD COLUMN stadium VARCHAR(255),\nADD COLUMN website VARCHAR(500),\nADD COLUMN logo VARCHAR(500),\nADD COLUMN primaryColor VARCHAR(50),\nADD COLUMN secondaryColor VARCHAR(50),\nADD COLUMN description TEXT,\nADD COLUMN achievements JSON,\nADD COLUMN socialMedia JSON;",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 3589
-}

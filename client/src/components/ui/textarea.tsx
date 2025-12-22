@@ -1,3 +1,4 @@
+import { useDialogComposition } from "@/components/ui/dialog";
 import { useComposition } from "@/hooks/useComposition";
 import { cn } from "@/lib/utils";
 import * as React from "react";
@@ -9,12 +10,8 @@ function Textarea({
   onCompositionEnd,
   ...props
 }: React.ComponentProps<"textarea">) {
-  // Composition handling for IME support
-  const dialogComposition = { 
-    justEndedComposing: () => false,
-    setComposing: (_: boolean) => {},
-    markCompositionEnd: () => {}
-  };
+  // Get dialog composition context if available (will be no-op if not inside Dialog)
+  const dialogComposition = useDialogComposition();
 
   // Add composition event handlers to support input method editor (IME) for CJK languages.
   const {

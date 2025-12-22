@@ -1,9 +1,0 @@
-{
-  "query": "ALTER TABLE businesses \nADD COLUMN IF NOT EXISTS whiteLabelEnabled INT DEFAULT 0,\nADD COLUMN IF NOT EXISTS whiteLabelLogoUrl VARCHAR(500),\nADD COLUMN IF NOT EXISTS whiteLabelPrimaryColor VARCHAR(7),\nADD COLUMN IF NOT EXISTS whiteLabelSecondaryColor VARCHAR(7),\nADD COLUMN IF NOT EXISTS whiteLabelCompanyName VARCHAR(255);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute ALTER TABLE businesses \nADD COLUMN IF NOT EXISTS whiteLabelEnabled INT DEFAULT 0,\nADD COLUMN IF NOT EXISTS whiteLabelLogoUrl VARCHAR(500),\nADD COLUMN IF NOT EXISTS whiteLabelPrimaryColor VARCHAR(7),\nADD COLUMN IF NOT EXISTS whiteLabelSecondaryColor VARCHAR(7),\nADD COLUMN IF NOT EXISTS whiteLabelCompanyName VARCHAR(255);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1768
-}

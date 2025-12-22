@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS newsletter_subscribers (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  email VARCHAR(320) NOT NULL UNIQUE,\n  name VARCHAR(255),\n  source VARCHAR(100) DEFAULT 'resources_page',\n  status ENUM('active', 'unsubscribed') DEFAULT 'active' NOT NULL,\n  subscribedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  unsubscribedAt TIMESTAMP NULL,\n  tags TEXT\n);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute CREATE TABLE IF NOT EXISTS newsletter_subscribers (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  email VARCHAR(320) NOT NULL UNIQUE,\n  name VARCHAR(255),\n  source VARCHAR(100) DEFAULT 'resources_page',\n  status ENUM('active', 'unsubscribed') DEFAULT 'active' NOT NULL,\n  subscribedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  unsubscribedAt TIMESTAMP NULL,\n  tags TEXT\n);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 239
-}

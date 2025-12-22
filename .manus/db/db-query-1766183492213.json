@@ -1,9 +1,0 @@
-{
-  "query": "INSERT INTO webhook_configs (name, eventType, webhookUrl, isActive, retryAttempts, createdAt, updatedAt) VALUES ('Airtable CRM Sync', 'user.onboarded', 'https://hook.eu1.make.com/s2i7454swkvep29j1tk91tn74d5dlkc8', 1, 3, NOW(), NOW())",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute INSERT INTO webhook_configs (name, eventType, webhookUrl, isActive, retryAttempts, createdAt, updatedAt) VALUES ('Airtable CRM Sync', 'user.onboarded', 'https://hook.eu1.make.com/s2i7454swkvep29j1tk91tn74d5dlkc8', 1, 3, NOW(), NOW())",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 73
-}

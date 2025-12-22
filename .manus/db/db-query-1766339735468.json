@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS email_template_library (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  name VARCHAR(255) NOT NULL,\n  description TEXT NULL,\n  category VARCHAR(100) NULL,\n  thumbnailUrl VARCHAR(500) NULL,\n  htmlContent TEXT NOT NULL,\n  jsonStructure JSON NULL,\n  isPublic INT DEFAULT 0,\n  usageCount INT DEFAULT 0,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  INDEX idx_category (category),\n  INDEX idx_public (isPublic),\n  INDEX idx_usage (usageCount)\n);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute CREATE TABLE IF NOT EXISTS email_template_library (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  name VARCHAR(255) NOT NULL,\n  description TEXT NULL,\n  category VARCHAR(100) NULL,\n  thumbnailUrl VARCHAR(500) NULL,\n  htmlContent TEXT NOT NULL,\n  jsonStructure JSON NULL,\n  isPublic INT DEFAULT 0,\n  usageCount INT DEFAULT 0,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  INDEX idx_category (category),\n  INDEX idx_public (isPublic),\n  INDEX idx_usage (usageCount)\n);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 175
-}
