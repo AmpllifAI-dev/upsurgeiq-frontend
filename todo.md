@@ -2574,3 +2574,50 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 ## V2 Features (Lower Priority)
 - [ ] Apply DashboardHeader to remaining 15 secondary pages
 - [ ] Add user avatar/photo to Settings link in navigation
+
+## Critical Enhancements - Dec 22 (User Priority)
+
+### Social Media Posting Enhancements
+- [x] Add toggle between single post text (same for all channels) vs individual post text per channel
+- [x] Add photo upload functionality to social media composer (UI ready, needs backend S3 integration)
+- [x] Add AI image generation trigger to social media composer (UI ready, needs backend integration)
+- [x] Add toggle for images: same image for all channels vs individual images per channel
+- [x] Update social media post creation UI with toggle controls
+- [ ] Implement actual file upload to S3 for social media images
+- [ ] Implement AI image generation for social media posts
+- [ ] Test social media posting with images across all platforms
+
+### Press Release Distribution System - Critical Updates
+- [x] Add photo upload area to press release creation form (ALREADY IMPLEMENTED - ImageUpload component)
+- [x] Add AI image generation trigger to press release creation (ALREADY IMPLEMENTED - PressReleaseImageGenerator component)
+- [ ] Create image hosting system (upload to S3, generate public URL)
+- [ ] Build email template with image link at top (journalists don't like attachments)
+- [ ] Ensure press release text goes in email body (not as attachment)
+- [ ] Add "Prepare to Send" button to Press Release Detail page
+- [ ] Add "Prepare to Send" button to Press Release Edit page
+- [ ] Add "Prepare to Send" button to Press Releases list (alongside View/Edit/Delete)
+- [ ] Create distribution list selection page (Step 2)
+  - [ ] Section A: Show existing lists (default, custom free, purchasable £4 each)
+  - [ ] Section B: AI-generated media list catalog browser
+  - [ ] Display categories: Genre, Geographic, Trade/Industry (SIC)
+  - [ ] "Add this list" button triggers AI agent to build list
+  - [ ] Alert: "Building your list... We'll email you when ready"
+  - [ ] AI agent adds completed list to distribution automatically
+  - [ ] "Save for Later" button with draft email confirmation
+  - [ ] 24-hour reminder email if not sent (auto-email)
+- [ ] Create payment modal for media list credits
+  - [ ] Show credit usage if exceeding free allowance
+  - [ ] Option to use pre-purchased credits
+  - [ ] Option to buy credits (in-modal Stripe checkout)
+  - [ ] Bundle pricing: 10 credits = £36, 20 credits = £68, 30 credits = £96
+- [ ] Build final confirmation dialog with send button
+- [ ] Track distribution history per press release
+- [ ] Create email notification templates (list ready, 24hr reminder)
+
+### Admin Dashboard Consolidation
+- [ ] Create centralized Admin Dashboard page
+- [ ] Link Manus Credit Monitoring tool
+- [ ] Link Error Logs viewer
+- [ ] Link User Management (if needed)
+- [ ] Add admin-only navigation to dashboard header
+- [ ] Ensure role-based access control (admin only)

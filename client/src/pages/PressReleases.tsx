@@ -3,7 +3,7 @@ import { DashboardHeader } from "@/components/DashboardHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Zap, FileText, Plus, Calendar, ArrowLeft, Eye, Edit, Trash2, Search, Download, Save, Star, FileSpreadsheet } from "lucide-react";
+import { Zap, FileText, Plus, Calendar, ArrowLeft, Eye, Edit, Trash2, Search, Download, Save, Star, FileSpreadsheet, Send } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -586,7 +586,7 @@ export default function PressReleases() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <Button
                       variant="outline"
                       size="sm"
@@ -602,6 +602,13 @@ export default function PressReleases() {
                     >
                       <Edit className="w-4 h-4 mr-2" />
                       Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => setLocation(`/press-releases/${pr.id}/distribute`)}
+                    >
+                      <Send className="w-4 h-4 mr-2" />
+                      Prepare to Send
                     </Button>
                     <Button
                       variant="outline"

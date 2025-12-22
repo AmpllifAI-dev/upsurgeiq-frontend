@@ -3,7 +3,7 @@ import { DashboardHeader } from "@/components/DashboardHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Edit, Download, Share2, Calendar } from "lucide-react";
+import { ArrowLeft, Edit, Download, Share2, Calendar, Send } from "lucide-react";
 import { useLocation, useRoute } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -102,9 +102,13 @@ export default function PressReleaseDetail() {
             <Download className="w-4 h-4 mr-2" />
             Export PDF
           </Button>
-          <Button onClick={() => setLocation(`/press-releases/${pressRelease.id}/edit`)}>
+          <Button variant="outline" onClick={() => setLocation(`/press-releases/${pressRelease.id}/edit`)}>
             <Edit className="w-4 h-4 mr-2" />
             Edit
+          </Button>
+          <Button onClick={() => setLocation(`/press-releases/${pressRelease.id}/distribute`)}>
+            <Send className="w-4 h-4 mr-2" />
+            Prepare to Send
           </Button>
           </div>
         </div>

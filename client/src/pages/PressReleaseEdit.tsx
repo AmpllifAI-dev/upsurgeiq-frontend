@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Send } from "lucide-react";
 import { useLocation, useRoute } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -106,10 +106,16 @@ export default function PressReleaseEdit() {
       <div className="container max-w-4xl py-8 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-end">
-          <Button onClick={handleSave} disabled={updateMutation.isPending}>
-            <Save className="w-4 h-4 mr-2" />
-            {updateMutation.isPending ? "Saving..." : "Save Changes"}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => setLocation(`/press-releases/${prId}/distribute`)}>
+              <Send className="w-4 h-4 mr-2" />
+              Prepare to Send
+            </Button>
+            <Button onClick={handleSave} disabled={updateMutation.isPending}>
+              <Save className="w-4 h-4 mr-2" />
+              {updateMutation.isPending ? "Saving..." : "Save Changes"}
+            </Button>
+          </div>
         </div>
 
       {/* Edit Form */}

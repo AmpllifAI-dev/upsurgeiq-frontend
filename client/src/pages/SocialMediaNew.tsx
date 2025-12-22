@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Zap, Share2, ArrowLeft, Sparkles, Calendar, Facebook, Instagram, Linkedin } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Zap, Share2, ArrowLeft, Sparkles, Calendar, Facebook, Instagram, Linkedin, Upload, Image as ImageIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CharacterCounter } from "@/components/CharacterCounter";
 import { useLocation } from "wouter";
@@ -24,6 +25,11 @@ export default function SocialMediaNew() {
   const [platforms, setPlatforms] = useState<string[]>([]);
   const [scheduledFor, setScheduledFor] = useState("");
   const [customTones, setCustomTones] = useState<Record<string, string>>({});
+  const [postMode, setPostMode] = useState<'single' | 'individual'>('single');
+  const [platformContent, setPlatformContent] = useState<Record<string, string>>({});
+  const [imageMode, setImageMode] = useState<'single' | 'individual'>('single');
+  const [image, setImage] = useState<string>("");
+  const [platformImages, setPlatformImages] = useState<Record<string, string>>({});
 
   const { data: business } = trpc.business.get.useQuery(undefined, {
     enabled: !!user,
@@ -113,9 +119,19 @@ export default function SocialMediaNew() {
   };
 
   const handleSave = () => {
-    if (!content) {
-      toast.error("Please enter content for your post");
-      return;
+    // Validate content based on mode
+    if (postMode === 'single') {
+      if (!content) {
+        toast.error("Please enter content for your post");
+        return;
+      }
+    } else {
+      // Check if at least one selected platform has content
+      const hasContent = platforms.some(p => platformContent[p]?.trim());
+      if (!hasContent) {
+        toast.error("Please enter content for at least one selected platform");
+        return;
+      }
     }
 
     if (platforms.length === 0) {
@@ -123,11 +139,18 @@ export default function SocialMediaNew() {
       return;
     }
 
+    // Use appropriate content based on mode
+    const finalContent = postMode === 'single' ? content : undefined;
+    const finalPlatformContent = postMode === 'individual' ? platformContent : undefined;
+
     createMutation.mutate({
-      content,
+      content: finalContent || '',
       platforms,
       scheduledFor: scheduledFor || undefined,
       customTones,
+      platformContent: finalPlatformContent,
+      image: imageMode === 'single' ? image : undefined,
+      platformImages: imageMode === 'individual' ? platformImages : undefined,
     });
   };
 
@@ -178,23 +201,67 @@ export default function SocialMediaNew() {
           <div className="lg:col-span-2 space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Post Content</CardTitle>
-                <CardDescription>Write your social media post</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="content">Message *</Label>
-                  <div className="relative">
-                    <Textarea
-                      id="content"
-                      placeholder="What would you like to share?"
-                      value={content}
-                      onChange={(e) => setContent(e.target.value)}
-                      rows={8}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Post Content</CardTitle>
+                    <CardDescription>Write your social media post</CardDescription>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="post-mode" className="text-sm font-normal cursor-pointer">
+                      {postMode === 'single' ? 'Same for all' : 'Individual per platform'}
+                    </Label>
+                    <Switch
+                      id="post-mode"
+                      checked={postMode === 'individual'}
+                      onCheckedChange={(checked) => setPostMode(checked ? 'individual' : 'single')}
                     />
-                    <CharacterCounter current={content.length} max={280} />
                   </div>
                 </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {postMode === 'single' ? (
+                  <div className="space-y-2">
+                    <Label htmlFor="content">Message *</Label>
+                    <div className="relative">
+                      <Textarea
+                        id="content"
+                        placeholder="What would you like to share?"
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        rows={8}
+                      />
+                      <CharacterCounter current={content.length} max={280} />
+                    </div>
+                  </div>
+                ) : (
+                  <Tabs defaultValue={platforms[0] || 'facebook'} className="w-full">
+                    <TabsList className="grid w-full grid-cols-3">
+                      <TabsTrigger value="facebook">Facebook</TabsTrigger>
+                      <TabsTrigger value="instagram">Instagram</TabsTrigger>
+                      <TabsTrigger value="linkedin">LinkedIn</TabsTrigger>
+                    </TabsList>
+                    {['facebook', 'instagram', 'linkedin'].map((platform) => (
+                      <TabsContent key={platform} value={platform} className="space-y-2">
+                        <Label htmlFor={`content-${platform}`}>
+                          {platform.charAt(0).toUpperCase() + platform.slice(1)} Post *
+                        </Label>
+                        <div className="relative">
+                          <Textarea
+                            id={`content-${platform}`}
+                            placeholder={`What would you like to share on ${platform}?`}
+                            value={platformContent[platform] || ''}
+                            onChange={(e) => setPlatformContent(prev => ({ ...prev, [platform]: e.target.value }))}
+                            rows={8}
+                          />
+                          <CharacterCounter 
+                            current={(platformContent[platform] || '').length} 
+                            max={getCharacterLimit(platform)} 
+                          />
+                        </div>
+                      </TabsContent>
+                    ))}
+                  </Tabs>
+                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="scheduledFor">Schedule (Optional)</Label>
@@ -208,6 +275,79 @@ export default function SocialMediaNew() {
                     Leave empty to post immediately
                   </p>
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Images</CardTitle>
+                    <CardDescription>Add images to your posts</CardDescription>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="image-mode" className="text-sm font-normal cursor-pointer">
+                      {imageMode === 'single' ? 'Same for all' : 'Individual per platform'}
+                    </Label>
+                    <Switch
+                      id="image-mode"
+                      checked={imageMode === 'individual'}
+                      onCheckedChange={(checked) => setImageMode(checked ? 'individual' : 'single')}
+                    />
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {imageMode === 'single' ? (
+                  <div className="space-y-4">
+                    <div className="flex gap-2">
+                      <Button variant="outline" className="flex-1">
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload Image
+                      </Button>
+                      <Button variant="outline" className="flex-1">
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Generate with AI
+                      </Button>
+                    </div>
+                    {image && (
+                      <div className="relative border rounded-lg p-4">
+                        <ImageIcon className="w-12 h-12 text-muted-foreground mx-auto" />
+                        <p className="text-sm text-center text-muted-foreground mt-2">Image preview</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Tabs defaultValue={platforms[0] || 'facebook'} className="w-full">
+                    <TabsList className="grid w-full grid-cols-3">
+                      <TabsTrigger value="facebook">Facebook</TabsTrigger>
+                      <TabsTrigger value="instagram">Instagram</TabsTrigger>
+                      <TabsTrigger value="linkedin">LinkedIn</TabsTrigger>
+                    </TabsList>
+                    {['facebook', 'instagram', 'linkedin'].map((platform) => (
+                      <TabsContent key={platform} value={platform} className="space-y-4">
+                        <div className="flex gap-2">
+                          <Button variant="outline" className="flex-1">
+                            <Upload className="w-4 h-4 mr-2" />
+                            Upload
+                          </Button>
+                          <Button variant="outline" className="flex-1">
+                            <Sparkles className="w-4 h-4 mr-2" />
+                            Generate
+                          </Button>
+                        </div>
+                        {platformImages[platform] && (
+                          <div className="relative border rounded-lg p-4">
+                            <ImageIcon className="w-12 h-12 text-muted-foreground mx-auto" />
+                            <p className="text-sm text-center text-muted-foreground mt-2">
+                              {platform.charAt(0).toUpperCase() + platform.slice(1)} image
+                            </p>
+                          </div>
+                        )}
+                      </TabsContent>
+                    ))}
+                  </Tabs>
+                )}
               </CardContent>
             </Card>
 

@@ -1016,6 +1016,9 @@ Generate a complete, publication-ready press release.`;
           platforms: z.array(z.string()),
           scheduledFor: z.string().optional(),
           customTones: z.record(z.string(), z.string()).optional(),
+          platformContent: z.record(z.string(), z.string()).optional(),
+          image: z.string().optional(),
+          platformImages: z.record(z.string(), z.string()).optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -1031,15 +1034,20 @@ Generate a complete, publication-ready press release.`;
 
         // Create a post for each selected platform
         const posts = await Promise.all(
-          input.platforms.map((platform) =>
-            createSocialMediaPost({
+          input.platforms.map((platform) => {
+            // Use platform-specific content if available, otherwise use shared content
+            const postContent = input.platformContent?.[platform] || input.content;
+            const postImage = input.platformImages?.[platform] || input.image;
+            
+            return createSocialMediaPost({
               businessId: business.id,
               platform: platform as any,
-              content: input.content,
+              content: postContent,
               status: input.scheduledFor ? "scheduled" : "draft",
               scheduledFor: input.scheduledFor ? new Date(input.scheduledFor) : undefined,
-            })
-          )
+              imageUrl: postImage,
+            });
+          })
         );
 
         // Social posts are unlimited - no usage tracking needed
