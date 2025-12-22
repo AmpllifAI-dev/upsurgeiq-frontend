@@ -2505,7 +2505,7 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] FloatingIssueButton missing from Dashboard page (fixed - already added in last checkpoint)
 - [x] No hamburger menu on Dashboard page - Dashboard doesn't use DashboardLayout so missing mobile navigation (FIXED: Added horizontal menu items + hamburger menu)
 - [ ] Profile save button doesn't trigger mutation (button stays active, no toast, no save) - NEEDS INVESTIGATION
-- [ ] Attachment field in bug report dialog shows stale data ("1 file(s) attached (upload pending)" persists between opens)
+- [x] Attachment field in bug report dialog shows stale data ("1 file(s) attached (upload pending)" persists between opens) - FIXED (confirmed by user)
 
 ## Navigation Consistency - Dec 21 (User Requested)
 - [ ] Replace all "Back to..." buttons with consistent dashboard header navigation (logo + horizontal menu + hamburger)
@@ -2531,7 +2531,7 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] FloatingIssueButton missing from Dashboard page (fixed - already added in last checkpoint)
 - [x] No hamburger menu on Dashboard page - Dashboard doesn't use DashboardLayout so missing mobile navigation (FIXED: Added horizontal menu items + hamburger menu)
 - [x] Profile save button doesn't trigger mutation (button stays active, no toast, no save) - FIXED (added await to getDb() call in auth.updateProfile)
-- [ ] Attachment field in bug report dialog shows stale data ("1 file(s) attached (upload pending)" persists between opens)
+- [x] Attachment field in bug report dialog shows stale data ("1 file(s) attached (upload pending)" persists between opens) - FIXED (confirmed by user)
 
 ## Press Release Distribution System - Dec 22 (Critical Missing Feature)
 - [ ] Add "Prepare to Send" button to Press Release Detail view page
