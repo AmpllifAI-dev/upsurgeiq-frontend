@@ -13,25 +13,28 @@ export const stripe = stripeSecretKey
 
 /**
  * Media List Credit Bundle Products
- * These need to be created in Stripe Dashboard first
+ * Real Stripe Price IDs from created products
  */
 export const CREDIT_PRODUCTS = {
   STARTER: {
-    productId: "media_list_credits_10",
+    priceId: "price_1Sh4t0IEVr3V21Jee3XjNcYX",
+    productId: "prod_TeNe3AnU4JehWF",
     name: "10 Media List Credits",
     credits: 10,
     priceGBP: 3600, // £36.00 in pence
-    description: "10 credits for media list distribution",
+    description: "10 credits for media list distribution (Save £4)",
   },
   PROFESSIONAL: {
-    productId: "media_list_credits_20",
+    priceId: "price_1Sh4t1IEVr3V21JeDciG8p2v",
+    productId: "prod_TeNe3TD1SlLXcC",
     name: "20 Media List Credits",
     credits: 20,
     priceGBP: 6800, // £68.00 in pence
     description: "20 credits for media list distribution (Save £12)",
   },
   ENTERPRISE: {
-    productId: "media_list_credits_30",
+    priceId: "price_1Sh4t1IEVr3V21JecvcAMgkL",
+    productId: "prod_TeNe69n2aDDUck",
     name: "30 Media List Credits",
     credits: 30,
     priceGBP: 9600, // £96.00 in pence
@@ -64,14 +67,7 @@ export async function createCreditCheckoutSession(
     payment_method_types: ["card"],
     line_items: [
       {
-        price_data: {
-          currency: "gbp",
-          product_data: {
-            name: product.name,
-            description: product.description,
-          },
-          unit_amount: product.priceGBP,
-        },
+        price: product.priceId,
         quantity: 1,
       },
     ],

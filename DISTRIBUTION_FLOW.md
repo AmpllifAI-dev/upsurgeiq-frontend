@@ -3,6 +3,8 @@
 ## Overview
 This document describes the complete user experience for distributing press releases to AI-generated media lists, from selection through delivery.
 
+**CRITICAL PRIVACY RULE:** AI-generated media lists contain proprietary journalist contact information. Users NEVER see individual journalist names, emails, or contact details. Only publication names and aggregate statistics are shown. The system sends emails on the user's behalf.
+
 ---
 
 ## User Journey
@@ -65,6 +67,12 @@ Select Media Lists
 Choose which journalist groups should receive this press release
 ```
 
+**Privacy Notice Banner:**
+```
+🔒 For security reasons, individual journalist contact details are not shown.
+   Our system will send personalized emails to journalists at the publications you select.
+```
+
 **Tab Navigation:**
 ```
 [By Genre] [By Geography] [By Industry]
@@ -76,15 +84,16 @@ Each category displays as a selectable card with checkbox:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ ☑ UK Tech Media                                   [Ready] ✓ │
+│ ☑ UK Yachting Media                               [Ready] ✓ │
 │                                                              │
-│ Technology journalists covering UK startups and innovation  │
+│ Lifestyle journalists covering sailing, yachts, and marine │
+│ leisure in the UK                                           │
 │                                                              │
-│ 45 journalists                                   1 credit   │
+│ 45 publications (est. 120 journalists)           1 credit   │
 └─────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────┐
-│ ☐ London Finance Press                      [Generating] ⏳ │
+│ ☐ London Finance Press              [Being Generated] ⏳     │
 │                                                              │
 │ Financial journalists based in London                       │
 │                                                              │
@@ -93,9 +102,9 @@ Each category displays as a selectable card with checkbox:
 └─────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────┐
-│ ☐ National Lifestyle Media              [Not Generated] ○   │
+│ ☐ UK Model Railway Media            [Not Generated] ○       │
 │                                                              │
-│ Lifestyle and consumer journalists across the UK            │
+│ Journalists covering model trains, railways, and collecting│
 │                                                              │
 │ Click to generate this list               [Generate Now]    │
 └─────────────────────────────────────────────────────────────┘
@@ -105,10 +114,10 @@ Each category displays as a selectable card with checkbox:
 
 - **✓ Ready (Green)** - List is populated and ready to use
   - Checkbox enabled
-  - Shows contact count
+  - Shows publication count and estimated journalist count
   - Shows credit cost
 
-- **⏳ Generating (Yellow)** - AI is currently building the list
+- **⏳ Being Generated (Yellow)** - AI is currently building the list (triggered by you or another user)
   - Checkbox disabled
   - Shows "AI is researching journalists..."
   - Shows estimated time: "Usually takes 5-10 minutes"
@@ -132,13 +141,18 @@ Each category displays as a selectable card with checkbox:
 - Credit cost updates in summary panel
 
 **Scenario B: User clicks "Generate Now" on "Not Generated" list**
-- System creates generation request
-- AI agent starts researching in background
-- Card updates to "Generating" status with spinner
-- Alert: "Generation started! We'll email you when it's ready."
+- System checks if another user has already queued this category
+- If already in queue:
+  - Alert: "This list is already being generated! You'll receive an email when it's ready."
+  - Card updates to "Being Generated" status with spinner
+- If not in queue:
+  - System creates generation request
+  - AI agent starts researching in background
+  - Card updates to "Being Generated" status with spinner
+  - Alert: "Generation started! We'll email you when it's ready."
 - "Save for Later" button appears below summary panel
 
-**Scenario C: User tries to select "Generating" list**
+**Scenario C: User tries to select "Being Generated" list**
 - Checkbox remains disabled
 - Tooltip: "This list is being generated. Save your distribution for later or choose a different list."
 
@@ -155,11 +169,11 @@ Each category displays as a selectable card with checkbox:
 │ Press Release: TechStartup Raises £5M Series A              │
 │                                                              │
 │ Selected Lists:                                              │
-│ • UK Tech Media (45 journalists)                            │
-│ • Manchester Business Press (32 journalists)                │
-│ • FinTech Industry Media (58 journalists)                   │
+│ • UK Yachting Media (45 publications)                       │
+│ • Manchester Business Press (32 publications)               │
+│ • FinTech Industry Media (58 publications)                  │
 │                                                              │
-│ Total Recipients: 135 journalists                           │
+│ Estimated Recipients: 135 journalists                       │
 │                                                              │
 │ Credit Cost: 3 credits                                       │
 │ Your Balance: 15 credits                                     │
@@ -205,9 +219,11 @@ Each category displays as a selectable card with checkbox:
    │ Confirm Distribution                                     │
    │                                                          │
    │ You're about to send this press release to:             │
-   │ • 135 journalists across 3 media lists                  │
+   │ • Approximately 135 journalists across 3 media lists    │
    │                                                          │
    │ This will deduct 3 credits from your account.           │
+   │                                                          │
+   │ Note: Individual emails will be sent to each journalist │
    │                                                          │
    │ [Cancel]                          [Confirm & Send]       │
    └─────────────────────────────────────────────────────────┘
@@ -217,7 +233,7 @@ Each category displays as a selectable card with checkbox:
    - Checks credit balance
    - Deducts 3 credits
    - Uploads images to S3 (if not already uploaded)
-   - Sends individual emails to each journalist
+   - Sends individual emails to each journalist (user never sees email addresses)
    - Tracks success/failure counts
 5. Progress indicator shows:
    ```
@@ -229,7 +245,8 @@ Each category displays as a selectable card with checkbox:
    ┌─────────────────────────────────────────────────────────┐
    │ ✓ Press Release Sent Successfully!                      │
    │                                                          │
-   │ Your press release was sent to 135 journalists          │
+   │ Your press release was sent to approximately 135        │
+   │ journalists across 3 media lists                        │
    │                                                          │
    │ Delivery Summary:                                        │
    │ • Successfully sent: 132 emails                          │
@@ -247,14 +264,15 @@ Each category displays as a selectable card with checkbox:
 - Clear feedback on delivery success
 - Transparency on credit usage
 - Easy path to send another press release
+- **User never sees individual journalist contact details (proprietary information)**
 
 ---
 
-### Action 2: Save for Later (Some Lists Generating)
+### Action 2: Save for Later (Some Lists Being Generated)
 
 **Pre-conditions:**
 - At least 1 media list selected
-- At least 1 selected list has "Generating" status
+- At least 1 selected list has "Being Generated" status
 - OR user wants to review before sending
 
 **Flow:**
@@ -296,19 +314,23 @@ Each category displays as a selectable card with checkbox:
 
 **Flow:**
 1. User clicks "Generate Now" button on category card
-2. System checks if generation already in progress
-3. If not, creates new generation request
-4. AI agent starts researching in background
-5. Card updates to "Generating" status
-6. Alert message:
-   ```
-   Generation started! We're building the UK Lifestyle Media 
-   list for you. This usually takes 5-10 minutes. 
-   
-   You'll receive an email when it's ready.
-   ```
-7. "Save for Later" button becomes prominent
-8. User can either:
+2. System checks if generation already in progress (by any user)
+3. If already in progress:
+   - Alert: "This list is already being generated by another user! You'll receive an email when it's ready."
+   - Card updates to "Being Generated" status
+4. If not in progress:
+   - Creates new generation request
+   - AI agent starts researching in background
+   - Card updates to "Being Generated" status
+   - Alert message:
+     ```
+     Generation started! We're building the UK Model Railway Media 
+     list for you. This usually takes 5-10 minutes. 
+     
+     You'll receive an email when it's ready.
+     ```
+5. "Save for Later" button becomes prominent
+6. User can either:
    - **Option A:** Continue selecting other "Ready" lists and send those now
    - **Option B:** Save entire distribution for later
    - **Option C:** Navigate away and return when email arrives
@@ -318,6 +340,7 @@ Each category displays as a selectable card with checkbox:
 - No waiting required - can continue working
 - System handles complexity in background
 - Flexibility to send partial distribution or wait for all
+- Efficient resource sharing (lists generated once, used by all)
 
 ---
 
@@ -371,12 +394,16 @@ Each category displays as a selectable card with checkbox:
 ```
 Hi [User Name],
 
-Great news! Your UK Tech Media list has been generated and is 
+Great news! Your UK Yachting Media list has been generated and is 
 ready to use.
 
-Contacts Found: 45 journalists
+Publications Found: 45 publications (estimated 120 journalists)
 
 You can now use this list when distributing your press releases.
+
+Note: Individual journalist contact details are proprietary information 
+and are not displayed. Our system will send personalized emails to 
+journalists on your behalf.
 
 [View Media Lists] [Distribute Press Release]
 
@@ -386,7 +413,7 @@ The UpsurgeIQ Team
 
 **User Action:**
 - Clicks "Distribute Press Release" → Goes to distribution page
-- Clicks "View Media Lists" → Goes to category contacts page
+- Clicks "View Media Lists" → Goes to category publications page (shows publication names only)
 
 ---
 
@@ -404,7 +431,7 @@ You saved a press release distribution 24 hours ago but haven't
 completed it yet.
 
 Press Release: TechStartup Raises £5M Series A
-Selected Lists: 3 media lists (135 journalists)
+Selected Lists: 3 media lists (approximately 135 journalists)
 
 Status: All lists are now ready to send!
 
@@ -438,7 +465,7 @@ successfully distributed!
 Delivery Summary:
 • Successfully sent: 132 emails
 • Failed: 3 emails (invalid addresses)
-• Total recipients: 135 journalists across 3 media lists
+• Total recipients: Approximately 135 journalists across 3 media lists
 
 Credits Used: 3
 Remaining Balance: 12 credits
@@ -473,7 +500,7 @@ Show all distributions user has saved for later, with ability to complete or del
 │ TechStartup Raises £5M Series A                              │
 │ Saved: Dec 20, 2024 at 3:45 PM                              │
 │                                                              │
-│ Selected Lists: 3 (135 journalists)                         │
+│ Selected Lists: 3 (est. 135 journalists)                    │
 │ Status: ✓ All lists ready                                   │
 │ Cost: 3 credits                                              │
 │                                                              │
@@ -484,8 +511,8 @@ Show all distributions user has saved for later, with ability to complete or del
 │ New Product Launch Announcement                              │
 │ Saved: Dec 19, 2024 at 10:22 AM                             │
 │                                                              │
-│ Selected Lists: 2 (87 journalists)                          │
-│ Status: ⏳ 1 list still generating                           │
+│ Selected Lists: 2 (est. 87 journalists)                     │
+│ Status: ⏳ 1 list still being generated                      │
 │ Cost: 2 credits (when ready)                                 │
 │                                                              │
 │ [View Details]  [Delete]                                     │
@@ -494,12 +521,12 @@ Show all distributions user has saved for later, with ability to complete or del
 
 **Status Indicators:**
 - **✓ All lists ready** - Can send immediately
-- **⏳ X lists still generating** - Must wait
+- **⏳ X lists still being generated** - Must wait
 - **✗ Generation failed** - Needs attention
 
 **Actions:**
 - **Complete Distribution** - Opens distribution page with saved configuration
-- **View Details** - Shows which lists are ready/generating
+- **View Details** - Shows which lists are ready/being generated
 - **Delete** - Removes saved distribution (doesn't delete press release)
 
 ---
@@ -508,6 +535,8 @@ Show all distributions user has saved for later, with ability to complete or del
 
 ### Purpose
 Show detailed analytics for a completed distribution, including delivery status and engagement metrics (future).
+
+**PRIVACY NOTE:** Report shows publication-level statistics only, not individual journalist details.
 
 ### Layout
 
@@ -523,7 +552,7 @@ Show detailed analytics for a completed distribution, including delivery status 
 │                                                              │
 │ ✓ Successfully Sent: 132 emails                             │
 │ ✗ Failed: 3 emails                                           │
-│ ━ Total Recipients: 135 journalists                          │
+│ ━ Total Recipients: Approximately 135 journalists            │
 │                                                              │
 │ Credits Used: 3                                              │
 └─────────────────────────────────────────────────────────────┘
@@ -531,75 +560,86 @@ Show detailed analytics for a completed distribution, including delivery status 
 ┌─────────────────────────────────────────────────────────────┐
 │ Media Lists Used                                             │
 │                                                              │
-│ UK Tech Media                                                │
-│ • Sent: 43/45 journalists                                    │
+│ UK Yachting Media                                            │
+│ • Sent: 43/45 publications reached                           │
 │ • Failed: 2 (invalid email addresses)                        │
 │                                                              │
 │ Manchester Business Press                                    │
-│ • Sent: 32/32 journalists                                    │
+│ • Sent: 32/32 publications reached                           │
 │ • Failed: 0                                                  │
 │                                                              │
 │ FinTech Industry Media                                       │
-│ • Sent: 57/58 journalists                                    │
+│ • Sent: 57/58 publications reached                           │
 │ • Failed: 1 (bounce)                                         │
 └─────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────┐
-│ Failed Recipients                                            │
+│ Failed Deliveries                                            │
 │                                                              │
-│ • john.smith@oldpublication.com - Invalid email              │
-│ • editor@closedoutlet.co.uk - Domain not found               │
-│ • news@bounced.com - Mailbox full                            │
+│ • 2 emails failed in UK Yachting Media                      │
+│ • 1 email failed in FinTech Industry Media                  │
+│                                                              │
+│ Note: Specific email addresses are not shown for security   │
+│ reasons. Failed addresses have been flagged for review.     │
 │                                                              │
 │ [Report Issue] [Download Full Report]                        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 **Future Enhancements:**
-- Email open rates (requires tracking pixels)
-- Click-through rates (requires tracked links)
-- Journalist responses/replies
+- Email open rates (aggregate by publication)
+- Click-through rates (aggregate by publication)
+- Journalist responses/replies (forwarded to user)
 - Coverage secured (manual input or auto-detection)
 
 ---
 
 ## Key UX Principles
 
-### 1. **Progressive Disclosure**
+### 1. **Privacy Protection (CRITICAL)**
+- NEVER show individual journalist names/emails for AI-generated lists
+- Only show publication names and aggregate statistics
+- Clear notices explaining why details aren't shown
+- Emphasize that distribution still works (system sends on their behalf)
+- Build trust through transparency about the process
+
+### 2. **Progressive Disclosure**
 - Show essential information first
 - Hide advanced options (scheduling) behind collapsible sections
 - Reveal details only when needed
 
-### 2. **Clear Status Communication**
+### 3. **Clear Status Communication**
 - Visual indicators (colors, icons) for list status
 - Real-time updates when lists become ready
 - Transparent credit costs before commitment
+- Show "Being Generated" even if another user triggered it
 
-### 3. **Non-Blocking Workflow**
+### 4. **Non-Blocking Workflow**
 - Users never wait for AI generation
 - Can send to ready lists immediately
 - Can save and return later for generating lists
 - Background processing with email notifications
+- Efficient resource sharing (lists generated once, used by all)
 
-### 4. **Flexible Decision Points**
+### 5. **Flexibility & Control**
 - Generate new lists on-the-fly
 - Send partial distribution or wait for all
 - Save for later at any point
 - Change selection before sending
 
-### 5. **Confidence Through Transparency**
-- Show exact recipient count before sending
+### 6. **Confidence Through Transparency**
+- Show estimated recipient count before sending
 - Display credit cost clearly
 - Confirm before deducting credits
-- Detailed delivery report after sending
+- Detailed delivery report after sending (publication-level)
 
-### 6. **Error Prevention & Recovery**
+### 7. **Error Prevention & Recovery**
 - Check credit balance before allowing send
 - Validate all selections before processing
 - Preserve saved distributions indefinitely
 - Allow deletion of saved distributions
 
-### 7. **Contextual Guidance**
+### 8. **Contextual Guidance**
 - Tooltips explain why checkboxes are disabled
 - Inline help for scheduling options
 - Clear next steps after each action
@@ -616,15 +656,21 @@ Show detailed analytics for a completed distribution, including delivery status 
 - Persist saved distributions in database
 
 ### Performance
-- Lazy load journalist contacts (not needed for distribution)
+- Lazy load publication data (not needed for distribution selection)
 - Cache media list categories (change infrequently)
 - Debounce credit balance checks
 - Stream email sending (don't wait for all to complete)
 
+### Privacy & Security
+- **NEVER expose journalist contact details in API responses for AI-generated lists**
+- Backend handles all email sending (user never sees addresses)
+- Log all distribution attempts for audit trail
+- Encrypt sensitive contact data at rest
+
 ### Error Handling
 - Retry failed email sends (max 3 attempts)
 - Log all failures for debugging
-- Show user-friendly error messages
+- Show user-friendly error messages (no email addresses)
 - Provide "Contact Support" fallback
 
 ### Analytics Tracking
@@ -632,6 +678,38 @@ Show detailed analytics for a completed distribution, including delivery status 
 - Monitor generation success rates
 - Measure time from save to send
 - Track credit purchase conversion after "insufficient credits" error
+
+---
+
+## Genre Category Examples
+
+### Lifestyle & Hobby Categories (Genre):
+- Yachting & Sailing
+- Fishing & Angling
+- Model Trains & Railways
+- Women's Interest & Lifestyle
+- Men's Lifestyle & Grooming
+- Comics & Graphic Novels
+- Teenage & Youth Culture
+- Gardening & Horticulture
+- Photography & Imaging
+- Cycling & Biking
+- Running & Athletics
+- Golf & Country Clubs
+- Wine & Spirits
+- Food & Cooking
+- Travel & Adventure
+- Pets & Animals
+- Home & Interior Design
+- Fashion & Style
+- Beauty & Cosmetics
+- Weddings & Events
+
+### NOT Genre (these are Industry categories):
+- ❌ Technology
+- ❌ Finance
+- ❌ Healthcare
+- ❌ Manufacturing
 
 ---
 
@@ -663,11 +741,11 @@ Show detailed analytics for a completed distribution, including delivery status 
 - **Smart Recommendations:** AI suggests relevant media lists based on press release content
 - **Batch Distribution:** Send same press release to multiple lists over time
 - **A/B Testing:** Test different subject lines or content variations
-- **Engagement Tracking:** See which journalists opened emails
+- **Engagement Tracking:** See which publications had journalists open emails (aggregate only)
 
 ### Phase 3
-- **Journalist Profiles:** View detailed profiles before sending
-- **Relationship Management:** Track interactions with each journalist
+- **Publication Profiles:** View detailed profiles before sending (editorial focus, audience)
+- **Relationship Management:** Track interactions at publication level
 - **Coverage Tracking:** Link press releases to resulting articles
 - **ROI Analytics:** Measure press release effectiveness
 
@@ -675,4 +753,4 @@ Show detailed analytics for a completed distribution, including delivery status 
 - **API Access:** Programmatic distribution for power users
 - **White-Label:** Custom branding for agency clients
 - **Team Collaboration:** Multiple users managing distributions
-- **Advanced Targeting:** Filter journalists by beat, region, publication type
+- **Advanced Targeting:** Filter by publication type, circulation, audience demographics

@@ -3,12 +3,17 @@
 ## Overview
 The media list management UI provides users with a self-service interface to browse, generate, and manage AI-powered journalist contact lists organized by Genre, Geography, and Industry.
 
+**CRITICAL PRIVACY RULE:** AI-generated media lists are proprietary information. NEVER show journalist names, emails, or contact details for AI-generated lists. Only show publication names. Full contact details are ONLY shown for user's own uploaded custom lists.
+
 ---
 
 ## Page 1: Media List Categories Browser
 
 ### Purpose
-Allow users to discover and trigger AI generation of media lists across three dimensions: Genre (e.g., Technology, Finance), Geography (e.g., London, Manchester), and Industry (e.g., FinTech, Healthcare).
+Allow users to discover and trigger AI generation of media lists across three dimensions:
+- **Genre** (lifestyle/hobby-based): Yachting, Fishing, Model Trains, Women's Interest, Men's Lifestyle, Comics, Teenage, etc.
+- **Geography**: London, Manchester, Scotland, Wales, etc.
+- **Industry**: FinTech, Healthcare, SaaS, Manufacturing, etc.
 
 ### Layout
 
@@ -24,36 +29,41 @@ Allow users to discover and trigger AI generation of media lists across three di
 **Category Grid:**
 - 3-column responsive grid (1 column on mobile, 2 on tablet, 3 on desktop)
 - Each category displayed as a card with:
-  - **Category name** (e.g., "UK Tech Media")
-  - **Description** (optional, e.g., "Technology journalists covering UK startups and innovation")
+  - **Category name** (e.g., "UK Yachting Media")
+  - **Description** (optional, e.g., "Lifestyle journalists covering sailing, yachts, and marine leisure")
   - **Status badge:**
     - 🟢 "Ready" (green) - List is populated with contacts
-    - 🟡 "Generating" (yellow) - AI is currently building the list
+    - 🟡 "Being Generated" (yellow) - AI is currently building the list (triggered by you or another user)
     - 🔴 "Failed" (red) - Generation failed, click to retry
     - ⚪ "Not Generated" (gray) - List hasn't been requested yet
-  - **Contact count** (if generated): "45 journalists"
+  - **Contact count** (if generated): "45 publications"
   - **Action indicator:**
-    - If ready: "Click to view contacts"
-    - If generating: "AI is researching journalists..." with spinner
+    - If ready: "Click to view publications"
+    - If being generated: "AI is researching journalists..." with spinner
     - If not generated: "Click to generate this list"
 
 ### User Interactions
 
 **Scenario 1: User clicks on a "Not Generated" category**
-1. System checks if category is already in generation queue
-2. If not, creates new generation request and starts AI agent in background
-3. Shows alert: "Generation started! We're building this media list for you. You'll receive an email when it's ready."
-4. Card updates to "Generating" status with spinner
-5. User can navigate away - generation continues in background
+1. System checks if category is already in generation queue (by any user)
+2. If not in queue:
+   - Creates new generation request and starts AI agent in background
+   - Shows alert: "Generation started! We're building this media list for you. You'll receive an email when it's ready."
+   - Card updates to "Being Generated" status with spinner
+3. If already in queue by another user:
+   - Shows alert: "This list is already being generated! You'll receive an email when it's ready."
+   - Card updates to "Being Generated" status with spinner
+4. User can navigate away - generation continues in background
 
-**Scenario 2: User clicks on a "Generating" category**
+**Scenario 2: User clicks on a "Being Generated" category**
 1. Shows current generation progress
 2. Displays message: "This list is being generated. You'll receive an email when it's ready."
 3. Shows estimated time if available: "Usually takes 5-10 minutes"
+4. Note: Generation may have been triggered by you or another user
 
 **Scenario 3: User clicks on a "Ready" category**
-1. Navigates to detailed contacts view page (Page 2)
-2. Shows all journalist contacts in that category
+1. Navigates to detailed publications view page (Page 2)
+2. Shows all publications in that category (NOT individual journalist details)
 
 **Scenario 4: User clicks on a "Failed" category**
 1. Shows error message: "Generation failed: [error reason]"
@@ -61,12 +71,12 @@ Allow users to discover and trigger AI generation of media lists across three di
 3. On retry, creates new generation request
 
 ### Generation Queue Status Panel
-Below the category grid, show active generation requests:
+Below the category grid, show YOUR active generation requests:
 
 ```
 Your Generation Requests
 ┌─────────────────────────────────────────────┐
-│ UK Tech Media                    [Generating]│
+│ UK Yachting Media                [Generating]│
 │ Requested 2 minutes ago                      │
 └─────────────────────────────────────────────┘
 ┌─────────────────────────────────────────────┐
@@ -82,47 +92,92 @@ Your Generation Requests
 
 ---
 
-## Page 2: Category Contacts View
+## Page 2: Category Publications View (AI-Generated Lists)
 
 ### Purpose
-Display all journalist contacts within a specific media list category, with search and filtering capabilities.
+Display all publications within a specific AI-generated media list category. **CRITICAL: Only show publication names, NOT individual journalist contact details (proprietary information).**
 
 ### Layout
 
 **Header:**
-- Breadcrumb: "Media Lists > UK Tech Media"
+- Breadcrumb: "Media Lists > UK Yachting Media"
 - Category name and description
-- Contact count: "45 journalists in this list"
+- Publication count: "45 publications in this list"
 - "Back to Categories" button
 
+**Privacy Notice Banner:**
+```
+🔒 Contact details are proprietary information. This list shows publications only.
+   When you distribute a press release, our system sends individual emails to journalists at these publications.
+```
+
 **Search & Filter Bar:**
-- Search input: "Search by name, publication, or beat..."
+- Search input: "Search by publication name..."
 - Filter dropdowns:
-  - Publication (multi-select)
-  - Beat/Topic (multi-select)
+  - Publication type (Magazine, Newspaper, Online, Broadcast)
   - Region (if applicable)
+
+**Publications Table:**
+Sortable table with columns:
+- **Publication Name** - Media outlet name only
+- **Type** - Magazine, Newspaper, Online, Broadcast
+- **Focus** - Coverage area/specialty
+- **Region** - Geographic coverage
+- **Journalist Count** - "3 journalists" (aggregate only, no names)
+
+**NO individual journalist details shown:**
+- ❌ No journalist names
+- ❌ No email addresses
+- ❌ No social media links
+- ✅ Only publication-level information
+
+**Bulk Actions:**
+- Checkbox to select multiple publications
+- "Use Selected for Distribution" button (navigates to distribution flow)
+
+### Distribution Context
+When user selects publications:
+- Shows: "You've selected 12 publications (estimated 38 journalists will receive your press release)"
+- Cost preview: "This will use 1 credit"
+- "Continue to Distribution" button
+
+---
+
+## Page 2B: User's Own Custom Lists View
+
+### Purpose
+Display contacts from lists the user has uploaded themselves. **Full details are shown because this is the user's own data.**
+
+### Layout
+
+**Header:**
+- Breadcrumb: "Media Lists > My Custom List"
+- List name and description
+- Contact count: "45 journalists in this list"
+- "Back to Categories" button
+- "Edit List" / "Delete List" buttons
 
 **Contacts Table:**
 Sortable table with columns:
-- **Name** - Journalist's full name
+- **Name** - Journalist's full name ✅ (user's own data)
 - **Publication** - Media outlet name
-- **Email** - Professional email address (with copy button)
+- **Email** - Professional email address (with copy button) ✅ (user's own data)
 - **Beat** - Coverage area/specialty
-- **Social** - Twitter/LinkedIn icons (if available)
-- **Actions** - "View Details" button
+- **Social** - Twitter/LinkedIn icons (if available) ✅ (user's own data)
+- **Actions** - "Edit" / "Remove" buttons
 
 **Bulk Actions:**
 - Checkbox to select multiple contacts
 - "Export Selected" button (CSV download)
-- "Add to Custom List" button (for future feature)
+- "Delete Selected" button
+- "Add Contacts" button (upload more)
 
 ### Contact Detail Modal
-When user clicks "View Details":
-- Full contact information
-- Recent articles (if available from AI research)
-- Notes field (editable by user)
-- "Send Test Email" button
-- "Report Incorrect Info" button
+When user clicks "Edit":
+- Full contact information (editable)
+- Notes field
+- "Save Changes" button
+- "Delete Contact" button
 
 ---
 
@@ -172,7 +227,7 @@ Table showing:
 - Date
 - Type (Purchase / Deduction / Refund)
 - Amount (+10 / -3)
-- Description ("Purchased 10 credits" / "Used for UK Tech Media distribution")
+- Description ("Purchased 10 credits" / "Used for UK Yachting Media distribution")
 - Balance after transaction
 
 ### Purchase Flow
@@ -213,10 +268,11 @@ When user wants to distribute a press release:
 1. Navigate to "Distribute Press Release" page
 2. Select press release to distribute
 3. **Media List Selection Section:**
-   - Shows all "Ready" categories as checkboxes
-   - Shows "Generating" categories with spinner (disabled, can't select yet)
+   - Shows all "Ready" categories as checkboxes with publication count
+   - Shows "Being Generated" categories with spinner (disabled, can't select yet)
    - Shows "Not Generated" categories with "Generate Now" button
    - Displays credit cost: "3 lists selected = 3 credits"
+   - **Privacy reminder:** "Your press release will be sent to individual journalists at the selected publications. Contact details are not shown for security reasons."
 4. User can trigger generation of new lists on-the-fly
 5. User can save distribution for later if lists aren't ready yet
 
@@ -224,14 +280,14 @@ When user wants to distribute a press release:
 
 **When list generation completes:**
 ```
-Subject: Your UK Tech Media List is Ready!
+Subject: Your UK Yachting Media List is Ready!
 
 Hi [Name],
 
-Great news! Your UK Tech Media media list has been generated 
+Great news! Your UK Yachting Media media list has been generated 
 and is ready to use.
 
-Contacts Found: 45 journalists
+Publications Found: 45 publications (estimated 120 journalists)
 
 You can now use this list when distributing your press releases.
 
@@ -262,31 +318,40 @@ The UpsurgeIQ Team
 
 ## Key UX Principles
 
-### 1. **Non-Blocking Generation**
+### 1. **Privacy Protection (CRITICAL)**
+- NEVER show individual journalist names/emails for AI-generated lists
+- Only show publication names and aggregate stats
+- Full details only for user's own uploaded lists
+- Clear privacy notices explaining why details aren't shown
+- Emphasize that distribution still works (system sends emails on their behalf)
+
+### 2. **Non-Blocking Generation**
 - Users never wait for AI generation
 - All generation happens in background
 - Email notifications keep users informed
 - Users can continue working on other tasks
+- Multiple users can trigger the same category (shared generation)
 
-### 2. **Transparent Status**
+### 3. **Transparent Status**
 - Always show current generation status
 - Clear visual indicators (badges, spinners)
+- Show "Being Generated" even if another user triggered it
 - Estimated time when available
 - Error messages are actionable
 
-### 3. **Self-Service Discovery**
+### 4. **Self-Service Discovery**
 - Browse all available categories
 - No need to request custom lists
 - AI automatically builds what users need
 - Expand categories over time based on usage
 
-### 4. **Credit Clarity**
+### 5. **Credit Clarity**
 - Always show current balance
 - Show cost before confirming distribution
 - Clear pricing with savings highlighted
 - Transaction history for transparency
 
-### 5. **Progressive Enhancement**
+### 6. **Progressive Enhancement**
 - Core functionality works without JavaScript
 - Real-time updates enhance experience
 - Graceful degradation for older browsers
@@ -294,21 +359,53 @@ The UpsurgeIQ Team
 
 ---
 
+## Genre Category Examples
+
+### Lifestyle & Hobby Categories:
+- Yachting & Sailing
+- Fishing & Angling
+- Model Trains & Railways
+- Women's Interest & Lifestyle
+- Men's Lifestyle & Grooming
+- Comics & Graphic Novels
+- Teenage & Youth Culture
+- Gardening & Horticulture
+- Photography & Imaging
+- Cycling & Biking
+- Running & Athletics
+- Golf & Country Clubs
+- Wine & Spirits
+- Food & Cooking
+- Travel & Adventure
+- Pets & Animals
+- Home & Interior Design
+- Fashion & Style
+- Beauty & Cosmetics
+- Weddings & Events
+
+### NOT Genre (these are Industry categories):
+- ❌ Technology
+- ❌ Finance
+- ❌ Healthcare
+- ❌ Manufacturing
+
+---
+
 ## Future Enhancements
 
 ### Phase 2 Features:
-- **Custom Lists:** Users can upload their own CSV contacts
+- **Custom Lists:** Users can upload their own CSV contacts (full details shown)
 - **List Combining:** Merge multiple categories into one distribution
 - **Contact Enrichment:** AI updates contacts with latest info
-- **Engagement Tracking:** See which journalists opened emails
+- **Engagement Tracking:** See which publications had journalists open emails (aggregate only)
 - **Smart Recommendations:** AI suggests relevant categories based on press release content
 
 ### Phase 3 Features:
-- **Journalist Profiles:** Detailed profiles with article history
-- **Relationship Management:** Track interactions with each journalist
-- **Pitch Templates:** Personalized email templates per journalist
+- **Publication Profiles:** Detailed profiles with editorial focus
+- **Relationship Management:** Track interactions at publication level
+- **Pitch Templates:** Personalized email templates per publication type
 - **A/B Testing:** Test different subject lines and content
-- **Analytics Dashboard:** Distribution performance metrics
+- **Analytics Dashboard:** Distribution performance metrics (publication-level)
 
 ---
 
@@ -321,7 +418,7 @@ The UpsurgeIQ Team
 - Poll generation requests every 30s when on page
 
 ### Performance
-- Lazy load contact tables (paginate if >100 contacts)
+- Lazy load publication tables (paginate if >100 publications)
 - Debounce search input (300ms)
 - Cache Stripe checkout sessions
 - Preload "Ready" categories for faster navigation

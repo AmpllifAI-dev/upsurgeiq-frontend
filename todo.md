@@ -20,11 +20,25 @@
 - [x] Document credit management page with purchase options
 - [x] Document generation status tracking UI
 - [x] Document press release distribution flow
+- [x] Fix privacy protection rules (only show publications for AI-generated lists)
+- [x] Add "Being Generated" status scenario (shared generation queue)
+- [x] Correct Genre definition to lifestyle/hobby-based categories
 
-### Stripe Integration (Code Complete)
+### Frontend UI Pages (Complete)
+- [x] Create MediaListCategories page with tab navigation
+- [x] Create CategoryPublications view page (AI-generated lists)
+- [x] Create CreditManagement page with purchase flow
+- [x] Update Home page with navigation and features
+- [x] Register all routes in App.tsx
+- [ ] Create DistributePressRelease page (future feature)
+- [ ] Create SavedDistributions page (future feature)
+- [ ] Create DistributionReport page (future feature)
+
+### Stripe Integration (Complete)
 - [x] Create Stripe service with product configuration
 - [x] Create webhook handler for credit fulfillment
 - [x] Add tRPC procedures for checkout
-- [ ] Create 3 credit bundle products in Stripe Dashboard (manual step)
-- [ ] Configure webhook endpoint in Stripe Dashboard (manual step)
-- [ ] Test payment flow end-to-end
+- [x] Create credit bundle products in Stripe (10, 20, 30 credits)
+- [x] Replace placeholder Stripe product IDs with real Price IDs
+- [x] Write and pass vitest tests for media lists and credits
+- [ ] Configure webhook endpoint in Stripe Dashboard (manual step - user action required)
