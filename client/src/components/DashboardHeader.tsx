@@ -15,6 +15,7 @@ export function DashboardHeader({ currentPage }: DashboardHeaderProps) {
     { name: "Campaigns", href: "/campaigns" },
     { name: "Analytics", href: "/analytics" },
     { name: "Media Lists", href: "/media-lists" },
+    { name: "Settings", href: "/profile" },
   ];
 
   const publicPages = [
