@@ -2530,5 +2530,47 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Bug report submission fails with "Unexpected token '<', \"<!doctype \"... is not valid JSON\" error (fixed by removing file upload to non-existent endpoint)
 - [x] FloatingIssueButton missing from Dashboard page (fixed - already added in last checkpoint)
 - [x] No hamburger menu on Dashboard page - Dashboard doesn't use DashboardLayout so missing mobile navigation (FIXED: Added horizontal menu items + hamburger menu)
-- [ ] Profile save button doesn't trigger mutation (button stays active, no toast, no save) - 500 error from backend, needs database fix
+- [x] Profile save button doesn't trigger mutation (button stays active, no toast, no save) - FIXED (added await to getDb() call in auth.updateProfile)
 - [ ] Attachment field in bug report dialog shows stale data ("1 file(s) attached (upload pending)" persists between opens)
+
+## Press Release Distribution System - Dec 22 (Critical Missing Feature)
+- [ ] Add "Prepare to Send" button to Press Release Detail view page
+- [ ] Add "Prepare to Send" button to Press Release Edit page
+- [ ] Add "Prepare to Send" button to Press Releases list (alongside View/Edit/Delete)
+- [ ] Create distribution list selection page (Step 2)
+  - [ ] Section A: Show existing lists (default, custom free, purchasable)
+  - [ ] Section B: AI-generated media list catalog browser
+  - [ ] Display available categories: Genre, Geographic, Trade/Industry (SIC)
+  - [ ] "Add this list" button triggers AI agent to build list
+  - [ ] Alert user: "Building your list... We'll email you when ready"
+  - [ ] AI agent background job to research and generate list
+  - [ ] Auto-add completed list to distribution
+  - [ ] "Save for Later" button to save progress
+- [ ] Create email templates:
+  - [ ] "Your media list is ready" notification email
+  - [ ] "Save for later" confirmation email
+  - [ ] 24-hour reminder email if release not sent
+- [ ] Build payment flow for media list credits:
+  - [ ] Check if user exceeds free allowance
+  - [ ] Modal to use pre-purchased credits or buy more
+  - [ ] In-modal Stripe checkout (no navigation away)
+  - [ ] Create media list credit bundles:
+    - [ ] 10 credits = £36 (save £4)
+    - [ ] 20 credits = £68 (save £12)
+    - [ ] 30 credits = £96 (save £24)
+- [ ] Create final confirmation page (Step 3):
+  - [ ] Summary of selected lists + contact count
+  - [ ] "Send" button with confirmation alert
+  - [ ] Track distribution history
+  - [ ] Record which lists were used for each send
+
+## Admin Dashboard Consolidation - Dec 22
+- [ ] Create proper Admin Dashboard page
+- [ ] Move "Manus Credit Monitoring" to admin dashboard
+- [ ] Link error logs page to admin dashboard
+- [ ] Add user management tools to admin dashboard
+- [ ] Add platform statistics to admin dashboard
+
+## V2 Features (Lower Priority)
+- [ ] Apply DashboardHeader to remaining 15 secondary pages
+- [ ] Add user avatar/photo to Settings link in navigation

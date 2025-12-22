@@ -190,6 +190,13 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         try {
+          const db = await getDb();
+          if (!db) {
+            throw new TRPCError({
+              code: 'INTERNAL_SERVER_ERROR',
+              message: 'Database unavailable',
+            });
+          }
           const updates: any = {};
           if (input.name !== undefined) updates.name = input.name;
           if (input.email !== undefined) updates.email = input.email;
