@@ -1,0 +1,494 @@
+{
+    "name": "UpsurgeIQ Social Media Posting",
+    "flow": [
+        {
+            "id": 1,
+            "module": "gateway:CustomWebHook",
+            "version": 1,
+            "parameters": {
+                "hook": 0,
+                "maxResults": 1
+            },
+            "mapper": {},
+            "metadata": {
+                "designer": {
+                    "x": 0,
+                    "y": 0
+                },
+                "restore": {
+                    "parameters": {
+                        "hook": {
+                            "label": "UpsurgeIQ Social Media",
+                            "data": {
+                                "editable": "true"
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "hook",
+                        "type": "hook:gateway-webhook",
+                        "label": "Webhook",
+                        "required": true
+                    },
+                    {
+                        "name": "maxResults",
+                        "type": "number",
+                        "label": "Maximum number of results"
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "event",
+                        "type": "text"
+                    },
+                    {
+                        "name": "timestamp",
+                        "type": "text"
+                    },
+                    {
+                        "name": "post",
+                        "type": "collection",
+                        "spec": [
+                            {
+                                "name": "id",
+                                "type": "number"
+                            },
+                            {
+                                "name": "content",
+                                "type": "text"
+                            },
+                            {
+                                "name": "platforms",
+                                "type": "array",
+                                "spec": {
+                                    "type": "text"
+                                }
+                            },
+                            {
+                                "name": "scheduledFor",
+                                "type": "date"
+                            },
+                            {
+                                "name": "imageUrl",
+                                "type": "text"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "user",
+                        "type": "collection",
+                        "spec": [
+                            {
+                                "name": "id",
+                                "type": "number"
+                            },
+                            {
+                                "name": "email",
+                                "type": "text"
+                            },
+                            {
+                                "name": "name",
+                                "type": "text"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "business",
+                        "type": "collection",
+                        "spec": [
+                            {
+                                "name": "name",
+                                "type": "text"
+                            },
+                            {
+                                "name": "brandVoice",
+                                "type": "text"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": 2,
+            "module": "builtin:BasicRouter",
+            "version": 1,
+            "parameters": {},
+            "mapper": null,
+            "metadata": {
+                "designer": {
+                    "x": 300,
+                    "y": 0
+                }
+            },
+            "routes": [
+                {
+                    "flow": [
+                        {
+                            "id": 3,
+                            "module": "facebook:createPagePost",
+                            "version": 2,
+                            "parameters": {
+                                "__IMTCONN__": 0
+                            },
+                            "mapper": {
+                                "page": "",
+                                "message": "{{1.post.content}}",
+                                "link": "",
+                                "picture": "{{1.post.imageUrl}}",
+                                "published": true
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 600,
+                                    "y": -150
+                                },
+                                "restore": {
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "label": "My Facebook Connection",
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "facebook"
+                                            }
+                                        }
+                                    },
+                                    "expect": {
+                                        "page": {
+                                            "mode": "edit",
+                                            "label": "Select Page"
+                                        },
+                                        "published": {
+                                            "mode": "chose"
+                                        }
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "name": "__IMTCONN__",
+                                        "type": "account:facebook",
+                                        "label": "Connection",
+                                        "required": true
+                                    }
+                                ],
+                                "expect": [
+                                    {
+                                        "name": "page",
+                                        "type": "select",
+                                        "label": "Page",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "message",
+                                        "type": "text",
+                                        "label": "Message"
+                                    },
+                                    {
+                                        "name": "link",
+                                        "type": "url",
+                                        "label": "Link"
+                                    },
+                                    {
+                                        "name": "picture",
+                                        "type": "url",
+                                        "label": "Picture URL"
+                                    },
+                                    {
+                                        "name": "published",
+                                        "type": "boolean",
+                                        "label": "Published"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "metadata": {
+                        "designer": {
+                            "label": "Facebook"
+                        }
+                    },
+                    "filter": {
+                        "name": "Facebook enabled",
+                        "conditions": [
+                            [
+                                {
+                                    "a": "{{contains(1.post.platforms; \"facebook\")}}",
+                                    "o": "boolean:equal",
+                                    "b": "true"
+                                }
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "flow": [
+                        {
+                            "id": 4,
+                            "module": "instagram:createMediaObjectPost",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 0
+                            },
+                            "mapper": {
+                                "account": "",
+                                "caption": "{{1.post.content}}",
+                                "image_url": "{{1.post.imageUrl}}"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 600,
+                                    "y": -50
+                                },
+                                "restore": {
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "label": "My Instagram Connection",
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "instagram"
+                                            }
+                                        }
+                                    },
+                                    "expect": {
+                                        "account": {
+                                            "mode": "edit",
+                                            "label": "Select Account"
+                                        }
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "name": "__IMTCONN__",
+                                        "type": "account:instagram",
+                                        "label": "Connection",
+                                        "required": true
+                                    }
+                                ],
+                                "expect": [
+                                    {
+                                        "name": "account",
+                                        "type": "select",
+                                        "label": "Instagram Business Account",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "caption",
+                                        "type": "text",
+                                        "label": "Caption"
+                                    },
+                                    {
+                                        "name": "image_url",
+                                        "type": "url",
+                                        "label": "Image URL",
+                                        "required": true
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "metadata": {
+                        "designer": {
+                            "label": "Instagram"
+                        }
+                    },
+                    "filter": {
+                        "name": "Instagram enabled",
+                        "conditions": [
+                            [
+                                {
+                                    "a": "{{contains(1.post.platforms; \"instagram\")}}",
+                                    "o": "boolean:equal",
+                                    "b": "true"
+                                }
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "flow": [
+                        {
+                            "id": 5,
+                            "module": "linkedin:createShare",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 0
+                            },
+                            "mapper": {
+                                "author": "",
+                                "text": "{{1.post.content}}",
+                                "visibility": "PUBLIC",
+                                "media": "{{1.post.imageUrl}}"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 600,
+                                    "y": 50
+                                },
+                                "restore": {
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "label": "My LinkedIn Connection",
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "linkedin"
+                                            }
+                                        }
+                                    },
+                                    "expect": {
+                                        "author": {
+                                            "mode": "edit",
+                                            "label": "Select Profile/Page"
+                                        },
+                                        "visibility": {
+                                            "mode": "chose",
+                                            "label": "Visibility"
+                                        }
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "name": "__IMTCONN__",
+                                        "type": "account:linkedin",
+                                        "label": "Connection",
+                                        "required": true
+                                    }
+                                ],
+                                "expect": [
+                                    {
+                                        "name": "author",
+                                        "type": "select",
+                                        "label": "Author",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "text",
+                                        "type": "text",
+                                        "label": "Text",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "visibility",
+                                        "type": "select",
+                                        "label": "Visibility",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "media",
+                                        "type": "url",
+                                        "label": "Media URL"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "metadata": {
+                        "designer": {
+                            "label": "LinkedIn"
+                        }
+                    },
+                    "filter": {
+                        "name": "LinkedIn enabled",
+                        "conditions": [
+                            [
+                                {
+                                    "a": "{{contains(1.post.platforms; \"linkedin\")}}",
+                                    "o": "boolean:equal",
+                                    "b": "true"
+                                }
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "flow": [
+                        {
+                            "id": 6,
+                            "module": "twitter:createATweet",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 0
+                            },
+                            "mapper": {
+                                "text": "{{1.post.content}}",
+                                "media": "{{1.post.imageUrl}}"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 600,
+                                    "y": 150
+                                },
+                                "restore": {
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "label": "My X (Twitter) Connection",
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "twitter"
+                                            }
+                                        }
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "name": "__IMTCONN__",
+                                        "type": "account:twitter",
+                                        "label": "Connection",
+                                        "required": true
+                                    }
+                                ],
+                                "expect": [
+                                    {
+                                        "name": "text",
+                                        "type": "text",
+                                        "label": "Tweet Text",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "media",
+                                        "type": "url",
+                                        "label": "Media URL"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "metadata": {
+                        "designer": {
+                            "label": "X (Twitter)"
+                        }
+                    },
+                    "filter": {
+                        "name": "X enabled",
+                        "conditions": [
+                            [
+                                {
+                                    "a": "{{contains(1.post.platforms; \"twitter\")}}",
+                                    "o": "boolean:equal",
+                                    "b": "true"
+                                }
+                            ]
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "metadata": {
+        "version": 1,
+        "scenario": {
+            "roundtrips": 1,
+            "maxErrors": 3,
+            "autoCommit": false,
+            "sequential": false,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false
+        },
+        "designer": {
+            "orphans": []
+        },
+        "zone": "eu1.make.com"
+    }
+}

@@ -1,0 +1,625 @@
+{
+    "name": "UpsurgeIQ Social Media Posting - Complete",
+    "flow": [
+        {
+            "id": 1,
+            "module": "gateway:CustomWebHook",
+            "version": 1,
+            "parameters": {
+                "hook": 0,
+                "maxResults": 1
+            },
+            "mapper": {},
+            "metadata": {
+                "designer": {
+                    "x": 0,
+                    "y": 0
+                },
+                "restore": {
+                    "parameters": {
+                        "hook": {
+                            "label": "UpsurgeIQ Social Media Webhook",
+                            "data": {
+                                "editable": "true"
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "hook",
+                        "type": "hook:gateway-webhook",
+                        "label": "Webhook",
+                        "required": true
+                    },
+                    {
+                        "name": "maxResults",
+                        "type": "number",
+                        "label": "Maximum number of results"
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "event",
+                        "type": "text"
+                    },
+                    {
+                        "name": "timestamp",
+                        "type": "text"
+                    },
+                    {
+                        "name": "post",
+                        "type": "collection",
+                        "spec": [
+                            {
+                                "name": "id",
+                                "type": "number"
+                            },
+                            {
+                                "name": "content",
+                                "type": "text"
+                            },
+                            {
+                                "name": "platforms",
+                                "type": "array",
+                                "spec": {
+                                    "type": "text"
+                                }
+                            },
+                            {
+                                "name": "scheduledFor",
+                                "type": "date"
+                            },
+                            {
+                                "name": "image",
+                                "type": "collection",
+                                "spec": [
+                                    {
+                                        "name": "url",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "fileName",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "dataUrl",
+                                        "type": "text"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "user",
+                        "type": "collection",
+                        "spec": [
+                            {
+                                "name": "id",
+                                "type": "number"
+                            },
+                            {
+                                "name": "email",
+                                "type": "text"
+                            },
+                            {
+                                "name": "name",
+                                "type": "text"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "business",
+                        "type": "collection",
+                        "spec": [
+                            {
+                                "name": "name",
+                                "type": "text"
+                            },
+                            {
+                                "name": "brandVoice",
+                                "type": "text"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": 2,
+            "module": "builtin:BasicRouter",
+            "version": 1,
+            "parameters": {},
+            "mapper": null,
+            "metadata": {
+                "designer": {
+                    "x": 300,
+                    "y": 0
+                }
+            },
+            "routes": [
+                {
+                    "flow": [
+                        {
+                            "id": 3,
+                            "module": "facebook-pages:uploadPhoto",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 0
+                            },
+                            "mapper": {
+                                "page": "",
+                                "caption": "{{1.post.content}}",
+                                "photos": [
+                                    {
+                                        "type": "file",
+                                        "name": "{{1.post.image.fileName}}",
+                                        "data": "{{1.post.image.dataUrl}}"
+                                    }
+                                ],
+                                "published": true
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 600,
+                                    "y": -250
+                                },
+                                "restore": {
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "label": "My Facebook Pages Connection",
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "facebook-pages"
+                                            }
+                                        }
+                                    },
+                                    "expect": {
+                                        "page": {
+                                            "mode": "edit",
+                                            "label": "Select your Facebook Page"
+                                        },
+                                        "published": {
+                                            "mode": "chose"
+                                        }
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "name": "__IMTCONN__",
+                                        "type": "account:facebook-pages",
+                                        "label": "Connection",
+                                        "required": true
+                                    }
+                                ],
+                                "expect": [
+                                    {
+                                        "name": "page",
+                                        "type": "select",
+                                        "label": "Page ID",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "message",
+                                        "type": "text",
+                                        "label": "Message"
+                                    },
+                                    {
+                                        "name": "link",
+                                        "type": "url",
+                                        "label": "Link URL"
+                                    },
+                                    {
+                                        "name": "picture",
+                                        "type": "url",
+                                        "label": "Picture URL"
+                                    },
+                                    {
+                                        "name": "published",
+                                        "type": "boolean",
+                                        "label": "Published"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "metadata": {
+                        "designer": {
+                            "label": "Post to Facebook"
+                        }
+                    },
+                    "filter": {
+                        "name": "Facebook selected",
+                        "conditions": [
+                            [
+                                {
+                                    "a": "{{contains(1.post.platforms; \"facebook\")}}",
+                                    "o": "boolean:equal",
+                                    "b": "true"
+                                }
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "flow": [
+                        {
+                            "id": 4,
+                            "module": "instagram-business:CreatePostPhoto",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 0
+                            },
+                            "mapper": {
+                                "account": "",
+                                "caption": "{{1.post.content}}",
+                                "image_url": "{{1.post.image.url}}"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 600,
+                                    "y": -50
+                                },
+                                "restore": {
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "label": "My Instagram Business Connection",
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "instagram-business"
+                                            }
+                                        }
+                                    },
+                                    "expect": {
+                                        "account": {
+                                            "mode": "edit",
+                                            "label": "Select Instagram Business Account"
+                                        }
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "name": "__IMTCONN__",
+                                        "type": "account:instagram-business",
+                                        "label": "Connection",
+                                        "required": true
+                                    }
+                                ],
+                                "expect": [
+                                    {
+                                        "name": "account",
+                                        "type": "select",
+                                        "label": "Instagram Business Account",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "caption",
+                                        "type": "text",
+                                        "label": "Caption"
+                                    },
+                                    {
+                                        "name": "image_url",
+                                        "type": "url",
+                                        "label": "Image URL",
+                                        "required": true
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "metadata": {
+                        "designer": {
+                            "label": "Post to Instagram"
+                        }
+                    },
+                    "filter": {
+                        "name": "Instagram selected",
+                        "conditions": [
+                            [
+                                {
+                                    "a": "{{contains(1.post.platforms; \"instagram\")}}",
+                                    "o": "boolean:equal",
+                                    "b": "true"
+                                }
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "flow": [
+                        {
+                            "id": 5,
+                            "module": "linkedin:CreateCompanyImagePost",
+                            "version": 2,
+                            "parameters": {
+                                "__IMTCONN__": 0
+                            },
+                            "mapper": {
+                                "organization": "",
+                                "commentary": "{{1.post.content}}",
+                                "visibility": "PUBLIC",
+                                "media": [
+                                    {
+                                        "uploadMethod": "file",
+                                        "name": "{{1.post.image.fileName}}",
+                                        "data": "{{1.post.image.dataUrl}}",
+                                        "title": "",
+                                        "altText": ""
+                                    }
+                                ]
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 600,
+                                    "y": 130
+                                },
+                                "restore": {
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "label": "My LinkedIn Connection",
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "linkedin"
+                                            }
+                                        }
+                                    },
+                                    "expect": {
+                                        "organization": {
+                                            "mode": "edit",
+                                            "label": "Select Company Page"
+                                        },
+                                        "visibility": {
+                                            "mode": "chose"
+                                        }
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "name": "__IMTCONN__",
+                                        "type": "account:linkedin",
+                                        "label": "Connection",
+                                        "required": true
+                                    }
+                                ],
+                                "expect": [
+                                    {
+                                        "name": "organization",
+                                        "type": "select",
+                                        "label": "Organization",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "commentary",
+                                        "type": "text",
+                                        "label": "Commentary",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "visibility",
+                                        "type": "select",
+                                        "label": "Visibility"
+                                    },
+                                    {
+                                        "name": "media",
+                                        "type": "url",
+                                        "label": "Media URL"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "metadata": {
+                        "designer": {
+                            "label": "Post to LinkedIn"
+                        }
+                    },
+                    "filter": {
+                        "name": "LinkedIn selected",
+                        "conditions": [
+                            [
+                                {
+                                    "a": "{{contains(1.post.platforms; \"linkedin\")}}",
+                                    "o": "boolean:equal",
+                                    "b": "true"
+                                }
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "flow": [
+                        {
+                            "id": 6,
+                            "module": "http:ActionSendData",
+                            "version": 3,
+                            "parameters": {},
+                            "mapper": {
+                                "url": "https://api.twitter.com/2/tweets",
+                                "serializeUrl": false,
+                                "method": "post",
+                                "headers": [],
+                                "qs": [],
+                                "bodyType": "raw",
+                                "parseResponse": true,
+                                "authPass": "",
+                                "authUser": "",
+                                "timeout": "",
+                                "shareCookies": false,
+                                "ca": "",
+                                "rejectUnauthorized": true,
+                                "followRedirect": true,
+                                "useQuerystring": false,
+                                "followAllRedirects": false,
+                                "data": "{\"text\": \"{{1.post.content}}\"}"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 600,
+                                    "y": 340
+                                },
+                                "restore": {
+                                    "expect": {
+                                        "method": {
+                                            "mode": "chose",
+                                            "label": "POST"
+                                        },
+                                        "headers": {
+                                            "mode": "chose"
+                                        },
+                                        "qs": {
+                                            "mode": "chose"
+                                        },
+                                        "bodyType": {
+                                            "label": "Raw"
+                                        },
+                                        "parseResponse": {
+                                            "mode": "chose"
+                                        },
+                                        "shareCookies": {
+                                            "mode": "chose"
+                                        },
+                                        "rejectUnauthorized": {
+                                            "mode": "chose"
+                                        },
+                                        "followRedirect": {
+                                            "mode": "chose"
+                                        },
+                                        "useQuerystring": {
+                                            "mode": "chose"
+                                        },
+                                        "followAllRedirects": {
+                                            "mode": "chose"
+                                        }
+                                    }
+                                },
+                                "parameters": [],
+                                "expect": [
+                                    {
+                                        "name": "url",
+                                        "type": "url",
+                                        "label": "URL",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "serializeUrl",
+                                        "type": "boolean",
+                                        "label": "Serialize URL"
+                                    },
+                                    {
+                                        "name": "method",
+                                        "type": "select",
+                                        "label": "Method",
+                                        "required": true,
+                                        "validate": {
+                                            "enum": [
+                                                "get",
+                                                "post",
+                                                "put",
+                                                "patch",
+                                                "delete",
+                                                "options"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "headers",
+                                        "spec": [
+                                            {
+                                                "name": "name",
+                                                "type": "text",
+                                                "label": "Name",
+                                                "required": true
+                                            },
+                                            {
+                                                "name": "value",
+                                                "type": "text",
+                                                "label": "Value"
+                                            }
+                                        ],
+                                        "type": "array",
+                                        "label": "Headers"
+                                    },
+                                    {
+                                        "name": "qs",
+                                        "spec": [
+                                            {
+                                                "name": "name",
+                                                "type": "text",
+                                                "label": "Name",
+                                                "required": true
+                                            },
+                                            {
+                                                "name": "value",
+                                                "type": "text",
+                                                "label": "Value"
+                                            }
+                                        ],
+                                        "type": "array",
+                                        "label": "Query String"
+                                    },
+                                    {
+                                        "name": "bodyType",
+                                        "type": "select",
+                                        "label": "Body type",
+                                        "validate": {
+                                            "enum": [
+                                                "raw",
+                                                "application/x-www-form-urlencoded",
+                                                "multipart/form-data"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "parseResponse",
+                                        "type": "boolean",
+                                        "label": "Parse response"
+                                    },
+                                    {
+                                        "name": "data",
+                                        "type": "text",
+                                        "label": "Request content"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "metadata": {
+                        "designer": {
+                            "label": "Post to X (Twitter) - Requires OAuth 2.0"
+                        }
+                    },
+                    "filter": {
+                        "name": "X selected",
+                        "conditions": [
+                            [
+                                {
+                                    "a": "{{contains(1.post.platforms; \"twitter\")}}",
+                                    "o": "boolean:equal",
+                                    "b": "true"
+                                }
+                            ]
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "metadata": {
+        "instant": false,
+        "version": 1,
+        "scenario": {
+            "roundtrips": 1,
+            "maxErrors": 3,
+            "autoCommit": false,
+            "sequential": false,
+            "slots": null,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false
+        },
+        "designer": {
+            "orphans": []
+        },
+        "zone": "eu1.make.com"
+    }
+}

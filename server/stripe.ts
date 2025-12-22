@@ -1,99 +1,171 @@
 import Stripe from "stripe";
+import { ENV } from "./_core/env";
+import { createLogger } from "./_core/logger";
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-if (!stripeSecretKey) {
-  console.warn("STRIPE_SECRET_KEY not found in environment variables");
+const logger = createLogger("StripePayment");
+
+if (!ENV.stripeSecretKey) {
+  throw new Error("STRIPE_SECRET_KEY is not configured");
 }
 
-export const stripe = stripeSecretKey
-  ? new Stripe(stripeSecretKey, {
-      apiVersion: "2025-12-15.clover",
-    })
-  : null;
+export const stripe = new Stripe(ENV.stripeSecretKey, {
+  apiVersion: "2025-12-15.clover",
+});
 
 /**
- * Media List Credit Bundle Products
- * Real Stripe Price IDs from created products
+ * Create a Stripe Checkout Session for subscription
  */
-export const CREDIT_PRODUCTS = {
-  STARTER: {
-    priceId: "price_1Sh4t0IEVr3V21Jee3XjNcYX",
-    productId: "prod_TeNe3AnU4JehWF",
-    name: "10 Media List Credits",
-    credits: 10,
-    priceGBP: 3600, // £36.00 in pence
-    description: "10 credits for media list distribution (Save £4)",
-  },
-  PROFESSIONAL: {
-    priceId: "price_1Sh4t1IEVr3V21JeDciG8p2v",
-    productId: "prod_TeNe3TD1SlLXcC",
-    name: "20 Media List Credits",
-    credits: 20,
-    priceGBP: 6800, // £68.00 in pence
-    description: "20 credits for media list distribution (Save £12)",
-  },
-  ENTERPRISE: {
-    priceId: "price_1Sh4t1IEVr3V21JecvcAMgkL",
-    productId: "prod_TeNe69n2aDDUck",
-    name: "30 Media List Credits",
-    credits: 30,
-    priceGBP: 9600, // £96.00 in pence
-    description: "30 credits for media list distribution (Save £24)",
-  },
-} as const;
+export async function createCheckoutSession(params: {
+  userId: number;
+  userEmail: string;
+  userName: string;
+  priceId: string;
+  tier: string;
+  origin: string;
+}): Promise<Stripe.Checkout.Session> {
+  logger.info("Creating Stripe checkout session", {
+    userId: params.userId,
+    action: "createCheckout",
+    metadata: { tier: params.tier, priceId: params.priceId },
+  });
 
-export type CreditProductId = keyof typeof CREDIT_PRODUCTS;
-
-/**
- * Create Stripe Checkout Session for credit purchase
- */
-export async function createCreditCheckoutSession(
-  productId: CreditProductId,
-  userId: number,
-  userEmail: string,
-  successUrl: string,
-  cancelUrl: string
-): Promise<string> {
-  if (!stripe) {
-    throw new Error("Stripe not configured");
-  }
-
-  const product = CREDIT_PRODUCTS[productId];
-  if (!product) {
-    throw new Error(`Invalid product ID: ${productId}`);
-  }
-
-  const session = await stripe.checkout.sessions.create({
+  try {
+    const session = await stripe.checkout.sessions.create({
+    mode: "subscription",
     payment_method_types: ["card"],
     line_items: [
       {
-        price: product.priceId,
+        price: params.priceId,
         quantity: 1,
       },
     ],
-    mode: "payment",
-    success_url: successUrl,
-    cancel_url: cancelUrl,
-    client_reference_id: userId.toString(),
-    customer_email: userEmail,
+    customer_email: params.userEmail,
+    client_reference_id: params.userId.toString(),
     metadata: {
-      userId: userId.toString(),
-      productId: product.productId,
-      credits: product.credits.toString(),
+      user_id: params.userId.toString(),
+      customer_email: params.userEmail,
+      customer_name: params.userName,
+      tier: params.tier,
     },
-  });
+    allow_promotion_codes: true,
+    success_url: `${params.origin}/dashboard?payment=success`,
+    cancel_url: `${params.origin}/subscribe?payment=canceled`,
+    });
 
-  if (!session.url) {
-    throw new Error("Failed to create checkout session");
+    logger.info("Checkout session created successfully", {
+      userId: params.userId,
+      action: "createCheckout",
+      metadata: { sessionId: session.id, tier: params.tier },
+    });
+
+    return session;
+  } catch (error) {
+    logger.error("Failed to create checkout session", error as Error, {
+      userId: params.userId,
+      action: "createCheckout",
+      metadata: { tier: params.tier, priceId: params.priceId },
+    });
+    throw error;
   }
-
-  return session.url;
 }
 
 /**
- * Get product details by ID
+ * Create a Customer Portal session for managing subscriptions
  */
-export function getCreditProduct(productId: string) {
-  const product = Object.values(CREDIT_PRODUCTS).find((p) => p.productId === productId);
-  return product || null;
+export async function createPortalSession(params: {
+  customerId: string;
+  origin: string;
+}): Promise<Stripe.BillingPortal.Session> {
+  logger.info("Creating customer portal session", {
+    action: "createPortal",
+    metadata: { customerId: params.customerId },
+  });
+
+  try {
+    const session = await stripe.billingPortal.sessions.create({
+      customer: params.customerId,
+      return_url: `${params.origin}/dashboard`,
+    });
+
+    logger.info("Portal session created successfully", {
+      action: "createPortal",
+      metadata: { sessionId: session.id },
+    });
+
+    return session;
+  } catch (error) {
+    logger.error("Failed to create portal session", error as Error, {
+      action: "createPortal",
+      metadata: { customerId: params.customerId },
+    });
+    throw error;
+  }
+}
+
+/**
+ * Create a Stripe Checkout Session for one-time media list purchase
+ */
+export async function createMediaListPurchaseSession(params: {
+  userId: number;
+  userEmail: string;
+  userName: string;
+  mediaListId: number;
+  mediaListName: string;
+  pressReleaseId?: number;
+  amount: number; // Amount in pence (e.g., 400 for £4)
+  origin: string;
+}): Promise<Stripe.Checkout.Session> {
+  logger.info("Creating media list purchase checkout session", {
+    userId: params.userId,
+    action: "createMediaListPurchase",
+    metadata: { mediaListId: params.mediaListId, amount: params.amount },
+  });
+
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment", // One-time payment, not subscription
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "gbp",
+            product_data: {
+              name: `Media List: ${params.mediaListName}`,
+              description: "One-time access to distribute press release to this media list",
+            },
+            unit_amount: params.amount, // Amount in pence
+          },
+          quantity: 1,
+        },
+      ],
+      customer_email: params.userEmail,
+      client_reference_id: params.userId.toString(),
+      metadata: {
+        user_id: params.userId.toString(),
+        payment_type: "media_list_purchase",
+        media_list_id: params.mediaListId.toString(),
+        media_list_name: params.mediaListName,
+        press_release_id: params.pressReleaseId?.toString() || "",
+        customer_email: params.userEmail,
+        customer_name: params.userName,
+      },
+      success_url: `${params.origin}/media-lists?purchase=success&list_id=${params.mediaListId}`,
+      cancel_url: `${params.origin}/media-lists?purchase=canceled`,
+    });
+
+    logger.info("Media list purchase session created successfully", {
+      userId: params.userId,
+      action: "createMediaListPurchase",
+      metadata: { sessionId: session.id, mediaListId: params.mediaListId },
+    });
+
+    return session;
+  } catch (error) {
+    logger.error("Failed to create media list purchase session", error as Error, {
+      userId: params.userId,
+      action: "createMediaListPurchase",
+      metadata: { mediaListId: params.mediaListId, amount: params.amount },
+    });
+    throw error;
+  }
 }

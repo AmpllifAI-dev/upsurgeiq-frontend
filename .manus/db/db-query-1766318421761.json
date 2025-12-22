@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE notification_preferences \nADD COLUMN IF NOT EXISTS usageLimitAlertsEnabled INT DEFAULT 1 NOT NULL,\nADD COLUMN IF NOT EXISTS usageLimitThreshold INT DEFAULT 80 NOT NULL,\nADD COLUMN IF NOT EXISTS scheduledPublishAlertsEnabled INT DEFAULT 1 NOT NULL,\nADD COLUMN IF NOT EXISTS scheduledPublishAdvanceNotice INT DEFAULT 60 NOT NULL,\nADD COLUMN IF NOT EXISTS campaignMilestoneAlertsEnabled INT DEFAULT 1 NOT NULL,\nADD COLUMN IF NOT EXISTS weeklySummaryEnabled INT DEFAULT 1 NOT NULL,\nADD COLUMN IF NOT EXISTS weeklySummaryDay ENUM('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday') DEFAULT 'monday' NOT NULL,\nADD COLUMN IF NOT EXISTS monthlyAnalyticsEnabled INT DEFAULT 1 NOT NULL,\nADD COLUMN IF NOT EXISTS distributionAlertsEnabled INT DEFAULT 1 NOT NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute ALTER TABLE notification_preferences \nADD COLUMN IF NOT EXISTS usageLimitAlertsEnabled INT DEFAULT 1 NOT NULL,\nADD COLUMN IF NOT EXISTS usageLimitThreshold INT DEFAULT 80 NOT NULL,\nADD COLUMN IF NOT EXISTS scheduledPublishAlertsEnabled INT DEFAULT 1 NOT NULL,\nADD COLUMN IF NOT EXISTS scheduledPublishAdvanceNotice INT DEFAULT 60 NOT NULL,\nADD COLUMN IF NOT EXISTS campaignMilestoneAlertsEnabled INT DEFAULT 1 NOT NULL,\nADD COLUMN IF NOT EXISTS weeklySummaryEnabled INT DEFAULT 1 NOT NULL,\nADD COLUMN IF NOT EXISTS weeklySummaryDay ENUM('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday') DEFAULT 'monday' NOT NULL,\nADD COLUMN IF NOT EXISTS monthlyAnalyticsEnabled INT DEFAULT 1 NOT NULL,\nADD COLUMN IF NOT EXISTS distributionAlertsEnabled INT DEFAULT 1 NOT NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 3156
+}

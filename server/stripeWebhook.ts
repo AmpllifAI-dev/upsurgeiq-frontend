@@ -1,94 +1,163 @@
-import { Request, Response } from "express";
-import { stripe } from "./stripe";
-import { handleCreditPurchase } from "./mediaListCredits";
-
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+import Stripe from "stripe";
+import { getStripeClient } from "./stripeProductSync";
+import { addWordCountCredits, addImageCredits } from "./addOnCredits";
 
 /**
- * Stripe webhook handler for checkout.session.completed events
- * This is called by Stripe when a payment is successful
+ * Stripe Webhook Handler
+ * 
+ * Handles webhook events from Stripe for purchase fulfillment
  */
-export async function handleStripeWebhook(req: Request, res: Response) {
-  if (!stripe) {
-    console.error("[Stripe Webhook] Stripe not configured");
-    return res.status(500).json({ error: "Stripe not configured" });
+
+/**
+ * Handle checkout.session.completed event
+ * This is called when a customer successfully completes a purchase
+ */
+export async function handleCheckoutSessionCompleted(
+  session: Stripe.Checkout.Session
+): Promise<void> {
+  const userId = parseInt(session.client_reference_id || "0");
+  const productType = session.metadata?.productType;
+  
+  if (!userId || !productType) {
+    console.error("Missing userId or productType in session metadata", session.id);
+    return;
   }
-
-  if (!webhookSecret) {
-    console.error("[Stripe Webhook] Webhook secret not configured");
-    return res.status(500).json({ error: "Webhook secret not configured" });
+  
+  console.log(`Processing purchase for user ${userId}, type: ${productType}`);
+  
+  if (productType === "word_count") {
+    await handleWordCountPurchase(session, userId);
+  } else if (productType === "image_pack") {
+    await handleImagePackPurchase(session, userId);
+  } else {
+    console.error(`Unknown product type: ${productType}`);
   }
-
-  const sig = req.headers["stripe-signature"];
-  if (!sig) {
-    console.error("[Stripe Webhook] No signature header");
-    return res.status(400).json({ error: "No signature" });
-  }
-
-  let event;
-
-  try {
-    // Verify webhook signature
-    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
-  } catch (err) {
-    console.error("[Stripe Webhook] Signature verification failed:", err);
-    return res.status(400).json({ error: `Webhook Error: ${err instanceof Error ? err.message : "Unknown error"}` });
-  }
-
-  // Handle the event
-  switch (event.type) {
-    case "checkout.session.completed": {
-      const session = event.data.object as any;
-
-      try {
-        // Extract metadata
-        const userId = parseInt(session.metadata?.userId || session.client_reference_id);
-        const productId = session.metadata?.productId;
-        const sessionId = session.id;
-
-        if (!userId || !productId) {
-          console.error("[Stripe Webhook] Missing userId or productId in session metadata");
-          return res.status(400).json({ error: "Missing metadata" });
-        }
-
-        // Add credits to user account
-        await handleCreditPurchase(userId, productId, sessionId);
-
-        console.log(`[Stripe Webhook] Credits added for user ${userId}, product ${productId}`);
-      } catch (error) {
-        console.error("[Stripe Webhook] Error processing checkout.session.completed:", error);
-        return res.status(500).json({ error: "Failed to process payment" });
-      }
-
-      break;
-    }
-
-    default:
-      console.log(`[Stripe Webhook] Unhandled event type: ${event.type}`);
-  }
-
-  // Return a 200 response to acknowledge receipt of the event
-  res.json({ received: true });
 }
 
 /**
- * Register Stripe webhook route
- * This should be called in server/_core/index.ts
+ * Handle word count purchase fulfillment
  */
-export function registerStripeWebhook(app: any) {
-  // Stripe requires raw body for signature verification
-  app.post(
-    "/api/stripe/webhook",
-    (req: Request, res: Response, next: any) => {
-      // Skip body parsing for this route
-      if (req.originalUrl === "/api/stripe/webhook") {
-        next();
-      } else {
-        next();
-      }
-    },
-    handleStripeWebhook
-  );
+async function handleWordCountPurchase(
+  session: Stripe.Checkout.Session,
+  userId: number
+): Promise<void> {
+  const words = parseInt(session.metadata?.words || "0");
+  const productKey = session.metadata?.productKey || "unknown";
+  
+  if (!words) {
+    console.error("Missing words in session metadata", session.id);
+    return;
+  }
+  
+  try {
+    await addWordCountCredits({
+      userId,
+      words,
+      stripeSessionId: session.id,
+      stripePaymentIntentId: session.payment_intent as string || null,
+      productKey,
+    });
+    
+    console.log(`✅ Added ${words} word credits to user ${userId}`);
+  } catch (error) {
+    console.error(`Failed to add word credits for user ${userId}:`, error);
+    throw error;
+  }
+}
 
-  console.log("[Stripe] Webhook registered at /api/stripe/webhook");
+/**
+ * Handle image pack purchase fulfillment
+ */
+async function handleImagePackPurchase(
+  session: Stripe.Checkout.Session,
+  userId: number
+): Promise<void> {
+  const images = parseInt(session.metadata?.images || "0");
+  const productKey = session.metadata?.productKey || "unknown";
+  
+  if (!images) {
+    console.error("Missing images in session metadata", session.id);
+    return;
+  }
+  
+  try {
+    await addImageCredits({
+      userId,
+      images,
+      stripeSessionId: session.id,
+      stripePaymentIntentId: session.payment_intent as string || null,
+      productKey,
+    });
+    
+    console.log(`✅ Added ${images} image credits to user ${userId}`);
+  } catch (error) {
+    console.error(`Failed to add image credits for user ${userId}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Verify webhook signature
+ */
+export function verifyWebhookSignature(
+  payload: string | Buffer,
+  signature: string,
+  webhookSecret: string
+): Stripe.Event {
+  const stripe = getStripeClient();
+  
+  try {
+    return stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+  } catch (error: any) {
+    console.error("Webhook signature verification failed:", error.message);
+    throw new Error("Invalid webhook signature");
+  }
+}
+
+/**
+ * Main webhook handler
+ * Call this from your webhook endpoint
+ */
+export async function handleStripeWebhook(
+  payload: string | Buffer,
+  signature: string
+): Promise<{ received: boolean; error?: string }> {
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  
+  if (!webhookSecret) {
+    console.error("STRIPE_WEBHOOK_SECRET not configured");
+    return { received: false, error: "Webhook secret not configured" };
+  }
+  
+  try {
+    // Verify the webhook signature
+    const event = verifyWebhookSignature(payload, signature, webhookSecret);
+    
+    console.log(`Received webhook event: ${event.type}`);
+    
+    // Handle the event
+    switch (event.type) {
+      case "checkout.session.completed":
+        await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
+        break;
+      
+      case "checkout.session.async_payment_succeeded":
+        // Handle async payment success (e.g., bank transfers)
+        await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
+        break;
+      
+      case "checkout.session.async_payment_failed":
+        // Log failed async payments
+        console.error("Async payment failed:", event.data.object);
+        break;
+      
+      default:
+        console.log(`Unhandled event type: ${event.type}`);
+    }
+    
+    return { received: true };
+  } catch (error: any) {
+    console.error("Webhook handler error:", error);
+    return { received: false, error: error.message };
+  }
 }

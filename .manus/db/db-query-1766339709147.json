@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS campaign_events (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  campaignId INT NOT NULL,\n  subscriberId INT NULL,\n  eventType ENUM('sent', 'delivered', 'opened', 'clicked', 'bounced', 'unsubscribed') NOT NULL,\n  eventData JSON NULL,\n  ipAddress VARCHAR(45) NULL,\n  userAgent TEXT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  FOREIGN KEY (campaignId) REFERENCES email_campaigns(id) ON DELETE CASCADE,\n  FOREIGN KEY (subscriberId) REFERENCES newsletter_subscribers(id) ON DELETE SET NULL,\n  INDEX idx_campaign_event (campaignId, eventType),\n  INDEX idx_subscriber_event (subscriberId, eventType),\n  INDEX idx_created_at (createdAt)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute CREATE TABLE IF NOT EXISTS campaign_events (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  campaignId INT NOT NULL,\n  subscriberId INT NULL,\n  eventType ENUM('sent', 'delivered', 'opened', 'clicked', 'bounced', 'unsubscribed') NOT NULL,\n  eventData JSON NULL,\n  ipAddress VARCHAR(45) NULL,\n  userAgent TEXT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  FOREIGN KEY (campaignId) REFERENCES email_campaigns(id) ON DELETE CASCADE,\n  FOREIGN KEY (subscriberId) REFERENCES newsletter_subscribers(id) ON DELETE SET NULL,\n  INDEX idx_campaign_event (campaignId, eventType),\n  INDEX idx_subscriber_event (subscriberId, eventType),\n  INDEX idx_created_at (createdAt)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 301
+}

@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS workflow_steps (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  workflowId INT NOT NULL,\n  stepOrder INT NOT NULL,\n  name VARCHAR(255) NOT NULL,\n  subject VARCHAR(255) NOT NULL,\n  emailTemplate TEXT NOT NULL,\n  delayDays INT DEFAULT 0,\n  delayHours INT DEFAULT 0,\n  `condition` JSON NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  FOREIGN KEY (workflowId) REFERENCES email_workflows(id) ON DELETE CASCADE,\n  INDEX idx_workflow_order (workflowId, stepOrder)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute CREATE TABLE IF NOT EXISTS workflow_steps (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  workflowId INT NOT NULL,\n  stepOrder INT NOT NULL,\n  name VARCHAR(255) NOT NULL,\n  subject VARCHAR(255) NOT NULL,\n  emailTemplate TEXT NOT NULL,\n  delayDays INT DEFAULT 0,\n  delayHours INT DEFAULT 0,\n  `condition` JSON NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  FOREIGN KEY (workflowId) REFERENCES email_workflows(id) ON DELETE CASCADE,\n  INDEX idx_workflow_order (workflowId, stepOrder)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 259
+}

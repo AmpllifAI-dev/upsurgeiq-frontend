@@ -1,0 +1,187 @@
+{
+  "query": "SHOW TABLES",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute SHOW TABLES",
+  "rows": [
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "activity_logs"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "addon_subscriptions"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "ai_chat_history"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "ai_credits_usage"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "ai_usage_log"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "approval_comments"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "approval_requests"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "businesses"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "campaign_activity_log"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "campaign_analytics"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "campaign_deliverables"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "campaign_milestones"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "campaign_team_members"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "campaign_templates"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "campaign_variants"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "campaigns"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "content_versions"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "credit_alert_history"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "credit_alert_thresholds"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "credit_usage"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "distributions"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "email_templates"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "error_logs"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "image_credits"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "journalist_beat_relations"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "journalist_beats"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "journalist_outreach"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "journalist_tag_relations"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "journalist_tags"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "journalists"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "media_list_contacts"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "media_lists"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "media_outlets"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "newsletter_subscribers"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "notification_preferences"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "partner_referrals"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "partners"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "payments"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "preset_prompts"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "press_release_distributions"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "press_release_templates"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "press_releases"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "saved_filters"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "scheduled_press_releases"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "social_accounts"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "social_connections"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "social_media_accounts"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "social_media_posts"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "sports_teams"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "subscriptions"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "team_invitations"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "team_members"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "usage_tracking"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "users"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "webhook_configs"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "webhook_delivery_logs"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "website_research"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th": "word_count_credits"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_grCyd6mifTZvX8AxBen7Th\n__drizzle_migrations\nactivity_logs\naddon_subscriptions\nai_chat_history\nai_credits_usage\nai_usage_log\napproval_comments\napproval_requests\nbusinesses\ncampaign_activity_log\ncampaign_analytics\ncampaign_deliverables\ncampaign_milestones\ncampaign_team_members\ncampaign_templates\ncampaign_variants\ncampaigns\ncontent_versions\ncredit_alert_history\ncredit_alert_thresholds\ncredit_usage\ndistributions\nemail_templates\nerror_logs\nimage_credits\njournalist_beat_relations\njournalist_beats\njournalist_outreach\njournalist_tag_relations\njournalist_tags\njournalists\nmedia_list_contacts\nmedia_lists\nmedia_outlets\nnewsletter_subscribers\nnotification_preferences\npartner_referrals\npartners\npayments\npreset_prompts\npress_release_distributions\npress_release_templates\npress_releases\nsaved_filters\nscheduled_press_releases\nsocial_accounts\nsocial_connections\nsocial_media_accounts\nsocial_media_posts\nsports_teams\nsubscriptions\nteam_invitations\nteam_members\nusage_tracking\nusers\nwebhook_configs\nwebhook_delivery_logs\nwebsite_research\nword_count_credits\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

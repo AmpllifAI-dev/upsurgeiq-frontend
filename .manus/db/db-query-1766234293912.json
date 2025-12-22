@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO subscriptions (userId, plan, status, stripeCustomerId, stripeSubscriptionId, currentPeriodStart, currentPeriodEnd, createdAt, updatedAt) VALUES (1, 'pro', 'active', 'cus_test_123', 'sub_test_123', NOW(), DATE_ADD(NOW(), INTERVAL 30 DAY), NOW(), NOW())",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute INSERT INTO subscriptions (userId, plan, status, stripeCustomerId, stripeSubscriptionId, currentPeriodStart, currentPeriodEnd, createdAt, updatedAt) VALUES (1, 'pro', 'active', 'cus_test_123', 'sub_test_123', NOW(), DATE_ADD(NOW(), INTERVAL 30 DAY), NOW(), NOW())",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 62
+}

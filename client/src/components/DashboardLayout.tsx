@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { trpc } from "@/lib/trpc";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -21,15 +22,40 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, Share2, Megaphone, BarChart3, Mail, Trophy, Sparkles, Image, Link2, Settings, Bug, Calendar, Inbox, Workflow, TrendingUp, User, Bell, CreditCard, Plug, ShieldCheck } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
+import { HelpCenter } from "./HelpCenter";
+import { CreditBalanceDisplay } from "./CreditBalanceDisplay";
+import { FloatingIssueButton } from "./FloatingIssueButton";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Page 1", path: "/" },
-  { icon: Users, label: "Page 2", path: "/some-path" },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+  { icon: FileText, label: "Press Releases", path: "/press-releases" },
+  { icon: Share2, label: "Social Media", path: "/social-media" },
+  { icon: Calendar, label: "Content Calendar", path: "/content-calendar" },
+  { icon: Megaphone, label: "Campaigns", path: "/campaigns" },
+  { icon: Inbox, label: "Email Campaigns", path: "/email-campaigns" },
+  { icon: Mail, label: "Media Lists", path: "/media-lists" },
+  { icon: Link2, label: "Social Connections", path: "/dashboard/social-connections" },
+  { icon: BarChart3, label: "Analytics", path: "/analytics" },
+  { icon: TrendingUp, label: "Email Analytics", path: "/email-analytics" },
+  { icon: Bug, label: "Issue Tracker", path: "/issues" },
+  { icon: Sparkles, label: "AI Assistant", path: "/ai-assistant" },
+  { icon: Trophy, label: "Sports Teams", path: "/dashboard/sports-teams" },
+  { icon: Image, label: "Image Packs", path: "/dashboard/image-packs" },
+  { icon: User, label: "Profile", path: "/profile" },
+  { icon: Bell, label: "Notifications", path: "/notification-preferences" },
+  { icon: CreditCard, label: "Billing & Usage", path: "/billing-history" },
+];
+
+const adminMenuItems = [
+  { icon: Settings, label: "White Label Settings", path: "/dashboard/white-label-settings", adminOnly: true },
+  { icon: ShieldCheck, label: "Error Logs", path: "/error-logs", adminOnly: true },
+  { icon: CreditCard, label: "Credit Management", path: "/admin-credit-management", adminOnly: true },
+  { icon: Users, label: "Team Management", path: "/team-management", adminOnly: true },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -114,12 +140,38 @@ function DashboardLayoutContent({
   const sidebarRef = useRef<HTMLDivElement>(null);
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
+  
+  // Get white label settings
+  const { data: business } = trpc.business.get.useQuery();
+  const isWhiteLabeled = business?.whiteLabelEnabled === 1;
+  const whiteLabelLogo = business?.whiteLabelLogoUrl;
+  const whiteLabelName = business?.whiteLabelCompanyName;
+  const whiteLabelPrimary = business?.whiteLabelPrimaryColor;
+  const whiteLabelSecondary = business?.whiteLabelSecondaryColor;
 
   useEffect(() => {
     if (isCollapsed) {
       setIsResizing(false);
     }
   }, [isCollapsed]);
+
+  // Inject white-label colors as CSS custom properties
+  useEffect(() => {
+    if (isWhiteLabeled && (whiteLabelPrimary || whiteLabelSecondary)) {
+      const root = document.documentElement;
+      if (whiteLabelPrimary) {
+        root.style.setProperty('--wl-primary', whiteLabelPrimary);
+      }
+      if (whiteLabelSecondary) {
+        root.style.setProperty('--wl-secondary', whiteLabelSecondary);
+      }
+    } else {
+      // Remove custom properties when white label is disabled
+      const root = document.documentElement;
+      root.style.removeProperty('--wl-primary');
+      root.style.removeProperty('--wl-secondary');
+    }
+  }, [isWhiteLabeled, whiteLabelPrimary, whiteLabelSecondary]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -170,9 +222,17 @@ function DashboardLayoutContent({
               </button>
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-semibold tracking-tight truncate">
-                    Navigation
-                  </span>
+                  {isWhiteLabeled && whiteLabelLogo ? (
+                    <img 
+                      src={whiteLabelLogo} 
+                      alt={whiteLabelName || "Logo"} 
+                      className="h-8 object-contain"
+                    />
+                  ) : (
+                    <span className="font-semibold tracking-tight truncate">
+                      {isWhiteLabeled && whiteLabelName ? whiteLabelName : "UpsurgeIQ"}
+                    </span>
+                  )}
                 </div>
               ) : null}
             </div>
@@ -181,6 +241,24 @@ function DashboardLayoutContent({
           <SidebarContent className="gap-0">
             <SidebarMenu className="px-2 py-1">
               {menuItems.map(item => {
+                const isActive = location === item.path;
+                return (
+                  <SidebarMenuItem key={item.path}>
+                    <SidebarMenuButton
+                      isActive={isActive}
+                      onClick={() => setLocation(item.path)}
+                      tooltip={item.label}
+                      className={`h-10 transition-all font-normal`}
+                    >
+                      <item.icon
+                        className={`h-4 w-4 ${isActive ? "text-primary" : ""}`}
+                      />
+                      <span>{item.label}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+              {user?.role === "admin" && adminMenuItems.map(item => {
                 const isActive = location === item.path;
                 return (
                   <SidebarMenuItem key={item.path}>
@@ -255,9 +333,24 @@ function DashboardLayoutContent({
                 </div>
               </div>
             </div>
+            <HelpCenter />
           </div>
         )}
-        <main className="flex-1 p-4">{children}</main>
+        {!isMobile && (
+          <div className="flex border-b h-14 items-center justify-between bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:backdrop-blur sticky top-0 z-40">
+            <CreditBalanceDisplay variant="compact" />
+            <HelpCenter />
+          </div>
+        )}
+        <main className="flex-1 p-4">
+          {children}
+          {isWhiteLabeled && (
+            <div className="mt-8 pt-4 border-t text-center text-xs text-muted-foreground">
+              Delivered by UpsurgeIQ
+            </div>
+          )}
+        </main>
+        <FloatingIssueButton />
       </SidebarInset>
     </>
   );

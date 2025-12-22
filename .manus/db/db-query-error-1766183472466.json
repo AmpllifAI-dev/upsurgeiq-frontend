@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO webhook_configs (event_type, webhook_url, is_active, created_at, updated_at) VALUES ('onboarding_completed', 'https://hook.eu1.make.com/s2i7454swkvep29j1tk91tn74d5dlkc8', 1, NOW(), NOW())",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute INSERT INTO webhook_configs (event_type, webhook_url, is_active, created_at, updated_at) VALUES ('onboarding_completed', 'https://hook.eu1.make.com/s2i7454swkvep29j1tk91tn74d5dlkc8', 1, NOW(), NOW())",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'event_type' in 'field list'"
+  ]
+}

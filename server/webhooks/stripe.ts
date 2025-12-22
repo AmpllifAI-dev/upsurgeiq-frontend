@@ -1,0 +1,840 @@
+import { Request, Response } from "express";
+import Stripe from "stripe";
+import { stripe } from "../stripe";
+import { ENV } from "../_core/env";
+import { getDb } from "../db";
+import { subscriptions, users, payments } from "../../drizzle/schema";
+import { eq } from "drizzle-orm";
+import { createLogger } from "../_core/logger";
+import {
+  sendPaymentConfirmationEmail,
+  sendMediaListPurchaseEmail,
+  sendTrialEndingEmail,
+  sendPaymentActionRequiredEmail,
+} from "../_core/email";
+
+const logger = createLogger("StripeWebhook");
+
+if (!ENV.stripeWebhookSecret) {
+  logger.warn("STRIPE_WEBHOOK_SECRET not configured");
+}
+
+export async function handleStripeWebhook(req: Request, res: Response) {
+  const sig = req.headers["stripe-signature"];
+
+  if (!sig) {
+    logger.error("No signature header in webhook request", undefined, {
+      action: "verifySignature",
+    });
+    return res.status(400).send("No signature");
+  }
+
+  if (!ENV.stripeWebhookSecret) {
+    logger.error("Webhook secret not configured", undefined, {
+      action: "verifySignature",
+    });
+    return res.status(500).send("Webhook secret not configured");
+  }
+
+  let event: Stripe.Event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      ENV.stripeWebhookSecret
+    );
+  } catch (err: any) {
+    logger.error("Signature verification failed", err, {
+      action: "verifySignature",
+    });
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // Handle test events
+  if (event.id.startsWith("evt_test_")) {
+    logger.info("Test event detected, returning verification response", {
+      action: "handleTestEvent",
+      metadata: { eventType: event.type },
+    });
+    return res.json({
+      verified: true,
+    });
+  }
+
+  logger.info("Received webhook event", {
+    action: "handleWebhook",
+    metadata: { eventType: event.type, eventId: event.id },
+  });
+
+  try {
+    switch (event.type) {
+      case "checkout.session.completed": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        // Check if this is an add-on purchase (word count or image pack)
+        const productType = session.metadata?.productType;
+        if (productType === "word_count" || productType === "image_pack") {
+          await handleAddOnPurchase(session);
+        } else {
+          // Regular subscription checkout
+          await handleCheckoutCompleted(session);
+        }
+        break;
+      }
+
+      case "checkout.session.async_payment_succeeded": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        // Handle async payment success (e.g., bank transfers)
+        const productType = session.metadata?.productType;
+        if (productType === "word_count" || productType === "image_pack") {
+          await handleAddOnPurchase(session);
+        }
+        break;
+      }
+
+      case "customer.subscription.created":
+      case "customer.subscription.updated": {
+        const subscription = event.data.object as Stripe.Subscription;
+        // Check if this is an add-on subscription
+        const isAddon = subscription.metadata?.addon_type;
+        if (isAddon) {
+          await handleAddonSubscriptionUpdate(subscription);
+        } else {
+          await handleSubscriptionUpdate(subscription);
+        }
+        break;
+      }
+
+      case "customer.subscription.deleted": {
+        const subscription = event.data.object as Stripe.Subscription;
+        // Check if this is an add-on subscription
+        const isAddon = subscription.metadata?.addon_type;
+        if (isAddon) {
+          await handleAddonSubscriptionCanceled(subscription);
+        } else {
+          await handleSubscriptionCanceled(subscription);
+        }
+        break;
+      }
+
+      case "invoice.paid": {
+        const invoice = event.data.object as Stripe.Invoice;
+        await handleInvoicePaid(invoice);
+        break;
+      }
+
+      case "invoice.payment_failed": {
+        const invoice = event.data.object as Stripe.Invoice;
+        await handleInvoicePaymentFailed(invoice);
+        break;
+      }
+
+      case "payment_intent.succeeded": {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        await handlePaymentIntentSucceeded(paymentIntent);
+        break;
+      }
+
+      case "payment_intent.payment_failed": {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        await handlePaymentIntentFailed(paymentIntent);
+        break;
+      }
+
+      case "payment_intent.canceled": {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        await handlePaymentIntentCanceled(paymentIntent);
+        break;
+      }
+
+      case "charge.refunded": {
+        const charge = event.data.object as Stripe.Charge;
+        await handleChargeRefunded(charge);
+        break;
+      }
+
+      case "customer.subscription.trial_will_end": {
+        const subscription = event.data.object as Stripe.Subscription;
+        await handleTrialWillEnd(subscription);
+        break;
+      }
+
+      case "invoice.payment_action_required": {
+        const invoice = event.data.object as Stripe.Invoice;
+        await handlePaymentActionRequired(invoice);
+        break;
+      }
+
+      default:
+        logger.info("Unhandled event type", {
+          action: "handleWebhook",
+          metadata: { eventType: event.type },
+        });
+    }
+
+    logger.info("Webhook event processed successfully", {
+      action: "handleWebhook",
+      metadata: { eventType: event.type },
+    });
+
+    res.json({ received: true });
+  } catch (error) {
+    logger.error("Error processing webhook event", error as Error, {
+      action: "handleWebhook",
+      metadata: { eventType: event.type, eventId: event.id },
+    });
+    res.status(500).json({ error: "Webhook processing failed" });
+  }
+}
+
+async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
+  logger.info("Checkout completed", {
+    action: "handleCheckout",
+    metadata: { sessionId: session.id },
+  });
+
+  const userId = session.metadata?.user_id;
+  const tier = session.metadata?.tier;
+
+  if (!userId) {
+    logger.error("No user_id in checkout session metadata", undefined, {
+      action: "handleCheckout",
+      metadata: { sessionId: session.id },
+    });
+    return;
+  }
+
+  const db = await getDb();
+  if (!db) {
+    logger.error("Database not available", undefined, {
+      action: "handleCheckout",
+      userId: parseInt(userId),
+    });
+    return;
+  }
+
+  // Get subscription details
+  const stripeSubscriptionId = session.subscription as string;
+  const stripeCustomerId = session.customer as string;
+
+  if (!stripeSubscriptionId) {
+    logger.error("No subscription ID in checkout session", undefined, {
+      action: "handleCheckout",
+      userId: parseInt(userId),
+      metadata: { sessionId: session.id },
+    });
+    return;
+  }
+
+  // Create or update subscription record
+  const existingSubscription = await db
+    .select()
+    .from(subscriptions)
+    .where(eq(subscriptions.userId, parseInt(userId)))
+    .limit(1);
+
+  if (existingSubscription.length > 0) {
+    // Update existing subscription
+    await db
+      .update(subscriptions)
+      .set({
+        plan: tier as "starter" | "pro" | "scale",
+        status: "active",
+        stripeCustomerId,
+        stripeSubscriptionId,
+        updatedAt: new Date(),
+      })
+      .where(eq(subscriptions.userId, parseInt(userId)));
+  } else {
+    // Create new subscription
+    await db.insert(subscriptions).values({
+      userId: parseInt(userId),
+      plan: (tier as "starter" | "pro" | "scale") || "starter",
+      status: "active",
+      stripeCustomerId,
+      stripeSubscriptionId,
+    });
+  }
+
+  logger.info("Subscription created/updated successfully", {
+    action: "handleCheckout",
+    userId: parseInt(userId),
+    metadata: { tier, subscriptionId: stripeSubscriptionId },
+  });
+
+  // Send payment confirmation email
+  const userEmail = session.metadata?.customer_email;
+  const userName = session.metadata?.customer_name;
+  if (userEmail && userName && tier) {
+    const tierMap: Record<string, { name: string; amount: number }> = {
+      starter: { name: "Starter", amount: 4900 },
+      pro: { name: "Pro", amount: 9900 },
+      scale: { name: "Scale", amount: 34900 },
+    };
+    const planInfo = tierMap[tier.toLowerCase()] || { name: tier, amount: 0 };
+    
+    await sendPaymentConfirmationEmail({
+      to: userEmail,
+      name: userName,
+      plan: planInfo.name,
+      amount: planInfo.amount,
+    }).catch((error) => {
+      logger.error("Failed to send payment confirmation email", error as Error, {
+        action: "handleCheckout",
+        userId: parseInt(userId),
+      });
+    });
+  }
+}
+
+async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
+  console.log("[Stripe Webhook] Subscription updated:", subscription.id);
+
+  const db = await getDb();
+  if (!db) return;
+
+  // Find subscription by Stripe ID
+  const existingSubscription = await db
+    .select()
+    .from(subscriptions)
+    .where(eq(subscriptions.stripeSubscriptionId, subscription.id))
+    .limit(1);
+
+  if (existingSubscription.length === 0) {
+    console.warn("[Stripe Webhook] Subscription not found:", subscription.id);
+    return;
+  }
+
+  // Update subscription status
+  let status: "active" | "canceled" | "past_due" | "trialing";
+  if (subscription.status === "active") {
+    status = "active";
+  } else if (subscription.status === "past_due") {
+    status = "past_due";
+  } else if (subscription.status === "trialing") {
+    status = "trialing";
+  } else {
+    status = "canceled";
+  }
+
+  await db
+    .update(subscriptions)
+    .set({
+      status,
+      updatedAt: new Date(),
+    })
+    .where(eq(subscriptions.stripeSubscriptionId, subscription.id));
+
+  console.log(`[Stripe Webhook] Subscription status updated to ${status}`);
+}
+
+async function handleSubscriptionCanceled(subscription: Stripe.Subscription) {
+  console.log("[Stripe Webhook] Subscription canceled:", subscription.id);
+
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .update(subscriptions)
+    .set({
+      status: "canceled",
+      updatedAt: new Date(),
+    })
+    .where(eq(subscriptions.stripeSubscriptionId, subscription.id));
+
+  console.log("[Stripe Webhook] Subscription marked as canceled");
+}
+
+async function handleInvoicePaid(invoice: Stripe.Invoice) {
+  console.log("[Stripe Webhook] Invoice paid:", invoice.id);
+  // Additional logic for successful payments can be added here
+}
+
+async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
+  console.log("[Stripe Webhook] Invoice payment failed:", invoice.id);
+  // Additional logic for failed payments (e.g., notify user) can be added here
+}
+
+async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent) {
+  logger.info("Payment intent succeeded", {
+    action: "handlePaymentIntent",
+    metadata: { paymentIntentId: paymentIntent.id, amount: paymentIntent.amount },
+  });
+
+  const userId = paymentIntent.metadata?.user_id;
+  const paymentType = paymentIntent.metadata?.payment_type || "other";
+
+  if (!userId) {
+    logger.error("No user_id in payment intent metadata", undefined, {
+      action: "handlePaymentIntent",
+      metadata: { paymentIntentId: paymentIntent.id },
+    });
+    return;
+  }
+
+  const db = await getDb();
+  if (!db) {
+    logger.error("Database not available", undefined, {
+      action: "handlePaymentIntent",
+      userId: parseInt(userId),
+    });
+    return;
+  }
+
+  // Create or update payment record
+  const existingPayment = await db
+    .select()
+    .from(payments)
+    .where(eq(payments.stripePaymentIntentId, paymentIntent.id))
+    .limit(1);
+
+  const chargeId = paymentIntent.latest_charge as string;
+
+  if (existingPayment.length > 0) {
+    await db
+      .update(payments)
+      .set({
+        status: "succeeded",
+        stripeChargeId: chargeId,
+        updatedAt: new Date(),
+      })
+      .where(eq(payments.stripePaymentIntentId, paymentIntent.id));
+  } else {
+    await db.insert(payments).values({
+      userId: parseInt(userId),
+      stripePaymentIntentId: paymentIntent.id,
+      stripeChargeId: chargeId,
+      amount: paymentIntent.amount,
+      currency: paymentIntent.currency,
+      status: "succeeded",
+      paymentType: paymentType as "media_list_purchase" | "other",
+      metadata: JSON.stringify(paymentIntent.metadata),
+    });
+  }
+
+  logger.info("Payment recorded successfully", {
+    action: "handlePaymentIntent",
+    userId: parseInt(userId),
+    metadata: { paymentIntentId: paymentIntent.id, type: paymentType },
+  });
+
+  // Send email notification for media list purchase
+  if (paymentType === "media_list_purchase") {
+    const user = await db.select().from(users).where(eq(users.id, parseInt(userId))).limit(1);
+    if (user.length > 0 && user[0].email) {
+      const mediaListName = paymentIntent.metadata?.media_list_name || "Media List";
+      await sendMediaListPurchaseEmail({
+        to: user[0].email,
+        name: user[0].name || "Customer",
+        mediaListName,
+        amount: paymentIntent.amount,
+      });
+    }
+  }
+}
+
+async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
+  logger.error("Payment intent failed", undefined, {
+    action: "handlePaymentIntent",
+    metadata: { 
+      paymentIntentId: paymentIntent.id,
+      lastPaymentError: paymentIntent.last_payment_error?.message 
+    },
+  });
+
+  const userId = paymentIntent.metadata?.user_id;
+  if (!userId) return;
+
+  const db = await getDb();
+  if (!db) return;
+
+  const existingPayment = await db
+    .select()
+    .from(payments)
+    .where(eq(payments.stripePaymentIntentId, paymentIntent.id))
+    .limit(1);
+
+  if (existingPayment.length > 0) {
+    await db
+      .update(payments)
+      .set({
+        status: "failed",
+        updatedAt: new Date(),
+      })
+      .where(eq(payments.stripePaymentIntentId, paymentIntent.id));
+  } else {
+    await db.insert(payments).values({
+      userId: parseInt(userId),
+      stripePaymentIntentId: paymentIntent.id,
+      amount: paymentIntent.amount,
+      currency: paymentIntent.currency,
+      status: "failed",
+      paymentType: (paymentIntent.metadata?.payment_type as "media_list_purchase" | "other") || "other",
+      metadata: JSON.stringify(paymentIntent.metadata),
+    });
+  }
+
+  logger.info("Failed payment recorded", {
+    action: "handlePaymentIntent",
+    userId: parseInt(userId),
+  });
+}
+
+async function handlePaymentIntentCanceled(paymentIntent: Stripe.PaymentIntent) {
+  logger.info("Payment intent canceled", {
+    action: "handlePaymentIntent",
+    metadata: { paymentIntentId: paymentIntent.id },
+  });
+
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .update(payments)
+    .set({
+      status: "canceled",
+      updatedAt: new Date(),
+    })
+    .where(eq(payments.stripePaymentIntentId, paymentIntent.id));
+}
+
+async function handleChargeRefunded(charge: Stripe.Charge) {
+  logger.info("Charge refunded", {
+    action: "handleRefund",
+    metadata: { chargeId: charge.id, amountRefunded: charge.amount_refunded },
+  });
+
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .update(payments)
+    .set({
+      status: "refunded",
+      refundedAmount: charge.amount_refunded,
+      refundedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(eq(payments.stripeChargeId, charge.id));
+
+  logger.info("Refund recorded successfully", {
+    action: "handleRefund",
+    metadata: { chargeId: charge.id },
+  });
+}
+
+async function handleTrialWillEnd(subscription: Stripe.Subscription) {
+  logger.info("Trial will end soon", {
+    action: "handleTrialWillEnd",
+    metadata: { 
+      subscriptionId: subscription.id,
+      trialEnd: subscription.trial_end 
+    },
+  });
+
+  const db = await getDb();
+  if (!db) return;
+
+  // Find user by subscription
+  const existingSubscription = await db
+    .select()
+    .from(subscriptions)
+    .where(eq(subscriptions.stripeSubscriptionId, subscription.id))
+    .limit(1);
+
+  if (existingSubscription.length === 0) {
+    logger.warn("Subscription not found for trial end notification", {
+      action: "handleTrialWillEnd",
+      metadata: { subscriptionId: subscription.id },
+    });
+    return;
+  }
+
+  const userId = existingSubscription[0].userId;
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  if (user.length > 0 && user[0].email) {
+    const plan = existingSubscription[0].plan;
+    const trialEndDate = subscription.trial_end ? new Date(subscription.trial_end * 1000) : new Date();
+    
+    await sendTrialEndingEmail({
+      to: user[0].email,
+      name: user[0].name || "Customer",
+      plan: plan.charAt(0).toUpperCase() + plan.slice(1),
+      trialEndDate: trialEndDate.toLocaleDateString(),
+    });
+    
+    logger.info("Trial ending reminder sent", {
+      action: "handleTrialWillEnd",
+      userId,
+      metadata: { email: user[0].email },
+    });
+  }
+}
+
+async function handlePaymentActionRequired(invoice: Stripe.Invoice) {
+  logger.info("Payment action required (3D Secure)", {
+    action: "handlePaymentActionRequired",
+    metadata: { 
+      invoiceId: invoice.id
+    },
+  });
+
+  const db = await getDb();
+  if (!db) return;
+
+  // Find subscription by invoice
+  const subscriptionId = (invoice as any).subscription as string | null;
+  if (!subscriptionId) return;
+
+  const existingSubscription = await db
+    .select()
+    .from(subscriptions)
+    .where(eq(subscriptions.stripeSubscriptionId, subscriptionId))
+    .limit(1);
+
+  if (existingSubscription.length === 0) return;
+
+  const userId = existingSubscription[0].userId;
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  if (user.length > 0 && user[0].email) {
+    const plan = existingSubscription[0].plan;
+    const amount = invoice.amount_due / 100; // Convert from cents to dollars
+    
+    await sendPaymentActionRequiredEmail({
+      to: user[0].email,
+      name: user[0].name || "Customer",
+      paymentUrl: invoice.hosted_invoice_url || `${ENV.frontendUrl}/billing`,
+    });
+    
+    logger.info("Payment action required notification sent", {
+      action: "handlePaymentActionRequired",
+      userId,
+      metadata: { email: user[0].email },
+    });
+  }
+}
+
+
+/**
+ * Handle add-on purchase (word count or image packs)
+ */
+async function handleAddOnPurchase(session: Stripe.Checkout.Session) {
+  logger.info("Add-on purchase completed", {
+    action: "handleAddOnPurchase",
+    metadata: { sessionId: session.id },
+  });
+
+  const userId = parseInt(session.client_reference_id || "0");
+  const productType = session.metadata?.productType;
+  
+  if (!userId || !productType) {
+    logger.error("Missing userId or productType in session metadata", undefined, {
+      action: "handleAddOnPurchase",
+      metadata: { sessionId: session.id },
+    });
+    return;
+  }
+
+  // Import add-on credit functions
+  const { addWordCountCredits, addImageCredits, getAvailableWordCountCredits, getAvailableImageCredits } = await import("../addOnCredits");
+  const { sendPurchaseConfirmationEmail } = await import("../purchaseEmails");
+  const { getDb } = await import("../db");
+  const { users } = await import("../../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+
+  try {
+    if (productType === "word_count") {
+      const words = parseInt(session.metadata?.words || "0");
+      const productKey = session.metadata?.productKey || "unknown";
+      
+      if (!words) {
+        logger.error("Missing words in session metadata", undefined, {
+          action: "handleAddOnPurchase",
+          metadata: { sessionId: session.id },
+        });
+        return;
+      }
+
+      await addWordCountCredits({
+        userId,
+        words,
+        stripeSessionId: session.id,
+        stripePaymentIntentId: session.payment_intent as string || null,
+        productKey,
+      });
+
+      logger.info("Word count credits added successfully", {
+        action: "handleAddOnPurchase",
+        userId,
+        metadata: { words, productKey },
+      });
+    } else if (productType === "image_pack") {
+      const images = parseInt(session.metadata?.images || "0");
+      const productKey = session.metadata?.productKey || "unknown";
+      
+      if (!images) {
+        logger.error("Missing images in session metadata", undefined, {
+          action: "handleAddOnPurchase",
+          metadata: { sessionId: session.id },
+        });
+        return;
+      }
+
+      await addImageCredits({
+        userId,
+        images,
+        stripeSessionId: session.id,
+        stripePaymentIntentId: session.payment_intent as string || null,
+        productKey,
+      });
+
+      logger.info("Image credits added successfully", {
+        action: "handleAddOnPurchase",
+        userId,
+        metadata: { images, productKey },
+      });
+    }
+
+    // Send purchase confirmation email
+    try {
+      const db = await getDb();
+      if (db) {
+        const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+        
+        if (user.length > 0 && user[0].email && user[0].name) {
+          // Get current credit balance
+          const availableCredits: { words?: number; images?: number } = {};
+          
+          if (productType === "word_count") {
+            availableCredits.words = await getAvailableWordCountCredits(userId);
+          } else if (productType === "image_pack") {
+            availableCredits.images = await getAvailableImageCredits(userId);
+          }
+
+          await sendPurchaseConfirmationEmail({
+            to: user[0].email,
+            name: user[0].name,
+            productType: productType as "word_count" | "image_pack",
+            productKey: session.metadata?.productKey || "unknown",
+            amountPaid: session.amount_total || 0,
+            currency: session.currency || "gbp",
+            purchaseDate: new Date(),
+            availableCredits,
+          });
+
+          logger.info("Purchase confirmation email sent", {
+            action: "handleAddOnPurchase",
+            userId,
+            metadata: { productType },
+          });
+        }
+      }
+    } catch (emailError) {
+      logger.error("Failed to send purchase confirmation email", emailError as Error, {
+        action: "handleAddOnPurchase",
+        userId,
+        metadata: { productType },
+      });
+      // Don't throw - email failure shouldn't prevent credit fulfillment
+    }
+  } catch (error) {
+    logger.error("Failed to add credits", error as Error, {
+      action: "handleAddOnPurchase",
+      userId,
+      metadata: { productType },
+    });
+    throw error;
+  }
+}
+
+/**
+ * Handle add-on subscription update (AI Chat, AI Call-in, Campaign Lab)
+ */
+async function handleAddonSubscriptionUpdate(subscription: Stripe.Subscription) {
+  logger.info("Add-on subscription updated", {
+    action: "handleAddonSubscriptionUpdate",
+    metadata: { subscriptionId: subscription.id },
+  });
+
+  const { upsertAddonSubscription } = await import("../addonSubscriptions");
+  
+  // Get user ID from metadata
+  const userId = parseInt(subscription.metadata?.userId || "0");
+  if (!userId) {
+    logger.error("No user ID in subscription metadata", undefined, {
+      action: "handleAddonSubscriptionUpdate",
+      metadata: { subscriptionId: subscription.id },
+    });
+    return;
+  }
+
+  // Get addon type from metadata
+  const addonType = subscription.metadata?.addon_type as "aiChat" | "aiCallIn" | "intelligentCampaignLab";
+  if (!addonType) {
+    logger.error("No addon type in subscription metadata", undefined, {
+      action: "handleAddonSubscriptionUpdate",
+      metadata: { subscriptionId: subscription.id },
+    });
+    return;
+  }
+
+  // Map Stripe status to our status
+  let status: "active" | "canceled" | "past_due";
+  if (subscription.status === "active" || subscription.status === "trialing") {
+    status = "active";
+  } else if (subscription.status === "past_due") {
+    status = "past_due";
+  } else {
+    status = "canceled";
+  }
+
+  // Get price ID
+  const stripePriceId = subscription.items.data[0]?.price.id || "";
+
+  // Upsert subscription
+  await upsertAddonSubscription({
+    userId,
+    addonType,
+    status,
+    stripeSubscriptionId: subscription.id,
+    stripePriceId,
+    currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+    currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+    cancelAtPeriodEnd: subscription.cancel_at_period_end,
+  });
+
+  logger.info("Add-on subscription updated successfully", {
+    action: "handleAddonSubscriptionUpdate",
+    userId,
+    metadata: { addonType, status, subscriptionId: subscription.id },
+  });
+}
+
+/**
+ * Handle add-on subscription cancellation
+ */
+async function handleAddonSubscriptionCanceled(subscription: Stripe.Subscription) {
+  logger.info("Add-on subscription canceled", {
+    action: "handleAddonSubscriptionCanceled",
+    metadata: { subscriptionId: subscription.id },
+  });
+
+  const { cancelAddonSubscription } = await import("../addonSubscriptions");
+  
+  await cancelAddonSubscription(subscription.id);
+
+  logger.info("Add-on subscription canceled successfully", {
+    action: "handleAddonSubscriptionCanceled",
+    metadata: { subscriptionId: subscription.id },
+  });
+}

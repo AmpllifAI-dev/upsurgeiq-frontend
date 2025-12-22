@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE users ADD COLUMN IF NOT EXISTS support_role ENUM('none', 'support_agent', 'tech_lead', 'admin') DEFAULT 'none' AFTER role",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute ALTER TABLE users ADD COLUMN IF NOT EXISTS support_role ENUM('none', 'support_agent', 'tech_lead', 'admin') DEFAULT 'none' AFTER role",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 711
+}
