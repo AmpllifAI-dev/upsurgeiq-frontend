@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { DashboardHeader } from "@/components/DashboardHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -100,18 +101,16 @@ export default function PressReleaseEdit() {
   }
 
   return (
-    <div className="container max-w-4xl py-8 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={() => setLocation(`/press-releases/${prId}`)}>
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to View
-        </Button>
-        <Button onClick={handleSave} disabled={updateMutation.isPending}>
-          <Save className="w-4 h-4 mr-2" />
-          {updateMutation.isPending ? "Saving..." : "Save Changes"}
-        </Button>
-      </div>
+    <>
+      <DashboardHeader currentPage="Press Releases" />
+      <div className="container max-w-4xl py-8 space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-end">
+          <Button onClick={handleSave} disabled={updateMutation.isPending}>
+            <Save className="w-4 h-4 mr-2" />
+            {updateMutation.isPending ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
 
       {/* Edit Form */}
       <Card>
@@ -171,6 +170,7 @@ export default function PressReleaseEdit() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   );
 }

@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { DashboardHeader } from "@/components/DashboardHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -305,22 +306,7 @@ export default function PressReleases() {
         Skip to main content
       </a>
       {/* Navigation */}
-      <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto flex items-center justify-between py-4">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
-              <Zap className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <span className="text-2xl font-bold text-foreground">UpsurgeIQ</span>
-          </div>
-          <div className="flex items-center gap-6">
-            <Button variant="ghost" size="sm" onClick={() => setLocation("/dashboard")}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Button>
-          </div>
-        </div>
-      </nav>
+      <DashboardHeader currentPage="Press Releases" />
 
       <div id="main-content" className="container mx-auto py-8">
         <div className="flex items-center justify-between mb-8">

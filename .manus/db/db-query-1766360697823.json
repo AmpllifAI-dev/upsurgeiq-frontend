@@ -1,0 +1,37 @@
+{
+  "query": "SELECT id, title, description, pageUrl FROM tech_issues WHERE userId = 1 ORDER BY createdAt DESC LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute SELECT id, title, description, pageUrl FROM tech_issues WHERE userId = 1 ORDER BY createdAt DESC LIMIT 5",
+  "rows": [
+    {
+      "id": "30008",
+      "title": "edit profile ",
+      "description": "the error message that comes up when clicking on the save button is \"db is not defined\"",
+      "pageUrl": "https://3000-id7fgcuu7svb6ccu5sz3i-3fc3de73.manusvm.computer/dashboard"
+    },
+    {
+      "id": "30007",
+      "title": "sending press release",
+      "description": "there is no button to set up the release to send out and choose additional lists (users own proprietary lists: free, lists beyond allocation: add on",
+      "pageUrl": "https://3000-id7fgcuu7svb6ccu5sz3i-3fc3de73.manusvm.computer/dashboard"
+    },
+    {
+      "id": "30006",
+      "title": "Need menu to repeat on all pages",
+      "description": "The Dashboard menu with the hamburger need to be on all the \"user logged in\" pages, it is too many clicks to get back from editing press release, for example",
+      "pageUrl": "https://3000-id7fgcuu7svb6ccu5sz3i-3fc3de73.manusvm.computer/dashboard"
+    },
+    {
+      "id": "30005",
+      "title": "Press release editor not rendering",
+      "description": "there is only the placeholder where there should be text",
+      "pageUrl": "https://3000-id7fgcuu7svb6ccu5sz3i-3fc3de73.manusvm.computer/dashboard"
+    }
+  ],
+  "messages": [
+    "30004\tDashboard\tno hamburger menu",
+    "and attachment stuck from earlier bug report\thttps://3000-id7fgcuu7svb6ccu5sz3i-3fc3de73.manusvm.computer/dashboard"
+  ],
+  "stdout": "id\ttitle\tdescription\tpageUrl\n30008\tedit profile \tthe error message that comes up when clicking on the save button is \"db is not defined\"\thttps://3000-id7fgcuu7svb6ccu5sz3i-3fc3de73.manusvm.computer/dashboard\n30007\tsending press release\tthere is no button to set up the release to send out and choose additional lists (users own proprietary lists: free, lists beyond allocation: add on\thttps://3000-id7fgcuu7svb6ccu5sz3i-3fc3de73.manusvm.computer/dashboard\n30006\tNeed menu to repeat on all pages\tThe Dashboard menu with the hamburger need to be on all the \"user logged in\" pages, it is too many clicks to get back from editing press release, for example\thttps://3000-id7fgcuu7svb6ccu5sz3i-3fc3de73.manusvm.computer/dashboard\n30005\tPress release editor not rendering\tthere is only the placeholder where there should be text\thttps://3000-id7fgcuu7svb6ccu5sz3i-3fc3de73.manusvm.computer/dashboard\n30004\tDashboard\tno hamburger menu\nand attachment stuck from earlier bug report\thttps://3000-id7fgcuu7svb6ccu5sz3i-3fc3de73.manusvm.computer/dashboard\n",
+  "stderr": "",
+  "execution_time_ms": 62
+}

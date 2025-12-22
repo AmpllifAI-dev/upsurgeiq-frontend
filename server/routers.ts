@@ -189,17 +189,26 @@ export const appRouter = router({
         email: z.string().email().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const updates: any = {};
-        if (input.name !== undefined) updates.name = input.name;
-        if (input.email !== undefined) updates.email = input.email;
-        
-        if (Object.keys(updates).length > 0) {
-          await db.update(users)
-            .set(updates)
-            .where(eq(users.id, ctx.user.id));
+        try {
+          const updates: any = {};
+          if (input.name !== undefined) updates.name = input.name;
+          if (input.email !== undefined) updates.email = input.email;
+          
+          if (Object.keys(updates).length > 0) {
+            await db.update(users)
+              .set(updates)
+              .where(eq(users.id, ctx.user.id));
+          }
+          
+          return { success: true };
+        } catch (error) {
+          console.error('[auth.updateProfile] Error:', error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to update profile',
+            cause: error,
+          });
         }
-        
-        return { success: true };
       }),
   }),
 

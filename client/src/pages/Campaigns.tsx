@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { DashboardHeader } from "@/components/DashboardHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import { Plus, Megaphone, FileSpreadsheet } from "lucide-react";
@@ -34,7 +35,9 @@ export default function Campaigns() {
   };
 
   return (
-    <div className="container py-8">
+    <>
+      <DashboardHeader currentPage="Campaigns" />
+      <div className="container py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-4xl font-bold mb-2">Campaigns</h1>
@@ -74,6 +77,7 @@ export default function Campaigns() {
           </Button>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   );
 }

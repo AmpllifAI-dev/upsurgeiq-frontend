@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { DashboardHeader } from "@/components/DashboardHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
@@ -35,7 +36,9 @@ export default function SocialMedia() {
   };
 
   return (
-    <div className="container py-8">
+    <>
+      <DashboardHeader currentPage="Social Media" />
+      <div className="container py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-4xl font-bold mb-2">Social Media Posts</h1>
@@ -81,6 +84,7 @@ export default function SocialMedia() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   );
 }

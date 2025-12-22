@@ -2502,4 +2502,33 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 
 ## New Bugs - Dec 21 (User Reported)
 - [x] Bug report submission fails with "Unexpected token '<', \"<!doctype \"... is not valid JSON" error (fixed by removing file upload to non-existent endpoint)
+- [x] FloatingIssueButton missing from Dashboard page (fixed - already added in last checkpoint)
+- [x] No hamburger menu on Dashboard page - Dashboard doesn't use DashboardLayout so missing mobile navigation (FIXED: Added horizontal menu items + hamburger menu)
 - [ ] Profile save button doesn't trigger mutation (button stays active, no toast, no save) - NEEDS INVESTIGATION
+- [ ] Attachment field in bug report dialog shows stale data ("1 file(s) attached (upload pending)" persists between opens)
+
+## Navigation Consistency - Dec 21 (User Requested)
+- [ ] Replace all "Back to..." buttons with consistent dashboard header navigation (logo + horizontal menu + hamburger)
+- [ ] Apply to: Press Releases list, Press Release view, Press Release edit, Profile, Social Media, Campaigns, Analytics, Media Lists, and any other dashboard pages
+- [ ] Users should never have to relearn navigation - same header everywhere in dashboard section
+
+## Navigation Consistency - Dec 22 (User Reported)
+- [x] Created reusable DashboardHeader component with logo, horizontal menu items, and hamburger menu
+- [x] Applied DashboardHeader to 9 key dashboard pages:
+  - Dashboard
+  - Press Releases
+  - Press Release Detail
+  - Press Release Edit
+  - Profile
+  - Social Media
+  - Campaigns
+  - Analytics
+  - Media Lists
+- [ ] Apply to remaining 15 secondary pages (admin tools, settings pages) - lower priority
+
+## New Bugs - Dec 22 (User Reported)
+- [x] Bug report submission fails with "Unexpected token '<', \"<!doctype \"... is not valid JSON\" error (fixed by removing file upload to non-existent endpoint)
+- [x] FloatingIssueButton missing from Dashboard page (fixed - already added in last checkpoint)
+- [x] No hamburger menu on Dashboard page - Dashboard doesn't use DashboardLayout so missing mobile navigation (FIXED: Added horizontal menu items + hamburger menu)
+- [ ] Profile save button doesn't trigger mutation (button stays active, no toast, no save) - 500 error from backend, needs database fix
+- [ ] Attachment field in bug report dialog shows stale data ("1 file(s) attached (upload pending)" persists between opens)

@@ -143,17 +143,8 @@ export default function Dashboard() {
             <span className="text-2xl font-bold text-foreground">UpsurgeIQ</span>
           </div>
           
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-foreground"
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-          
-          {/* Desktop navigation */}
-          <div className="hidden md:flex flex-wrap items-center gap-3 md:gap-6 text-sm">
+          {/* Horizontal navigation menu - key dashboard pages */}
+          <div className="hidden md:flex items-center gap-6">
             <a href="/dashboard" className="text-sm font-medium text-foreground" aria-current="page">
               Dashboard
             </a>
@@ -169,34 +160,24 @@ export default function Dashboard() {
             <a href="/analytics" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Analytics
             </a>
-            {user.role === "admin" && (
-              <a href="/error-logs" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                Error Logs
-              </a>
-            )}
-            <div className="flex items-center gap-3">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="gap-2"
-                onClick={() => {/* Command palette will handle this */}}
-                aria-label="Open search (Ctrl+K)"
-              >
-                <Search className="w-4 h-4" />
-                <span className="hidden sm:inline">Search</span>
-                <KeyboardShortcut keys={["Ctrl", "K"]} className="hidden md:inline-flex" />
-              </Button>
-              <Badge variant="secondary">{planName} Plan</Badge>
-              <Button variant="ghost" size="sm" onClick={() => setLocation("/profile")} aria-label="Go to settings and profile">
-                Settings
-              </Button>
-            </div>
+            <a href="/media-lists" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Media Lists
+            </a>
           </div>
+          
+          {/* Hamburger menu button - visible on all screens */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 text-foreground hover:bg-accent rounded-md transition-colors"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
         
         {/* Mobile menu dropdown */}
         {mobileMenuOpen && (
-          <div className="md:hidden fixed top-[73px] left-0 right-0 bg-card border-b border-border shadow-lg z-40">
+          <div className="fixed top-[73px] left-0 right-0 bg-card border-b border-border shadow-lg z-40">
             <div className="container mx-auto py-4 space-y-3">
               <div className="space-y-2">
                 <h3 className="text-xs font-semibold text-muted-foreground px-3">Dashboard</h3>

@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { DashboardHeader } from "@/components/DashboardHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -215,7 +216,9 @@ export default function MediaLists() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <DashboardHeader currentPage="Media Lists" />
+      <div className="min-h-screen bg-background">
       {/* Skip Navigation Link */}
       <a href="#main-content" className="skip-link">
         Skip to main content
@@ -528,6 +531,7 @@ export default function MediaLists() {
         cancelText="Cancel"
         variant="destructive"
       />
-    </div>
+      </div>
+    </>
   );
 }

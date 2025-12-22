@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { DashboardHeader } from "@/components/DashboardHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -87,14 +88,12 @@ export default function PressReleaseDetail() {
   };
 
   return (
-    <div className="container max-w-4xl py-8 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={() => setLocation("/press-releases")}>
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Press Releases
-        </Button>
-        <div className="flex items-center gap-2">
+    <>
+      <DashboardHeader currentPage="Press Releases" />
+      <div className="container max-w-4xl py-8 space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-end">
+          <div className="flex items-center gap-2">
           <Button variant="outline" onClick={handleShare}>
             <Share2 className="w-4 h-4 mr-2" />
             Share
@@ -107,8 +106,8 @@ export default function PressReleaseDetail() {
             <Edit className="w-4 h-4 mr-2" />
             Edit
           </Button>
+          </div>
         </div>
-      </div>
 
       {/* Press Release Content */}
       <Card>
@@ -153,5 +152,6 @@ export default function PressReleaseDetail() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }

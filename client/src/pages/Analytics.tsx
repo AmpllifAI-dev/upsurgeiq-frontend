@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { DashboardHeader } from "@/components/DashboardHeader";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -51,9 +52,9 @@ export default function Analytics() {
   const campaignGrowth = totalCampaigns > 0 ? "+8%" : "0%";
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b">
+    <>
+      <DashboardHeader currentPage="Analytics" />
+      <div className="min-h-screen bg-gray-50">
         <div className="container py-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
@@ -442,6 +443,6 @@ export default function Analytics() {
           </>
         )}
       </div>
-    </div>
+    </>
   );
 }
