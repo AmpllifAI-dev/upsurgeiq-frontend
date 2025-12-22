@@ -109,19 +109,35 @@
 - **NEW**: Tier limit enforcement
 - **NEW**: Upgrade prompts
 
-### 9. Partner Referral System
+### 9. Partner Referral System & White Label
 **Status**: ✅ Complete
 
 - Partner dashboard
 - Referral tracking
 - Commission management
 - Partner analytics
+- **NEW**: White Label Partnership Program for Chambers of Commerce
+- **NEW**: 20% commission structure
+- **NEW**: Custom branding settings
+- **NEW**: Partner-specific analytics
+
+### 10. Intelligent Campaign Lab
+**Status**: ✅ Complete
+
+- AI-powered ad optimization
+- A/B testing automation
+- Performance prediction
+- Budget optimization recommendations
+- Campaign strategy generation
+- **Pricing**: £299/month standalone or included in Scale plan
+- Multi-platform campaign management
+- Real-time performance monitoring
 
 ---
 
 ## New Features Added
 
-### 10. Activity Logging System
+### 11. Activity Logging System
 **Status**: ✅ Complete
 **Added**: Post-deployment
 
@@ -137,7 +153,7 @@
 - Endpoints: `activityLog.list`, `activityLog.recent`
 - Integration: All major endpoints log activities
 
-### 11. Usage Tracking & Tier Limits
+### 12. Usage Tracking & Tier Limits
 **Status**: ✅ Complete
 **Added**: Post-deployment
 

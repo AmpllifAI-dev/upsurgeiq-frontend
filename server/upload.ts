@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, Request } from "express";
 import multer from "multer";
 import { storagePut } from "./storage";
 import { randomBytes } from "crypto";
@@ -9,7 +9,7 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
 });
 
-router.post("/api/upload", upload.array("files", 5), async (req, res) => {
+router.post("/api/upload", upload.array("files", 5), async (req: Request, res) => {
   try {
     if (!req.files || !Array.isArray(req.files)) {
       return res.status(400).json({ error: "No files uploaded" });

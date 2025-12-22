@@ -141,6 +141,20 @@
       "when": 1766236660071,
       "tag": "0019_acoustic_black_crow",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1766390198441,
+      "tag": "0020_brave_hannibal_king",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "5",
+      "when": 1766390889571,
+      "tag": "0021_lush_drax",
+      "breakpoints": true
     }
   ]
 }
