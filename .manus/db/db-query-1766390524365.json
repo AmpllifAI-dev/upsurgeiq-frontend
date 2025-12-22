@@ -1,0 +1,28 @@
+{
+  "query": "SHOW TABLES LIKE 'media_list%'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute SHOW TABLES LIKE 'media_list%'",
+  "rows": [
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th (media_list%)": "media_list_categories"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th (media_list%)": "media_list_contacts"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th (media_list%)": "media_list_credit_transactions"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th (media_list%)": "media_list_credits"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th (media_list%)": "media_list_generation_requests"
+    },
+    {
+      "Tables_in_grCyd6mifTZvX8AxBen7Th (media_list%)": "media_lists"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_grCyd6mifTZvX8AxBen7Th (media_list%)\nmedia_list_categories\nmedia_list_contacts\nmedia_list_credit_transactions\nmedia_list_credits\nmedia_list_generation_requests\nmedia_lists\n",
+  "stderr": "",
+  "execution_time_ms": 868
+}

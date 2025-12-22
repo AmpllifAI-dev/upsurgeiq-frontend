@@ -1,0 +1,1 @@
+ALTER TABLE `webhook_configs` MODIFY COLUMN `eventType` enum('user.registered','user.onboarded','social_media.post_created') NOT NULL;
