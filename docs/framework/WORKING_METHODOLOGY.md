@@ -57,56 +57,75 @@ If an AI agent does NOT address Christopher by name in the first message:
 ### Planning
 
 **How Features Are Planned:**
-[Describe your planning process]
 
-Example:
-1. Client requests feature or identifies need
-2. Create detailed requirements document
-3. Break down into tasks
-4. Estimate effort
-5. Add to backlog with priority
+1. Christopher identifies need or requests feature
+2. AI agent confirms understanding and proposes approach
+3. Present 2-3 options with pros/cons/trade-offs
+4. Christopher approves approach
+5. Add to todo.md as unchecked items [ ]
+6. Begin implementation
 
 **Definition of Ready:**
+
 Before work begins on a task, it must have:
-- [ ] Clear requirements
-- [ ] Acceptance criteria
-- [ ] Design mockups (if UI work)
-- [ ] Technical approach agreed upon
-- [ ] Dependencies identified
+- [x] Christopher's explicit approval or request
+- [x] Clear understanding of requirements (confirmed with Christopher)
+- [x] Technical approach agreed upon
+- [x] Added to todo.md
+- [x] Framework docs read and understood
+- [x] Dependencies identified
+
+**What NOT to Do:**
+- Don't start work without reading framework docs
+- Don't assume requirements - confirm with Christopher
+- Don't add features not in the plan without discussion
+- Don't skip adding to todo.md
 
 ### Development
 
 **Coding Standards:**
-- [Standard #1: e.g., "Follow ESLint configuration"]
-- [Standard #2: e.g., "Use TypeScript strict mode"]
-- [Standard #3: e.g., "Write self-documenting code with clear variable names"]
+- Use TypeScript strict mode (no `any` types)
+- Follow tRPC patterns (procedures in routers.ts, queries in db.ts)
+- Use Tailwind utilities (avoid custom CSS)
+- Write clean, readable code over clever code
+- Proper error handling with try/catch and error logging
+- Update todo.md as you work (mark [x] when complete)
 
 **Testing Requirements:**
-- [Requirement #1: e.g., "All new features must have unit tests"]
-- [Requirement #2: e.g., "Critical paths must have integration tests"]
-- [Requirement #3: e.g., "Manual testing checklist for UI changes"]
+- Write vitest tests for all tRPC procedures (see server/auth.logout.test.ts)
+- Test critical paths before delivery (auth, payments, AI generation)
+- Manual testing in browser before creating checkpoint
+- No delivery without testing
+- Fix failing tests before checkpoint
 
 **Code Review Process:**
-[Describe how code is reviewed]
 
-Example:
-1. Create pull request with description
-2. Request review from [person/role]
-3. Address feedback
-4. Merge after approval
+No formal code review (solo founder + AI development). Instead:
+1. AI tests thoroughly before delivery
+2. Christopher reviews in browser (Preview panel)
+3. Christopher provides feedback
+4. AI addresses feedback and re-tests
+5. Checkpoint created when Christopher approves
 
 ### Deployment
 
 **Deployment Frequency:**
-[How often code is deployed]
+Checkpoint-based deployment. Create checkpoint after completing features, then Christopher publishes via Manus UI.
 
 **Deployment Process:**
-1. [Step 1]
-2. [Step 2]
-3. [Step 3]
+1. AI completes feature and tests thoroughly
+2. AI creates checkpoint with clear description
+3. Christopher reviews in Preview panel
+4. Christopher clicks Publish button in Manus UI
+5. Platform deploys automatically
 
 **Rollback Procedure:**
-[How to roll back if something goes wrong]
+Use `webdev_rollback_checkpoint` tool to restore previous version:
+1. Identify version_id of stable checkpoint
+2. Call webdev_rollback_checkpoint with version_id
+3. Test rolled-back version
+4. Investigate and fix issue
+5. Create new checkpoint when fixed
 
 ---
 
@@ -114,19 +133,23 @@ Example:
 
 ### Code Quality
 
-**Before Committing Code:**
-- [ ] Code follows project conventions
-- [ ] No console errors or warnings
-- [ ] Tests are written and passing
-- [ ] Code is self-documenting or has comments
-- [ ] No hardcoded values (use config/env vars)
+**Before Creating Checkpoint:**
+- [x] Code follows TypeScript strict mode
+- [x] No console errors in browser
+- [x] Tests written and passing (vitest)
+- [x] Manual testing in browser completed
+- [x] todo.md updated (completed items marked [x])
+- [x] Framework docs updated if needed
+- [x] No hardcoded values (use env vars)
 
-**Code Review Checklist:**
-- [ ] Logic is correct
-- [ ] Edge cases are handled
-- [ ] Error handling is appropriate
-- [ ] Performance is acceptable
-- [ ] Security considerations addressed
+**Quality Checklist:**
+- [x] Logic is correct and tested
+- [x] Edge cases handled (empty states, errors)
+- [x] Error handling with try/catch and logging
+- [x] Performance acceptable (no slow queries)
+- [x] Security considered (no SQL injection, XSS)
+- [x] Mobile responsive
+- [x] Accessible (ARIA labels, keyboard navigation)
 
 ### Documentation Quality
 
@@ -152,33 +175,39 @@ Example:
 
 ### Update Frequency
 
-**Daily Updates:** [When and how]
+**Proactive Updates:**
+Provide progress updates during long-running tasks (>10 minutes). Christopher appreciates knowing what's happening.
 
-**Weekly Updates:** [When and how]
+**After Milestones:**
+Summarize what was completed and next steps after completing significant features.
 
-**Ad-Hoc Updates:** [When to provide unexpected updates]
+**When Blocked:**
+Flag blockers immediately - don't wait. Provide options for unblocking.
 
 ### Communication Channels
 
-**For Questions:** [Channel/method]
+**For Everything:** Manus chat (primary and only channel)
 
-**For Updates:** [Channel/method]
+**For Urgent Issues:**
+Same channel, but flag as urgent and explain impact clearly.
 
-**For Urgent Issues:** [Channel/method]
-
-**For Decisions:** [Channel/method]
+**For Decisions:**
+Present 2-3 options with pros/cons, recommend one, ask for decision.
 
 ### Tone and Style
 
-**When Communicating with Client:**
-- Tone: [Formal/Casual/Technical/etc.]
-- Level of Detail: [High-level/Detailed/etc.]
-- Frequency: [How often they want to hear from you]
+**When Communicating with Christopher:**
+- **ALWAYS address by name:** "Christopher, [message]"
+- **Tone:** Direct, practical, professional but conversational
+- **Level of Detail:** Provide context and reasoning, not just answers
+- **Frequency:** Proactive updates appreciated, but don't spam
+- **No:** Corporate jargon, buzzwords, excessive formality
 
 **When Documenting:**
-- Style: [Professional, clear, concise]
-- Audience: [Who will read this]
-- Format: [Markdown, PDF, etc.]
+- **Style:** Professional, clear, concise
+- **Audience:** Future AI agents and Christopher
+- **Format:** Markdown (GitHub-flavored)
+- **Structure:** Headings, paragraphs, tables (not excessive bullets)
 
 ---
 
@@ -258,70 +287,61 @@ Which approach would you prefer?
 ### Using todo.md
 
 **Format:**
+Flat list with markdown checkboxes, grouped by feature area:
+
 ```markdown
-## In Progress
-- [ ] [Task] - [Assigned to] - [Started date]
-
-## Up Next
-- [ ] [Task] - [Priority: High/Medium/Low]
-
-## Blocked
-- [ ] [Task] - [Blocker description]
-
-## Done
-- [x] [Task] - [Completed date]
+## Feature Area Name
+- [ ] Pending task
+- [x] Completed task
+- [ ] Another pending task
 ```
 
+**Rules:**
+1. **Add items BEFORE starting work** (use file append action)
+2. **Mark [x] when complete** (use file edit action)
+3. **Never delete items** - keep as history
+4. **Review before checkpoint** - ensure accuracy
+
 **Update Frequency:**
-- Update immediately when starting a task
-- Update immediately when completing a task
-- Update daily with progress notes
+- Add new items when Christopher requests features
+- Mark [x] immediately when completing items
+- Review entire file before creating checkpoint
 
 ---
 
 ## Version Control
 
-### Branch Naming
+### Checkpoints (Not Git Branches)
 
-**Format:** `[type]/[description]`
+**upsurgeIQ uses Manus checkpoints, not traditional Git workflow.**
 
-**Types:**
-- `feature/` - New features
-- `fix/` - Bug fixes
-- `refactor/` - Code refactoring
-- `docs/` - Documentation changes
-- `test/` - Test additions/changes
+**Checkpoint Strategy:**
+- Create checkpoint after completing features
+- Create checkpoint before risky changes
+- Create checkpoint before major refactoring
+- Descriptive checkpoint messages (what, why, impact)
 
-**Examples:**
-- `feature/user-authentication`
-- `fix/login-button-alignment`
-- `refactor/database-queries`
+**Checkpoint Message Format:**
+```
+[Brief summary of changes]
 
-### Commit Messages
+DETAILS:
+- [What was changed]
+- [What was added]
+- [What was fixed]
 
-**Format:** `[type]: [description]`
+IMPACT:
+- [What this affects]
+- [What users can now do]
 
-**Examples:**
-- `feat: add user authentication`
-- `fix: resolve login button alignment issue`
-- `docs: update API documentation`
-- `refactor: optimize database queries`
+NEXT STEPS:
+- [What to do next]
+```
 
-**Guidelines:**
-- Use present tense ("add" not "added")
-- Be specific and descriptive
-- Reference issue numbers when applicable
-
-### Pull Requests
-
-**Title:** Clear, descriptive summary
-
-**Description Must Include:**
-- What changed
-- Why it changed
-- How to test it
-- Screenshots (for UI changes)
-- Breaking changes (if any)
+**DO NOT:**
+- Use `git reset --hard` (use webdev_rollback_checkpoint instead)
+- Create checkpoints for every tiny change
+- Skip checkpoint descriptions
 
 ---
 
@@ -329,31 +349,29 @@ Which approach would you prefer?
 
 ### Test Types
 
-**Unit Tests:**
-- When: For all business logic
-- Coverage Target: [e.g., 80%]
-- Tools: [e.g., Jest, Vitest]
-
-**Integration Tests:**
-- When: For critical user flows
-- Coverage: [e.g., All API endpoints]
-- Tools: [e.g., Supertest]
-
-**End-to-End Tests:**
-- When: For critical paths
-- Coverage: [e.g., Login, checkout, core features]
-- Tools: [e.g., Playwright, Cypress]
+**Unit Tests (Vitest):**
+- When: For all tRPC procedures
+- Coverage: Critical paths (auth, payments, AI generation)
+- Tools: Vitest (see server/auth.logout.test.ts)
+- Run: `pnpm test`
 
 **Manual Testing:**
-- When: Before every deployment
-- Checklist: [Link to testing checklist]
+- When: Before every checkpoint
+- Where: Browser Preview panel
+- What: Test the actual user flow end-to-end
+- Required: Yes, no checkpoint without manual testing
+
+**No Integration/E2E Tests:**
+Currently not using Playwright/Cypress. Manual testing in browser is sufficient for now.
 
 ### Testing Workflow
 
-1. Write tests before or alongside code
-2. Run tests locally before committing
-3. CI runs tests on every PR
-4. Manual testing before deployment
+1. Write vitest tests for tRPC procedures
+2. Run `pnpm test` to verify tests pass
+3. Manual testing in browser (Preview panel)
+4. Fix any issues found
+5. Re-test until working correctly
+6. Create checkpoint
 
 ---
 
@@ -502,31 +520,33 @@ This methodology should evolve based on what works:
 4. Get explicit approval before proceeding
 
 ---
-
-## Tools and Resources
+### Tools and Resources
 
 ### Development Tools
 
-- **IDE:** [Recommended IDE]
-- **Version Control:** [Git, GitHub, etc.]
-- **Package Manager:** [npm, yarn, pnpm]
-- **Testing:** [Jest, Vitest, etc.]
+- **Platform:** Manus (all-in-one development environment)
+- **Package Manager:** pnpm
+- **Testing:** Vitest
+- **Database:** MySQL/TiDB via Drizzle ORM
+- **Database Management:** Manus Database UI panel
 
 ### Project Management
 
-- **Task Tracking:** [Jira, Linear, etc.]
-- **Documentation:** [Notion, Confluence, etc.]
-- **Communication:** [Slack, Discord, etc.]
+- **Task Tracking:** todo.md (flat markdown file)
+- **Documentation:** /docs/framework/ (markdown files)
+- **Communication:** Manus chat
+- **Code Review:** Preview panel (Christopher reviews)
 
 ### Monitoring and Debugging
 
-- **Error Tracking:** [Sentry, etc.]
-- **Logging:** [LogRocket, etc.]
-- **Analytics:** [Google Analytics, etc.]
+- **Error Tracking:** Custom error_logs table + admin dashboard
+- **Logging:** Custom logging utility (server/logger.ts)
+- **Analytics:** Manus built-in analytics (UV/PV)
+- **Preview:** Manus Preview panel (live dev server)
 
 ---
 
 **This document should be updated whenever the way we work changes.**
 
-**Last Updated:** [DATE]  
-**Updated By:** [NAME]
+**Last Updated:** December 22, 2025  
+**Updated By:** AI Agent (from 8-day chat history analysis)
