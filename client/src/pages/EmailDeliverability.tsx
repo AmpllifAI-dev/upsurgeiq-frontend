@@ -9,22 +9,9 @@ import { useState } from "react";
 export default function EmailDeliverability() {
   const [timeRange, setTimeRange] = useState("30");
   
-  // TODO: Add getDeliverability procedure to leadBehaviour router
-  // const { data: deliverabilityData, isLoading } = trpc.leadBehaviour.getDeliverability.useQuery({
-  //   days: parseInt(timeRange),
-  // });
-  const deliverabilityData = {
-    bounced: 0,
-    spamComplaints: 0,
-    hardBounces: 0,
-    softBounces: 0,
-    delivered: 0,
-    totalSent: 0,
-    bounceRate: 0,
-    spamRate: 0,
-    deliveryRate: 100,
-  };
-  const isLoading = false;
+  const { data: deliverabilityData, isLoading } = trpc.leadBehaviour.getDeliverability.useQuery({
+    days: parseInt(timeRange),
+  });
 
   if (isLoading) {
     return (

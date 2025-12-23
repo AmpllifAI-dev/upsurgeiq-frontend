@@ -118,11 +118,11 @@ export function EmailCampaigns() {
       subject: enableAbTest ? variantASubject : subject,
       previewText: previewText || undefined,
       emailTemplate: template,
-      // scheduledAt: scheduledAt?.toISOString(), // TODO: Add to schema
-      // status: scheduleType === "scheduled" ? "scheduled" : "draft", // TODO: Add to schema
-      // abTestEnabled: enableAbTest ? 1 : 0, // TODO: Add to schema
-      // abTestDuration: enableAbTest ? parseInt(testDuration) : undefined, // TODO: Add to schema
-      // variantBSubject: enableAbTest ? variantBSubject : undefined, // TODO: Add to schema
+      scheduledAt: scheduledAt?.toISOString(),
+      status: scheduleType === "scheduled" ? "scheduled" : "draft",
+      abTestEnabled: enableAbTest ? 1 : 0,
+      abTestDuration: enableAbTest ? parseInt(testDuration) : undefined,
+      variantBSubject: enableAbTest ? variantBSubject : undefined,
     });
   };
 

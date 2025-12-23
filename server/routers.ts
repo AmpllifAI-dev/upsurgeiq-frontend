@@ -5120,6 +5120,84 @@ Generate a comprehensive campaign strategy that includes:
         const { getTopPages } = await import("./analytics");
         return await getTopPages(input?.limit);
       }),
+
+    // Email analytics procedures
+    getOverview: protectedProcedure
+      .input(z.object({
+        days: z.number().optional().default(30),
+      }))
+      .query(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        const { emailCampaigns } = await import("../drizzle/schema");
+        const { sql } = await import("drizzle-orm");
+        
+        // Calculate date range
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - input.days);
+        
+        // Get campaign stats (placeholder - would need actual email tracking data)
+        const campaigns = await db.select().from(emailCampaigns);
+        
+        return {
+          totalSent: campaigns.length * 100, // Placeholder
+          totalDelivered: campaigns.length * 95, // Placeholder
+          totalOpened: campaigns.length * 45, // Placeholder
+          totalClicked: campaigns.length * 15, // Placeholder
+          totalBounced: campaigns.length * 2, // Placeholder
+          totalUnsubscribed: campaigns.length * 1, // Placeholder
+          openRate: 45,
+          clickRate: 15,
+          bounceRate: 2,
+        };
+      }),
+
+    getCampaignPerformance: protectedProcedure
+      .input(z.object({
+        campaignId: z.number().optional(),
+        days: z.number().optional().default(30),
+      }))
+      .query(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        
+        const { emailCampaigns } = await import("../drizzle/schema");
+        
+        // Get campaign performance data (placeholder)
+        const campaigns = await db.select().from(emailCampaigns);
+        
+        return campaigns.map(c => ({
+          campaignId: c.id,
+          name: c.name,
+          sent: 100, // Placeholder
+          delivered: 95,
+          opened: 45,
+          clicked: 15,
+          bounced: 2,
+          openRate: 45,
+          clickRate: 15,
+        }));
+      }),
+
+    getDeliverability: protectedProcedure
+      .input(z.object({
+        days: z.number().optional().default(30),
+      }))
+      .query(async ({ ctx, input }) => {
+        // Return deliverability metrics (placeholder data)
+        return {
+          totalSent: 1000,
+          delivered: 950,
+          bounced: 30,
+          spamComplaints: 5,
+          hardBounces: 20,
+          softBounces: 10,
+          bounceRate: 3,
+          spamRate: 0.5,
+          deliveryRate: 95,
+        };
+      }),
   }),
 
   newsletter: router({ subscribe: publicProcedure
@@ -5268,12 +5346,24 @@ Generate a comprehensive campaign strategy that includes:
         previewText: z.string().optional(),
         emailTemplate: z.string(),
         targetSegmentId: z.number().optional(),
+        status: z.enum(["draft", "scheduled", "sending", "sent", "failed"]).optional(),
+        scheduledAt: z.string().optional(), // ISO date string
+        abTestEnabled: z.number().min(0).max(1).optional(),
+        variantBSubject: z.string().optional(),
+        abTestDuration: z.number().optional(),
       }))
       .mutation(async ({ input }) => {
         const db = await getDb();
         if (!db) throw new Error("Database connection failed");
         const { emailCampaigns } = await import("../drizzle/schema");
-        await db.insert(emailCampaigns).values(input);
+        
+        // Convert scheduledAt string to Date if provided
+        const values = {
+          ...input,
+          scheduledAt: input.scheduledAt ? new Date(input.scheduledAt) : undefined,
+        };
+        
+        await db.insert(emailCampaigns).values(values);
         return { success: true };
       }),
 
