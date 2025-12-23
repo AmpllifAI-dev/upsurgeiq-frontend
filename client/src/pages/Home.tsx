@@ -162,7 +162,7 @@ export default function Home() {
                 Pricing
               </a>
               {isAuthenticated && user?.role === "admin" && (
-                <a href="/admin/credit-management" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colours">
+                <a href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colours">
                   Admin Dashboard
                 </a>
               )}
@@ -215,7 +215,7 @@ export default function Home() {
               </a>
               {isAuthenticated && user?.role === "admin" && (
                 <a
-                  href="/admin/credit-management"
+                  href="/dashboard"
                   className="block text-sm text-foreground hover:text-primary transition-colours"
                   onClick={() => setMobileMenuOpen(false)}
                 >

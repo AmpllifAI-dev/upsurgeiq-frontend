@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, name, email, role FROM users WHERE id = 1",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute SELECT id, name, email, role FROM users WHERE id = 1",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Christopher Lembke",
+      "email": "christopher@thealchemyexperience.co.uk",
+      "role": "admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\n1\tChristopher Lembke\tchristopher@thealchemyexperience.co.uk\tadmin\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

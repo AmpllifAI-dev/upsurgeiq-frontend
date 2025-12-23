@@ -2667,3 +2667,10 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 ## Bug Fixes (December 23, 2025 - Issues #300001 & #300002)
 - [x] Fix UpsurgeIQ branding capitalization (lowercase 'u' to uppercase 'U') across all pages
 - [x] Add admin dashboard link to horizontal menu navigation
+
+## Admin Role Detection Bug (December 23, 2025)
+- [x] Investigate why admin users can't see Admin Dashboard menu link
+- [x] Fix role detection in Home.tsx navigation
+- [x] Verify admin role is properly returned from auth.me query
+- [x] Fix Admin Dashboard link to point to main admin page with sidebar (not directly to credit management)
+- [ ] Verify admin dashboard has sidebar navigation to all admin tools
