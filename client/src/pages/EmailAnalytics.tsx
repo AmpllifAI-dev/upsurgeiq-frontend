@@ -34,16 +34,22 @@ export function EmailAnalytics() {
   const [selectedCampaign, setSelectedCampaign] = useState<string>("all");
 
   // Fetch analytics data
-  const { data: overviewStats, isLoading: statsLoading } = trpc.leadBehaviour.getOverview.useQuery({
-    days: parseInt(timeRange),
-  });
+  // TODO: Add getOverview procedure to leadBehaviour router
+  // const { data: overviewStats, isLoading: statsLoading } = trpc.leadBehaviour.getOverview.useQuery({
+  //   days: parseInt(timeRange),
+  // });
+  const overviewStats = null;
+  const statsLoading = false;
 
   const { data: campaigns } = trpc.campaigns.list.useQuery();
   
-  const { data: campaignPerformance, isLoading: performanceLoading } = trpc.leadBehaviour.getCampaignPerformance.useQuery({
-    campaignId: selectedCampaign === "all" ? undefined : parseInt(selectedCampaign),
-    days: parseInt(timeRange),
-  });
+  // TODO: Add getCampaignPerformance procedure to leadBehaviour router
+  // const { data: campaignPerformance, isLoading: performanceLoading } = trpc.leadBehaviour.getCampaignPerformance.useQuery({
+  //   campaignId: selectedCampaign === "all" ? undefined : parseInt(selectedCampaign),
+  //   days: parseInt(timeRange),
+  // });
+  const campaignPerformance: any[] = [];
+  const performanceLoading = false;
 
   const stats = overviewStats || {
     totalSent: 0,

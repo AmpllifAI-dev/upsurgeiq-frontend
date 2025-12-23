@@ -22,7 +22,7 @@ export default function AdminCreditManagement() {
   const [adjustmentType, setAdjustmentType] = useState<"aiChat" | "aiCallIn">("aiChat");
 
   const { data: allUsersCredits, isLoading, refetch } = trpc.admin.getAllUsersCredits.useQuery();
-  const { data: stats } = trpc.admin.getCreditStats.useQuery();
+  const { data: stats } = trpc.admin.getCreditStats.useQuery({ timeRange: "all" });
   const adjustCreditsMutation = trpc.admin.adjustCredits.useMutation({
     onSuccess: () => {
       toast.success("Credits adjusted successfully");
@@ -53,8 +53,8 @@ export default function AdminCreditManagement() {
 
   const filteredUsers = allUsersCredits?.filter(
     (user) =>
-      user.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.userEmail.toLowerCase().includes(searchQuery.toLowerCase())
+      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleAdjustCredits = () => {
@@ -71,8 +71,8 @@ export default function AdminCreditManagement() {
 
     adjustCreditsMutation.mutate({
       userId: selectedUserId,
-      addonType: adjustmentType,
-      amount,
+      credits: amount,
+      reason: `Manual ${adjustmentType} adjustment`,
     });
   };
 
@@ -104,8 +104,8 @@ export default function AdminCreditManagement() {
               <Users className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Total Active Users</p>
-              <p className="text-2xl font-bold">{stats?.totalActiveUsers || 0}</p>
+              <p className="text-sm text-muted-foreground">Total Users</p>
+              <p className="text-2xl font-bold">{stats?.totalUsers || 0}</p>
             </div>
           </div>
         </Card>
@@ -116,8 +116,8 @@ export default function AdminCreditManagement() {
               <TrendingUp className="h-6 w-6 text-blue-500" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">AI Chat Credits Used</p>
-              <p className="text-2xl font-bold">{stats?.totalAiChatUsed || 0}</p>
+              <p className="text-sm text-muted-foreground">Total Credits</p>
+              <p className="text-2xl font-bold">{stats?.totalCredits || 0}</p>
             </div>
           </div>
         </Card>
@@ -128,8 +128,8 @@ export default function AdminCreditManagement() {
               <TrendingUp className="h-6 w-6 text-green-500" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">AI Call-in Credits Used</p>
-              <p className="text-2xl font-bold">{stats?.totalAiCallInUsed || 0}</p>
+              <p className="text-sm text-muted-foreground">Total Tokens</p>
+              <p className="text-2xl font-bold">{stats?.totalTokens || 0}</p>
             </div>
           </div>
         </Card>
@@ -147,7 +147,7 @@ export default function AdminCreditManagement() {
           />
         </div>
         <Button
-          onClick={() => exportMutation.mutate()}
+          onClick={() => exportMutation.mutate({ timeRange: "all" })}
           disabled={exportMutation.isPending}
           variant="outline"
         >
@@ -176,34 +176,23 @@ export default function AdminCreditManagement() {
           <TableBody>
             {filteredUsers?.map((user) => (
               <TableRow key={user.userId}>
-                <TableCell className="font-medium">{user.userName}</TableCell>
-                <TableCell>{user.userEmail}</TableCell>
+                <TableCell className="font-medium">{user.name}</TableCell>
+                <TableCell>{user.email}</TableCell>
                 <TableCell>
-                  {user.aiChatEnabled ? (
-                    <span className="text-sm">
-                      {user.aiChatUsed}/{user.aiChatTotal} used
-                      <span className="text-muted-foreground ml-2">
-                        ({user.aiChatRemaining} left)
-                      </span>
+                  <span className="text-sm">
+                    {user.totalCredits} credits
+                    <span className="text-muted-foreground ml-2">
+                      ({user.totalTokens} tokens)
                     </span>
-                  ) : (
-                    <span className="text-muted-foreground text-sm">Not subscribed</span>
-                  )}
+                  </span>
                 </TableCell>
                 <TableCell>
-                  {user.aiCallInEnabled ? (
-                    <span className="text-sm">
-                      {user.aiCallInUsed}/{user.aiCallInTotal} used
-                      <span className="text-muted-foreground ml-2">
-                        ({user.aiCallInRemaining} left)
-                      </span>
-                    </span>
-                  ) : (
-                    <span className="text-muted-foreground text-sm">Not subscribed</span>
-                  )}
+                  <span className="text-muted-foreground text-sm">
+                    Last used: {user.lastUsed ? new Date(user.lastUsed).toLocaleDateString() : 'Never'}
+                  </span>
                 </TableCell>
                 <TableCell>
-                  {user.aiChatEnabled || user.aiCallInEnabled ? (
+                  {user.totalCredits > 0 ? (
                     <Badge variant="default">Active</Badge>
                   ) : (
                     <Badge variant="secondary">Inactive</Badge>

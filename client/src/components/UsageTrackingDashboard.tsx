@@ -15,7 +15,7 @@ interface UsageStat {
 }
 
 export function UsageTrackingDashboard() {
-  const { data: subscription } = trpc.subscription.getSubscription.useQuery();
+  const { data: subscription } = trpc.subscription.get.useQuery();
   const { data: pressReleases } = trpc.pressRelease.list.useQuery();
   const { data: campaigns } = trpc.campaigns.list.useQuery();
   const { data: socialPosts } = trpc.socialMedia.list.useQuery();
@@ -31,7 +31,7 @@ export function UsageTrackingDashboard() {
     scale: { pressReleases: 15, campaigns: Infinity },
   };
 
-  const currentTier = subscription.tier as "starter" | "pro" | "scale";
+  const currentTier = subscription.plan as "starter" | "pro" | "scale";
   const limits = tierLimits[currentTier];
 
   // Count current month usage
@@ -171,8 +171,7 @@ export function UsageTrackingDashboard() {
                     <div className="space-y-1">
                       <Progress 
                         value={percentage} 
-                        className="h-2"
-                        indicatorClassName={getUsageColor(percentage)}
+                        className={`h-2 ${getUsageColor(percentage)}`}
                       />
                       <p className="text-xs text-muted-foreground">
                         {stat.limit - stat.used} remaining this month

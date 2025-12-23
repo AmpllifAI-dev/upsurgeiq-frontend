@@ -118,11 +118,11 @@ export function EmailCampaigns() {
       subject: enableAbTest ? variantASubject : subject,
       previewText: previewText || undefined,
       emailTemplate: template,
-      scheduledAt: scheduledAt?.toISOString(),
-      status: scheduleType === "scheduled" ? "scheduled" : "draft",
-      abTestEnabled: enableAbTest ? 1 : 0,
-      abTestDuration: enableAbTest ? parseInt(testDuration) : undefined,
-      variantBSubject: enableAbTest ? variantBSubject : undefined,
+      // scheduledAt: scheduledAt?.toISOString(), // TODO: Add to schema
+      // status: scheduleType === "scheduled" ? "scheduled" : "draft", // TODO: Add to schema
+      // abTestEnabled: enableAbTest ? 1 : 0, // TODO: Add to schema
+      // abTestDuration: enableAbTest ? parseInt(testDuration) : undefined, // TODO: Add to schema
+      // variantBSubject: enableAbTest ? variantBSubject : undefined, // TODO: Add to schema
     });
   };
 
@@ -530,8 +530,8 @@ export function EmailCampaigns() {
                 <p className="text-3xl font-bold mt-2">
                   {campaigns && campaigns.length > 0
                     ? `${Math.round(
-                        (campaigns.reduce((sum, c) => sum + c.openCount, 0) /
-                          campaigns.reduce((sum, c) => sum + c.recipientCount, 0)) *
+                        (campaigns.reduce((sum, c) => sum + (c.openCount || 0), 0) /
+                          campaigns.reduce((sum, c) => sum + (c.recipientCount || 0), 0)) *
                           100
                       )}%`
                     : "0%"}
@@ -549,8 +549,8 @@ export function EmailCampaigns() {
                 <p className="text-3xl font-bold mt-2">
                   {campaigns && campaigns.length > 0
                     ? `${Math.round(
-                        (campaigns.reduce((sum, c) => sum + c.clickCount, 0) /
-                          campaigns.reduce((sum, c) => sum + c.recipientCount, 0)) *
+                        (campaigns.reduce((sum, c) => sum + (c.clickCount || 0), 0) /
+                          campaigns.reduce((sum, c) => sum + (c.recipientCount || 0), 0)) *
                           100
                       )}%`
                     : "0%"}

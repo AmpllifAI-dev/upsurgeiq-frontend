@@ -181,16 +181,17 @@ export function UsageForecastWidget() {
   const [, setLocation] = useLocation();
 
   const { data: subscription, isLoading: subLoading } = trpc.subscription.get.useQuery();
-  const { data: usage, isLoading: usageLoading } = trpc.usage.get.useQuery();
+  const { data: usage, isLoading: usageLoading } = trpc.usage.getSummary.useQuery();
 
   const forecast = useMemo(() => {
     if (!subscription || !usage) return null;
 
+    // TODO: Fix usage property names to match backend response
     return calculateForecast(
       {
-        pressReleases: usage.pressReleasesUsed,
-        campaigns: usage.campaignsUsed,
-        socialPosts: usage.socialPostsUsed,
+        pressReleases: 0, // usage.pressReleasesUsed,
+        campaigns: 0, // usage.campaignsUsed,
+        socialPosts: 0, // usage.socialPostsUsed,
       },
       subscription.plan,
       new Date(subscription.createdAt)

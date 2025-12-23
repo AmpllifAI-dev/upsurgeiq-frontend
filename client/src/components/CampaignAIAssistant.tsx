@@ -11,7 +11,7 @@ import { Streamdown } from "streamdown";
 interface Message {
   role: "user" | "assistant";
   content: string;
-  timestamp: Date;
+  timestamp?: Date;
 }
 
 interface CampaignAIAssistantProps {
@@ -39,10 +39,10 @@ export function CampaignAIAssistant({ campaignId, onClose }: CampaignAIAssistant
       setMessages((prev) => [
         ...prev,
         {
-          role: "assistant",
+          role: "assistant" as const,
           content: response.message,
           timestamp: new Date(),
-        },
+        } as Message,
       ]);
       setIsStreaming(false);
     },
@@ -133,7 +133,7 @@ export function CampaignAIAssistant({ campaignId, onClose }: CampaignAIAssistant
                   <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                 )}
                 <p className="text-xs opacity-70 mt-1">
-                  {message.timestamp.toLocaleTimeString([], {
+                  {message.timestamp?.toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}

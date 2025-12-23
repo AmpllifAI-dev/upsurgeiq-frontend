@@ -309,7 +309,7 @@ export default function Home() {
                 Start Free Trial
                 <Sparkles className="ml-2 w-5 h-5" />
               </Button>
-              <Button size="lg" variant="outline" onClick={() => document.getElementById("features")?.scrollIntoView({ behaviour: "smooth" })}>
+              <Button size="lg" variant="outline" onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })}>
                 Learn More
               </Button>
             </div>

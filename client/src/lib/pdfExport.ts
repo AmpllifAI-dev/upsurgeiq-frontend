@@ -642,7 +642,7 @@ export function exportEnhancedCampaignToPDF(data: EnhancedCampaignData) {
   doc.setFont("helvetica", "bold");
   doc.text("Status:", margin, yPosition);
   doc.setFont("helvetica", "normal");
-  const statusColor = data.campaign.status === 'active' ? [0, 200, 0] : lightGray;
+  const statusColor: [number, number, number] = data.campaign.status === 'active' ? [0, 200, 0] : lightGray;
   doc.setTextColor(...statusColor);
   doc.text(data.campaign.status.toUpperCase(), margin + 35, yPosition);
   doc.setTextColor(...darkGray);

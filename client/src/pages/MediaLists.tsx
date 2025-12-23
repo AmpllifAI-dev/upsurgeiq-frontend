@@ -79,8 +79,8 @@ export default function MediaLists() {
 
   const handlePurchaseList = (listId: number, listName: string) => {
     purchaseMutation.mutate({
-      listId,
-      listName,
+      mediaListId: listId,
+      mediaListName: listName,
     });
   };
 

@@ -67,7 +67,7 @@ export default function IssueAnalytics() {
               <AlertTriangle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats?.new || 0}</div>
+              <div className="text-2xl font-bold">{stats?.open || 0}</div>
               <p className="text-xs text-muted-foreground">Needs attention</p>
             </CardContent>
           </Card>
@@ -163,12 +163,12 @@ export default function IssueAnalytics() {
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
               {[
-                { label: 'New', value: stats?.new || 0, color: 'text-red-500' },
-                { label: 'Acknowledged', value: stats?.acknowledged || 0, color: 'text-orange-500' },
-                { label: 'In Progress', value: stats?.in_progress || 0, color: 'text-blue-500' },
+                { label: 'Open', value: stats?.open || 0, color: 'text-red-500' },
+
+                { label: 'In Progress', value: stats?.inProgress || 0, color: 'text-blue-500' },
                 { label: 'Resolved', value: stats?.resolved || 0, color: 'text-green-500' },
                 { label: 'Closed', value: stats?.closed || 0, color: 'text-gray-500' },
-                { label: "Won't Fix", value: stats?.wont_fix || 0, color: 'text-gray-400' },
+
               ].map((status) => (
                 <div key={status.label} className="text-center p-4 border rounded-lg">
                   <div className={`text-3xl font-bold ${status.color}`}>{status.value}</div>

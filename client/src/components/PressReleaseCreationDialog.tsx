@@ -19,9 +19,11 @@ export function PressReleaseCreationDialog({
   const [, setLocation] = useLocation();
   
   // Fetch usage data
-  const { data: usageData } = trpc.usageTracking.getCurrentUsage.useQuery();
+  const { data: usageData } = trpc.usageTracking.current.useQuery();
   
-  const pressReleaseUsage = usageData?.pressReleases || { used: 0, limit: 0 };
+  const pressReleaseUsage = (typeof usageData?.pressReleases === 'object' && usageData?.pressReleases !== null) 
+    ? usageData.pressReleases 
+    : { used: 0, limit: 0 };
   const usagePercentage = pressReleaseUsage.limit > 0 
     ? (pressReleaseUsage.used / pressReleaseUsage.limit) * 100 
     : 0;

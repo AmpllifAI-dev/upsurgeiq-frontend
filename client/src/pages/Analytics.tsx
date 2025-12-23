@@ -13,6 +13,7 @@ import { AnalyticsCharts } from "@/components/AnalyticsCharts";
 import { toast } from "sonner";
 
 export default function Analytics() {
+  const exportMutation = trpc.csvExport.exportAnalyticsSummary.useMutation();
   const { user, loading: authLoading } = useAuth();
   const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d" | "custom">("30d");
   const [startDate, setStartDate] = useState<string>("");
@@ -98,7 +99,7 @@ export default function Analytics() {
                     const startDateStr = dateRange === "custom" && startDate ? startDate : undefined;
                     const endDateStr = dateRange === "custom" && endDate ? endDate : undefined;
                     
-                    const result = await trpc.csvExport.exportAnalyticsSummary.mutate({
+                    const result = await exportMutation.mutateAsync({
                       startDate: startDateStr,
                       endDate: endDateStr,
                     });

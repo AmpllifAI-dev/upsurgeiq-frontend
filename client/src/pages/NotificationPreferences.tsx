@@ -33,7 +33,7 @@ export default function NotificationPreferences() {
     scheduledPublishAdvanceNotice: 60,
     campaignMilestoneAlertsEnabled: true,
     weeklySummaryEnabled: true,
-    weeklySummaryDay: "monday" as const,
+    weeklySummaryDay: "monday" as "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday",
     monthlyAnalyticsEnabled: true,
     distributionAlertsEnabled: true,
   });
@@ -53,7 +53,7 @@ export default function NotificationPreferences() {
         scheduledPublishAdvanceNotice: preferences.scheduledPublishAdvanceNotice || 60,
         campaignMilestoneAlertsEnabled: !!preferences.campaignMilestoneAlertsEnabled,
         weeklySummaryEnabled: !!preferences.weeklySummaryEnabled,
-        weeklySummaryDay: (preferences.weeklySummaryDay || "monday") as "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday",
+        weeklySummaryDay: (preferences.weeklySummaryDay as "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday") || "monday",
         monthlyAnalyticsEnabled: !!preferences.monthlyAnalyticsEnabled,
         distributionAlertsEnabled: !!preferences.distributionAlertsEnabled,
       });

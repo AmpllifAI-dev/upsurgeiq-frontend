@@ -155,7 +155,7 @@ export default function BillingHistory() {
                         <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
-                            {format(new Date(invoice.createdAt), "MMM dd, yyyy")}
+                            {format(new Date(invoice.created * 1000), "MMM dd, yyyy")}
                           </span>
                           <span className="flex items-center gap-1">
                             <DollarSign className="h-3 w-3" />
@@ -171,7 +171,7 @@ export default function BillingHistory() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleDownloadInvoice(invoice.invoicePdf)}
+                        onClick={() => invoice.invoicePdf && handleDownloadInvoice(invoice.invoicePdf)}
                       >
                         <Download className="h-4 w-4 mr-2" />
                         Download
