@@ -63,6 +63,7 @@ Before taking any action, read these files:
 6. **DECISIONS_LOG.md** - Past decisions and their rationale
 7. **HOW_TO_GET_CONVERSATION_HISTORY.md** - How to scrape conversation history if needed
 8. **../todo.md** - Current priorities and task list
+9. **../../V2_FEATURES.md** - All post-launch features and roadmap (immediate enhancements + website builder vision)
 
 **Estimated Reading Time:** 20-25 minutes
 
@@ -91,6 +92,12 @@ This file tells you WHO you're working with - their background, communication st
 - Complete bug reporting system fixes (LLM format errors, floating button rendering)
 - Implement 30-minute auto-backup system
 - Admin dashboard navigation improvements
+
+**Post-Launch Development:**
+- **IMPORTANT:** All new features after site launch MUST be documented in V2_FEATURES.md
+- Before proposing any new feature, check if it's already planned in V2_FEATURES.md
+- If a feature isn't documented, discuss with Christopher before adding it
+- V2_FEATURES.md contains both immediate post-launch enhancements (Google Ads, LinkedIn Ads, analytics) and long-term vision (website builder for 2026-2027)
 
 ---
 
@@ -175,6 +182,7 @@ This file tells you WHO you're working with - their background, communication st
 - Don't use $ for pricing (it's £ GBP)
 - Don't forget to address Christopher by name in every message
 - Don't skip reading framework documents before starting work
+- Don't propose new features after site launch without checking V2_FEATURES.md first
 
 **Always Do This:**
 - Address Christopher by name in every message
@@ -183,6 +191,7 @@ This file tells you WHO you're working with - their background, communication st
 - Save checkpoints after completing major features
 - Update todo.md when completing tasks
 - Document decisions in DECISIONS_LOG.md
+- Check V2_FEATURES.md before proposing any post-launch features
 - Test features before marking as complete
 
 ---

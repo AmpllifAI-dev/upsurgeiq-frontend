@@ -2738,4 +2738,14 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Test notification system end-to-end
 - [x] Write comprehensive notification tests (14 tests)
 - [x] All tests passing (notification creation, retrieval, status management, security, limits)
-- [ ] Create checkpoint with notification system
+- [x] Create checkpoint with notification system
+
+
+## V2 Documentation Consolidation (December 23, 2025)
+- [x] Merge V2_FEATURES.md and ROADMAP_V2.md into single consolidated V2_FEATURES.md
+- [x] Rename old ROADMAP_V2.md to ROADMAP_V2_OLD.md for reference
+- [x] Update AI_AGENT_START_HERE.md mandatory reading list to include V2_FEATURES.md
+- [x] Add V2 enforcement rules to "Don't Do This" section
+- [x] Add V2 enforcement rules to "Always Do This" section
+- [x] Add Post-Launch Development section explaining V2 requirements
+- [x] Update all references to point to single V2_FEATURES.md document
