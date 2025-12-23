@@ -46,6 +46,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CampaignAnalyticsCharts } from "@/components/CampaignAnalyticsCharts";
 import { CampaignTeamManagement } from "@/components/CampaignTeamManagement";
 import { CampaignActivityFeed } from "@/components/CampaignActivityFeed";
+import { CampaignVariants } from "@/components/CampaignVariants";
 
 export default function CampaignDetail() {
   const [, params] = useRoute("/dashboard/campaign/:id");
@@ -461,8 +462,9 @@ export default function CampaignDetail() {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="milestones" className="space-y-6">
+      <Tabs defaultValue="variants" className="space-y-6">
         <TabsList>
+          <TabsTrigger value="variants">Ad Variations</TabsTrigger>
           <TabsTrigger value="milestones">Milestones</TabsTrigger>
           <TabsTrigger value="deliverables">Deliverables</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -470,6 +472,11 @@ export default function CampaignDetail() {
           <TabsTrigger value="team">Team</TabsTrigger>
           <TabsTrigger value="activity">Activity</TabsTrigger>
         </TabsList>
+
+        {/* Ad Variations Tab */}
+        <TabsContent value="variants" className="space-y-4">
+          <CampaignVariants campaignId={campaignId!} />
+        </TabsContent>
 
         {/* Milestones Tab */}
         <TabsContent value="milestones" className="space-y-4">

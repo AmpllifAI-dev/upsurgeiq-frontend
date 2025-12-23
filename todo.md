@@ -2673,4 +2673,28 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Fix role detection in Home.tsx navigation
 - [x] Verify admin role is properly returned from auth.me query
 - [x] Fix Admin Dashboard link to point to main admin page with sidebar (not directly to credit management)
-- [ ] Verify admin dashboard has sidebar navigation to all admin tools
+- [x] Verify admin dashboard has sidebar navigation to all admin tools
+- [x] Fix Dashboard page to use DashboardLayout component instead of DashboardHeader
+- [ ] Ensure admin sidebar navigation is accessible from Dashboard page
+- [ ] Remove duplicate "Settings" entry from DashboardLayout sidebar menu
+- [ ] Investigate why Dashboard page doesn't show hamburger menu on mobile
+
+## Framework Documentation Updates (December 23, 2025)
+- [x] Update PROJECT_CONTEXT.md to correctly document WordPress (WP Engine) as public-facing frontend
+- [ ] Review and update MVP status and future roadmap sections in PROJECT_CONTEXT.md
+- [x] Complete Campaign Lab feature audit against requirements
+- [x] Complete White Label Partnership Portal audit against requirements
+- [x] Create comprehensive audit report with findings and recommendations
+
+
+## Campaign Lab Enhancement (December 23, 2025)
+- [x] Review current Campaign Lab implementation (routers, database, UI)
+- [x] Define psychological angle framework (5-6 angles)
+- [x] Implement AI variant generation using invokeLLM
+- [x] Create campaign.generateVariants tRPC procedure
+- [x] Build variant management UI component
+- [x] Enable "View Variants" functionality in CampaignDetail page
+- [x] Implement performance tracking infrastructure
+- [x] Build automatic winner identification algorithm
+- [x] Add mock performance data for testing
+- [x] Test end-to-end campaign creation with variants

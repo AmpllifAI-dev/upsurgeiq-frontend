@@ -105,6 +105,9 @@ UpsurgeIQ is an AI-powered PR and marketing platform that automates content crea
 ### High-Level Overview
 
 ```
+Public Website (WordPress on WP Engine)
+         |
+         v
 Frontend (React 19) <--tRPC--> Backend (Express 4) <--> Database (MySQL/TiDB)
                                      |
                                      v
@@ -114,20 +117,26 @@ Frontend (React 19) <--tRPC--> Backend (Express 4) <--> Database (MySQL/TiDB)
                           - SendGrid (Email)
                           - Twilio (Voice)
                           - Facebook/Instagram/LinkedIn APIs
-                          - WordPress REST API
 ```
 
 **Key Pattern:** tRPC provides end-to-end type safety—procedures are contracts between frontend and backend
 
 ### Technology Stack
 
-**Frontend:**
+**Public Website (WordPress on WP Engine):**
+- Platform: WordPress
+- Hosting: WP Engine
+- Purpose: Marketing pages, blog, content presentation, public-facing website
+- Integration: Syncs with React app via REST API for business profiles and content
+
+**Frontend (React App - Authenticated User Dashboard):**
 - Framework: React 19
 - Styling: Tailwind CSS 4
 - Routing: Wouter
 - State Management: tRPC + React Query
 - UI Components: shadcn/ui
 - Build Tool: Vite
+- Purpose: Authenticated user dashboard, PR creation tools, campaign management, admin features
 
 **Backend:**
 - Runtime: Node.js 22
@@ -154,9 +163,12 @@ Frontend (React 19) <--tRPC--> Backend (Express 4) <--> Database (MySQL/TiDB)
 - Email: SendGrid
 - Voice: Twilio
 - Social Media: Facebook, Instagram, LinkedIn APIs
-- CMS: WordPress REST API integration
 
 ### Why These Technologies?
+
+**WordPress on WP Engine:** Proven CMS for public-facing website, blog, and marketing content. Easy content management for non-technical users. WP Engine provides enterprise-grade hosting with excellent performance and security.
+
+**React App (Manus Platform):** Authenticated user dashboard where customers create press releases, manage campaigns, and access AI tools. Separate from public website for security and performance.
 
 **tRPC:** End-to-end type safety without code generation. Procedures are contracts. No manual API documentation needed. Eliminates entire class of bugs.
 

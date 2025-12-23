@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { sql, eq, and, isNotNull, gte, desc } from "drizzle-orm";
 import { getDb } from "./db";
 import { generatePressReleaseImage, regenerateImage, getImageStylePresets } from "./pressReleaseImages";
-import { pressReleases, campaigns, journalists, users, creditUsage, creditAlertThresholds, creditAlertHistory, wordCountCredits, imageCredits, emailCampaigns, campaignEvents, emailWorkflows, workflowSteps, workflowEnrollments, emailTemplateLibrary } from "../drizzle/schema";
+import { pressReleases, campaigns, campaignVariants, journalists, users, creditUsage, creditAlertThresholds, creditAlertHistory, wordCountCredits, imageCredits, emailCampaigns, campaignEvents, emailWorkflows, workflowSteps, workflowEnrollments, emailTemplateLibrary } from "../drizzle/schema";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { COOKIE_NAME } from "@shared/const";
 import { systemRouter } from "./_core/systemRouter";
@@ -1674,6 +1674,170 @@ Generate a comprehensive campaign strategy that includes:
       .mutation(async ({ input }) => {
         const variant = await createCampaignVariant(input);
         return variant;
+      }),
+
+    generateVariants: protectedProcedure
+      .input(z.object({ campaignId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const { generateCampaignVariants, saveVariantsToDatabase } = await import("./campaignVariants");
+        
+        // Get campaign details
+        const campaign = await getCampaignById(input.campaignId);
+        if (!campaign) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Campaign not found",
+          });
+        }
+
+        // Get business context
+        const business = await getUserBusiness(ctx.user.id);
+        if (!business) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Business profile not found",
+          });
+        }
+
+        // Generate variants using AI
+        const variants = await generateCampaignVariants({
+          campaignId: campaign.id,
+          campaignName: campaign.name,
+          campaignGoal: campaign.goal || "",
+          targetAudience: campaign.targetAudience || business.targetAudience || undefined,
+          budget: campaign.budget || undefined,
+          platforms: campaign.platforms || undefined,
+          businessName: business.name,
+          brandVoice: business.brandVoiceTone || undefined,
+          productService: business.dossier || undefined,
+        });
+
+        // Save to database
+        await saveVariantsToDatabase(campaign.id, variants);
+
+        // Log activity
+        await logActivity({
+          userId: ctx.user.id,
+          action: "create",
+          entityType: "campaign_variant",
+          entityId: campaign.id,
+          description: `Generated ${variants.length} ad variations for campaign: ${campaign.name}`,
+          metadata: { campaignId: campaign.id, variantCount: variants.length },
+        });
+
+        return { success: true, count: variants.length, variants };
+      }),
+
+    updateVariantMetrics: protectedProcedure
+      .input(
+        z.object({
+          variantId: z.number(),
+          impressions: z.number().optional(),
+          clicks: z.number().optional(),
+          conversions: z.number().optional(),
+          cost: z.number().optional(), // Cost in pence
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { updateVariantStatuses } = await import("./campaignVariants");
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        // Get current variant
+        const [variant] = await db
+          .select()
+          .from(campaignVariants)
+          .where(eq(campaignVariants.id, input.variantId))
+          .limit(1);
+
+        if (!variant) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Variant not found",
+          });
+        }
+
+        // Calculate new metrics
+        const newImpressions = input.impressions ?? variant.impressions ?? 0;
+        const newClicks = input.clicks ?? variant.clicks ?? 0;
+        const newConversions = input.conversions ?? variant.conversions ?? 0;
+        const newCost = input.cost ?? variant.cost ?? 0;
+
+        const ctr = newImpressions > 0 ? ((newClicks / newImpressions) * 100).toFixed(2) : "0.00";
+        const conversionRate = newClicks > 0 ? ((newConversions / newClicks) * 100).toFixed(2) : "0.00";
+
+        // Update variant
+        await db
+          .update(campaignVariants)
+          .set({
+            impressions: newImpressions,
+            clicks: newClicks,
+            conversions: newConversions,
+            cost: newCost,
+            ctr,
+            conversionRate,
+          })
+          .where(eq(campaignVariants.id, input.variantId));
+
+        // Update variant statuses (identify winners)
+        await updateVariantStatuses(variant.campaignId);
+
+        return { success: true };
+      }),
+
+    simulateVariantPerformance: protectedProcedure
+      .input(z.object({ campaignId: z.number() }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        // Get all variants for this campaign
+        const variants = await db
+          .select()
+          .from(campaignVariants)
+          .where(eq(campaignVariants.campaignId, input.campaignId));
+
+        if (variants.length === 0) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "No variants found for this campaign",
+          });
+        }
+
+        // Simulate realistic performance data for each variant
+        const { updateVariantStatuses } = await import("./campaignVariants");
+        
+        for (const variant of variants) {
+          // Generate realistic metrics with some variance
+          const baseImpressions = 500 + Math.floor(Math.random() * 1000);
+          const baseCTR = 2 + Math.random() * 3; // 2-5% CTR
+          const baseConversionRate = 5 + Math.random() * 10; // 5-15% conversion rate
+          
+          const impressions = baseImpressions;
+          const clicks = Math.floor(impressions * (baseCTR / 100));
+          const conversions = Math.floor(clicks * (baseConversionRate / 100));
+          const cost = Math.floor(clicks * (50 + Math.random() * 150)); // 50-200 pence per click
+          
+          const ctr = impressions > 0 ? ((clicks / impressions) * 100).toFixed(2) : "0.00";
+          const conversionRate = clicks > 0 ? ((conversions / clicks) * 100).toFixed(2) : "0.00";
+
+          await db
+            .update(campaignVariants)
+            .set({
+              impressions,
+              clicks,
+              conversions,
+              cost,
+              ctr,
+              conversionRate,
+            })
+            .where(eq(campaignVariants.id, variant.id));
+        }
+
+        // Update variant statuses to identify winner
+        await updateVariantStatuses(input.campaignId);
+
+        return { success: true, message: "Performance data simulated for all variants" };
       }),
 
     bulkDelete: protectedProcedure
