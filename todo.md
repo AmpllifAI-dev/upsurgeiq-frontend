@@ -2663,3 +2663,7 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Test admin credit management functionality
 - [x] Test billing history display and invoice downloads
 - [x] Test analytics CSV export functionality
+
+## Bug Fixes (December 23, 2025 - Issues #300001 & #300002)
+- [x] Fix UpsurgeIQ branding capitalization (lowercase 'u' to uppercase 'U') across all pages
+- [x] Add admin dashboard link to horizontal menu navigation

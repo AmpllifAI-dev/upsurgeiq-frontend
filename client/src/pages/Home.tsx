@@ -161,6 +161,11 @@ export default function Home() {
               <a href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colours">
                 Pricing
               </a>
+              {isAuthenticated && user?.role === "admin" && (
+                <a href="/admin/credit-management" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colours">
+                  Admin Dashboard
+                </a>
+              )}
             </div>
             
             {/* CTA Button */}
@@ -208,6 +213,15 @@ export default function Home() {
               >
                 Pricing
               </a>
+              {isAuthenticated && user?.role === "admin" && (
+                <a
+                  href="/admin/credit-management"
+                  className="block text-sm text-foreground hover:text-primary transition-colours"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Admin Dashboard
+                </a>
+              )}
               <button
                 onClick={() => { setLocation("/resources"); setMobileMenuOpen(false); }}
                 className="block text-sm text-foreground hover:text-primary transition-colours text-left w-full"
@@ -493,7 +507,7 @@ export default function Home() {
                 <Badge variant="secondary" className="w-fit mx-auto mb-4">For Organizations</Badge>
                 <CardTitle className="text-3xl">White Label Solution</CardTitle>
                 <CardDescription className="text-base mt-2">
-                  Standalone product for agencies and organisations. Offer upsurgeIQ under your own brand.
+                  Standalone product for agencies and organisations. Offer UpsurgeIQ under your own brand.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
