@@ -173,6 +173,38 @@ const prLogger = createLogger("PressReleaseGeneration");
 const aiLogger = createLogger("AIAssistant");
 
 export const appRouter = router({
+  // Notifications
+  notifications: router({
+    getAll: protectedProcedure.query(async ({ ctx }) => {
+      const { getUserNotifications } = await import("./notificationService");
+      return await getUserNotifications(ctx.user.id);
+    }),
+
+    getUnreadCount: protectedProcedure.query(async ({ ctx }) => {
+      const { getUnreadCount } = await import("./notificationService");
+      return await getUnreadCount(ctx.user.id);
+    }),
+
+    markAsRead: protectedProcedure
+      .input(z.object({ notificationId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const { markNotificationAsRead } = await import("./notificationService");
+        return await markNotificationAsRead(input.notificationId, ctx.user.id);
+      }),
+
+    markAllAsRead: protectedProcedure.mutation(async ({ ctx }) => {
+      const { markAllNotificationsAsRead } = await import("./notificationService");
+      return await markAllNotificationsAsRead(ctx.user.id);
+    }),
+
+    delete: protectedProcedure
+      .input(z.object({ notificationId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const { deleteNotification } = await import("./notificationService");
+        return await deleteNotification(input.notificationId, ctx.user.id);
+      }),
+  }),
+
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
@@ -1725,6 +1757,17 @@ Generate a comprehensive campaign strategy that includes:
 
         // Save to database
         await saveVariantsToDatabase(campaign.id, variants);
+
+        // Create notification for pending approval
+        const { createNotification } = await import("./notificationService");
+        await createNotification({
+          userId: ctx.user.id,
+          type: "pending_approval",
+          title: "New Ad Variants Ready for Approval",
+          message: `${variants.length} new ad variations have been generated for campaign "${campaign.name}". Review and approve them to start testing.`,
+          entityType: "campaign",
+          entityId: campaign.id,
+        });
 
         // Update rate limiting fields
         const db = await getDb();

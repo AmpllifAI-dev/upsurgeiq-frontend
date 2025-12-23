@@ -44,6 +44,17 @@ export async function approveVariant(variantId: number, userId: number) {
     },
   });
 
+  // Create notification
+  const { createNotification } = await import("./notificationService");
+  await createNotification({
+    userId,
+    type: "optimization_action",
+    title: "Ad Variant Approved",
+    message: `Ad variant "${variant.name}" has been approved and is ready for deployment.`,
+    entityType: "campaign_variant",
+    entityId: variantId,
+  });
+
   return { success: true, variant: { ...variant, approvalStatus: "approved" } };
 }
 
@@ -138,6 +149,17 @@ export async function deployVariant(variantId: number, userId: number) {
     },
   });
 
+  // Create notification
+  const { createNotification } = await import("./notificationService");
+  await createNotification({
+    userId,
+    type: "variant_deployed",
+    title: "Ad Variant Deployed",
+    message: `Ad variant "${variant.name}" has been deployed and is now live.`,
+    entityType: "campaign_variant",
+    entityId: variantId,
+  });
+
   return { success: true, deployedAt: new Date() };
 }
 
@@ -181,6 +203,19 @@ export async function pauseVariant(variantId: number, userId: number, reason?: s
       campaignId: variant.campaignId,
       reason,
     },
+  });
+
+  // Create notification
+  const { createNotification } = await import("./notificationService");
+  await createNotification({
+    userId,
+    type: "variant_paused",
+    title: "Ad Variant Paused",
+    message: reason
+      ? `Ad variant "${variant.name}" has been paused. Reason: ${reason}`
+      : `Ad variant "${variant.name}" has been paused.`,
+    entityType: "campaign_variant",
+    entityId: variantId,
   });
 
   return { success: true };

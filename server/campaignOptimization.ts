@@ -602,3 +602,77 @@ export async function canGenerateVariants(campaignId: number): Promise<{
 
   return { allowed: true };
 }
+
+
+/**
+ * Check for underperforming variants and notify user
+ */
+export async function checkUnderperformingVariants(campaignId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const variants = await db
+    .select()
+    .from(campaignVariants)
+    .where(eq(campaignVariants.campaignId, campaignId));
+  const underperformers: typeof variants = [];
+
+  for (const variant of variants) {
+    // Only check deployed variants with sufficient data
+    if (
+      variant.deploymentStatus !== "deployed" ||
+      !variant.impressions ||
+      !variant.clicks ||
+      variant.impressions < OPTIMIZATION_CONFIG.MIN_IMPRESSIONS ||
+      variant.clicks < OPTIMIZATION_CONFIG.MIN_CLICKS
+    ) {
+      continue;
+    }
+
+    // Check if variant has been running for minimum time
+    if (variant.deployedAt) {
+      const hoursSinceDeployment =
+        (Date.now() - new Date(variant.deployedAt).getTime()) / (1000 * 60 * 60);
+      if (hoursSinceDeployment < OPTIMIZATION_CONFIG.MIN_RUNTIME_HOURS) {
+        continue;
+      }
+    }
+
+    // Calculate performance score
+    const scoreData = calculatePerformanceScore({
+      impressions: variant.impressions || 0,
+      clicks: variant.clicks || 0,
+      conversions: variant.conversions || 0,
+      cost: variant.cost || 0,
+    });
+
+    // Check if underperforming
+    if (scoreData.score < OPTIMIZATION_CONFIG.POOR_PERFORMANCE_THRESHOLD) {
+      underperformers.push(variant);
+    }
+  }
+
+  // Create notifications for underperformers
+  if (underperformers.length > 0) {
+    const { createNotification } = await import("./notificationService");
+    
+    for (const variant of underperformers) {
+      const scoreData = calculatePerformanceScore({
+        impressions: variant.impressions || 0,
+        clicks: variant.clicks || 0,
+        conversions: variant.conversions || 0,
+        cost: variant.cost || 0,
+      });
+      await createNotification({
+        userId,
+        type: "underperforming_ad",
+        title: "Ad Variant Underperforming",
+        message: `Ad variant "${variant.name}" is underperforming (score: ${scoreData.score.toFixed(1)}/100). Consider pausing it or generating new variations.`,
+        entityType: "campaign_variant",
+        entityId: variant.id,
+      });
+    }
+  }
+
+  return { underperformers, count: underperformers.length };
+}
