@@ -26,7 +26,7 @@ export async function createIssue(data: {
   if (!db) throw new Error("Database not available");
   const techIssues = await getTechIssuesTable();
 
-  const [issue] = await db.insert(techIssues).values({
+  await db.insert(techIssues).values({
     userId: data.userId,
     issueType: data.type,
     priority: data.priority || "medium",
@@ -42,6 +42,14 @@ export async function createIssue(data: {
     createdAt: new Date(),
     updatedAt: new Date(),
   });
+
+  // Get the most recently created issue for this user
+  const [issue] = await db
+    .select()
+    .from(techIssues)
+    .where(eq(techIssues.userId, data.userId))
+    .orderBy(desc(techIssues.id))
+    .limit(1);
 
   return issue;
 }
@@ -109,7 +117,6 @@ export async function updateIssueStatus(
   return await getIssueById(id);
 }
 
-// Get issue statistics
 // Add comment to issue
 export async function addIssueComment(data: {
   issueId: number;
@@ -119,11 +126,24 @@ export async function addIssueComment(data: {
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  const { issueComments } = await import("../drizzle/schema");
   
-  const [comment] = await db.execute(
-    `INSERT INTO issue_comments (issueId, userId, comment, isInternal, createdAt, updatedAt) VALUES (?, ?, ?, ?, NOW(), NOW())`,
-    [data.issueId, data.userId, data.comment, data.isInternal || false]
-  );
+  await db.insert(issueComments).values({
+    issueId: data.issueId,
+    userId: data.userId,
+    comment: data.comment,
+    isInternal: data.isInternal ? 1 : 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+  
+  // Get the most recently created comment for this issue
+  const [comment] = await db
+    .select()
+    .from(issueComments)
+    .where(eq(issueComments.issueId, data.issueId))
+    .orderBy(desc(issueComments.id))
+    .limit(1);
   
   return comment;
 }
@@ -132,21 +152,30 @@ export async function addIssueComment(data: {
 export async function getIssueComments(issueId: number, includeInternal: boolean = false) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  const { issueComments, users } = await import("../drizzle/schema");
   
-  let query = `
-    SELECT c.*, u.name as userName, u.email as userEmail
-    FROM issue_comments c
-    JOIN users u ON c.userId = u.id
-    WHERE c.issueId = ?
-  `;
-  
+  const conditions = [eq(issueComments.issueId, issueId)];
   if (!includeInternal) {
-    query += " AND c.isInternal = FALSE";
+    conditions.push(eq(issueComments.isInternal, 0)); // 0 = public, 1 = internal
   }
   
-  query += " ORDER BY c.createdAt ASC";
+  const comments = await db
+    .select({
+      id: issueComments.id,
+      issueId: issueComments.issueId,
+      userId: issueComments.userId,
+      comment: issueComments.comment,
+      isInternal: issueComments.isInternal,
+      createdAt: issueComments.createdAt,
+      updatedAt: issueComments.updatedAt,
+      userName: users.name,
+      userEmail: users.email,
+    })
+    .from(issueComments)
+    .innerJoin(users, eq(issueComments.userId, users.id))
+    .where(and(...conditions))
+    .orderBy(issueComments.createdAt);
   
-  const [comments] = await db.execute(query, [issueId]);
   return comments;
 }
 
@@ -154,8 +183,9 @@ export async function getIssueComments(issueId: number, includeInternal: boolean
 export async function deleteIssueComment(commentId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  const { issueComments } = await import("../drizzle/schema");
   
-  await db.execute(`DELETE FROM issue_comments WHERE id = ?`, [commentId]);
+  await db.delete(issueComments).where(eq(issueComments.id, commentId));
   return { success: true };
 }
 
@@ -173,12 +203,21 @@ export async function assignIssue(issueId: number, assignedTo: number) {
 export async function getSupportTeam() {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  const { users } = await import("../drizzle/schema");
+  const { ne, asc } = await import("drizzle-orm");
   
-  const [users] = await db.execute(
-    `SELECT id, name, email, support_role FROM users WHERE support_role != 'none' ORDER BY support_role, name`
-  );
+  const supportUsers = await db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      support_role: users.supportRole,
+    })
+    .from(users)
+    .where(ne(users.supportRole, "none"))
+    .orderBy(asc(users.supportRole), asc(users.name));
   
-  return users;
+  return supportUsers;
 }
 
 // Auto-assign issue based on type and priority

@@ -2643,3 +2643,12 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Update WORKING_METHODOLOGY.md with real development workflow
 - [x] Update AI_AGENT_START_HERE.md to include all framework docs in reading list
 - [x] Update README.md with complete framework documentation bootstrap
+
+
+## Priority Production Readiness Tasks (December 22, 2025)
+- [x] Complete bug reporting system - Add manual "Trigger Investigation" button to Issues list
+- [x] Complete bug reporting system - Automatic investigation runs via setImmediate on issue creation
+- [x] Complete bug reporting system - Add status badge to Issues list UI
+- [ ] Run full database migration - Deferred to maintenance window (70+ interactive prompts)
+- [x] Fix TypeScript errors - Resolved backend errors (67 → 55), client errors remain
+- [ ] Verify build - Client-side TypeScript errors still need fixing (~55 errors)

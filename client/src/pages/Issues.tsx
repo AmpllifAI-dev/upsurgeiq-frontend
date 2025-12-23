@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Bug, Plus, Search } from "lucide-react";
+import { Bug, Plus, Search, Sparkles } from "lucide-react";
 import { IssueReportDialog } from "@/components/IssueReportDialog";
 import { formatDistanceToNow } from "date-fns";
 
@@ -22,6 +22,11 @@ export default function Issues() {
     status: statusFilter === "all" ? undefined : statusFilter,
     type: typeFilter === "all" ? undefined : typeFilter,
   });
+  
+  const { data: commentsData } = trpc.issues.getComments.useQuery(
+    { issueId: issues?.[0]?.id || 0 },
+    { enabled: false } // We'll use this to check for investigation comments
+  );
 
   const { data: stats } = trpc.issues.stats.useQuery();
 
@@ -110,6 +115,7 @@ export default function Issues() {
                           <h3 className="font-semibold">{issue.title}</h3>
                           {getStatusBadge(issue.status)}
                           {getTypeBadge(issue.issueType)}
+                          {issue.status === "new" && <Badge variant="secondary" className="gap-1"><Sparkles className="h-3 w-3" />AI Ready</Badge>}
                         </div>
                         <p className="text-sm text-muted-foreground line-clamp-2">{issue.description}</p>
                         <div className="flex items-center gap-4 text-xs text-muted-foreground">

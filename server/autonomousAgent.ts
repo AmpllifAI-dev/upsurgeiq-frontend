@@ -86,7 +86,9 @@ Respond in JSON format:
       },
     });
 
-    const analysis = JSON.parse(response.choices[0].message.content || "{}");
+    const analysisContent = response.choices[0].message.content;
+    const analysisString = typeof analysisContent === 'string' ? analysisContent : JSON.stringify(analysisContent);
+    const analysis = JSON.parse(analysisString || "{}");
 
     // Post investigation findings
     const findingsComment = `🔍 **Investigation Complete**
@@ -190,7 +192,9 @@ Provide concrete fix suggestions in JSON format:
       },
     });
 
-    const fixSuggestion = JSON.parse(response.choices[0].message.content || "{}");
+    const messageContent = response.choices[0].message.content;
+    const contentString = typeof messageContent === 'string' ? messageContent : JSON.stringify(messageContent);
+    const fixSuggestion = JSON.parse(contentString || "{}");
 
     const fixComment = `🛠️ **Auto-Fix Analysis**
 

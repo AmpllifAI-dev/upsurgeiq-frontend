@@ -4830,7 +4830,8 @@ Generate a comprehensive campaign strategy that includes:
         })
       )
       .mutation(async ({ input }) => {
-        const db = getDb();
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
         const { emailCaptures } = await import("../drizzle/schema");
         const { sendEmail } = await import("./_core/email");
         const { notifyOwner } = await import("./_core/notification");
@@ -4923,7 +4924,7 @@ Generate a comprehensive campaign strategy that includes:
       }),
   }),
 
-  analytics: router({
+  leadBehaviour: router({
     trackEvent: publicProcedure
       .input(z.object({
         sessionId: z.string(),
@@ -4939,7 +4940,7 @@ Generate a comprehensive campaign strategy that includes:
           "video_play",
           "external_link_click"
         ]),
-        eventData: z.record(z.any()).optional(),
+        eventData: z.record(z.string(), z.any()).optional(),
         pageUrl: z.string().optional(),
         referrer: z.string().optional(),
         userAgent: z.string().optional(),
@@ -5087,6 +5088,40 @@ Generate a comprehensive campaign strategy that includes:
         
         return { success: true };
       }),
+
+    // Webhook endpoint for WordPress blog notifications
+    blogWebhook: publicProcedure
+      .input(z.object({
+        title: z.string(),
+        excerpt: z.string(),
+        url: z.string().url(),
+        secret: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        // Verify webhook secret
+        const expectedSecret = process.env.BLOG_WEBHOOK_SECRET || "upsurgeiq-blog-secret-2025";
+        if (input.secret !== expectedSecret) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Invalid webhook secret",
+          });
+        }
+
+        // Send blog notification to all subscribers
+        const { sendBlogNotification } = await import("./emailCampaigns");
+        const result = await sendBlogNotification({
+          blogTitle: input.title,
+          blogExcerpt: input.excerpt,
+          blogUrl: input.url,
+        });
+
+        return {
+          success: true,
+          sent: result.sent,
+          failed: result.failed,
+          total: result.total,
+        };
+      }),
   }),
 
   campaigns: router({
@@ -5125,41 +5160,7 @@ Generate a comprehensive campaign strategy that includes:
       }),
   }),
 
-  // Webhook endpoint for WordPress blog notifications
-  blogWebhook: publicProcedure
-    .input(z.object({
-      title: z.string(),
-      excerpt: z.string(),
-      url: z.string().url(),
-      secret: z.string(),
-    }))
-    .mutation(async ({ input }) => {
-      // Verify webhook secret
-      const expectedSecret = process.env.BLOG_WEBHOOK_SECRET || "upsurgeiq-blog-secret-2025";
-      if (input.secret !== expectedSecret) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "Invalid webhook secret",
-        });
-      }
-
-      // Send blog notification to all subscribers
-      const { sendBlogNotification } = await import("./emailCampaigns");
-      const result = await sendBlogNotification({
-        blogTitle: input.title,
-        blogExcerpt: input.excerpt,
-        blogUrl: input.url,
-      });
-
-      return {
-        success: true,
-        sent: result.sent,
-        failed: result.failed,
-        total: result.total,
-      };
-    }),
-
-  analytics: router({
+  leadEmailMetrics: router({
     getOverview: protectedProcedure
       .input(z.object({ days: z.number().default(30) }))
       .query(async ({ input }) => {
@@ -5799,6 +5800,49 @@ Generate a comprehensive campaign strategy that includes:
       .query(async () => {
         const { getSupportTeam } = await import("./issueTracker");
         return await getSupportTeam();
+      }),
+
+    triggerInvestigation: protectedProcedure
+      .input(z.object({ issueId: z.number() }))
+      .mutation(async ({ input }) => {
+        const { getIssueById } = await import("./issueTracker");
+        const { investigateIssue, attemptAutoFix } = await import("./autonomousAgent");
+        
+        const issue = await getIssueById(input.issueId);
+        if (!issue) {
+          throw new Error("Issue not found");
+        }
+        
+        try {
+          const analysis = await investigateIssue({
+            id: issue.id,
+            title: issue.title,
+            description: issue.description,
+            issueType: issue.issueType,
+            priority: issue.priority,
+            pageUrl: issue.pageUrl || undefined,
+            browserInfo: issue.browserInfo || undefined,
+            stepsToReproduce: issue.stepsToReproduce || undefined,
+            expectedBehavior: issue.expectedBehavior || undefined,
+            actualBehavior: issue.actualBehavior || undefined,
+            screenshotUrls: issue.screenshotUrls || undefined,
+          });
+          
+          if (analysis?.autoFixable) {
+            await attemptAutoFix({
+              id: issue.id,
+              title: issue.title,
+              description: issue.description,
+              issueType: issue.issueType,
+              priority: issue.priority,
+            }, analysis);
+          }
+          
+          return { success: true, analysis };
+        } catch (error) {
+          console.error("Manual investigation error:", error);
+          throw new Error("Investigation failed: " + (error instanceof Error ? error.message : "Unknown error"));
+        }
       }),
   }),
 });

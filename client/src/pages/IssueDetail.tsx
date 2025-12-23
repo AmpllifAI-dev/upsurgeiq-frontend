@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, MessageSquare, Send, Trash2 } from "lucide-react";
+import { ArrowLeft, MessageSquare, Send, Trash2, Sparkles } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -63,6 +63,17 @@ export default function IssueDetail() {
     onSuccess: () => {
       utils.issues.getComments.invalidate({ issueId });
       toast({ title: "Comment deleted" });
+    },
+  });
+  
+  const triggerInvestigationMutation = trpc.issues.triggerInvestigation.useMutation({
+    onSuccess: () => {
+      toast({ title: "Investigation started", description: "AI is analyzing this issue. Check comments for results." });
+      utils.issues.getComments.invalidate({ issueId });
+      utils.issues.getById.invalidate({ id: issueId });
+    },
+    onError: (error) => {
+      toast({ title: "Investigation failed", description: error.message, variant: "destructive" });
     },
   });
   
@@ -238,6 +249,16 @@ export default function IssueDetail() {
             <Card>
               <CardHeader><CardTitle>Status Management</CardTitle></CardHeader>
               <CardContent className="space-y-4">
+                <Button 
+                  onClick={() => triggerInvestigationMutation.mutate({ issueId })} 
+                  disabled={triggerInvestigationMutation.isPending}
+                  className="w-full"
+                  variant="outline"
+                >
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  {triggerInvestigationMutation.isPending ? "Investigating..." : "Trigger AI Investigation"}
+                </Button>
+                <div className="border-t pt-4" />
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Update Status</label>
                   <Select value={issue.status} onValueChange={handleStatusChange} disabled={updateStatusMutation.isPending}>
