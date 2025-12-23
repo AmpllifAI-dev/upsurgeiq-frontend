@@ -7,6 +7,23 @@ This document tracks all features planned for Version 2.0 of the UpsurgeIQ platf
 
 ---
 
+## 📋 Document Purpose
+
+**This document is for FUTURE features (V2) for post-launch development.**
+
+**For AI Agents:**
+- Before proposing ANY new feature after site launch, check THIS document first
+- If a feature is already documented here, follow the specifications and timeline
+- If a feature is NOT documented here, discuss with Christopher before implementing
+- DO NOT add current development features here - those belong in upsurgeIQ_Services_and_Features.md
+- This is the roadmap and planning document, not the current product specification
+
+**Distinction:**
+- **V2_FEATURES.md** (this file) = Future features for post-launch development (roadmap)
+- **upsurgeIQ_Services_and_Features.md** = Current V1 features being developed/deployed now
+
+---
+
 ## 📋 Table of Contents
 
 1. [Immediate Post-Launch Features](#immediate-post-launch-features)

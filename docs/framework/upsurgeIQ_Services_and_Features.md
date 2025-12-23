@@ -7,6 +7,22 @@ This document outlines all services and features available through upsurgeIQ, or
 
 ---
 
+## 📋 Document Purpose
+
+**This document is for CURRENT features (V1) being developed and deployed NOW.**
+
+**For AI Agents:**
+- When building new features during current development, update THIS document
+- When a feature is implemented and ready for users, add it to the appropriate tier section here
+- This document represents the official product specification for what's currently available
+- DO NOT add future/planned features here - those belong in V2_FEATURES.md
+
+**Distinction:**
+- **upsurgeIQ_Services_and_Features.md** (this file) = Current V1 features being developed/deployed now
+- **V2_FEATURES.md** = Future features for post-launch development (roadmap)
+
+---
+
 ## Subscription Tiers Overview
 
 upsurgeIQ offers three primary subscription tiers:

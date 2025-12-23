@@ -2749,3 +2749,9 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Add V2 enforcement rules to "Always Do This" section
 - [x] Add Post-Launch Development section explaining V2 requirements
 - [x] Update all references to point to single V2_FEATURES.md document
+
+## Document Purpose Clarification (December 23, 2025)
+- [x] Add purpose summary to upsurgeIQ_Services_and_Features.md (current V1 features)
+- [x] Add purpose summary to V2_FEATURES.md (future post-launch features)
+- [x] Clarify distinction between current development vs. future roadmap
+- [x] Add AI agent guidance for when to update each document
