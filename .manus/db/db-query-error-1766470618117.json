@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE campaign_variants \nADD COLUMN approvalStatus ENUM('pending', 'approved', 'rejected') DEFAULT 'pending' NOT NULL AFTER status,\nADD COLUMN deploymentStatus ENUM('not_deployed', 'deployed', 'paused') DEFAULT 'not_deployed' NOT NULL AFTER approvalStatus,\nADD COLUMN deployedAt TIMESTAMP NULL AFTER deploymentStatus,\nADD COLUMN pausedAt TIMESTAMP NULL AFTER deployedAt;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute ALTER TABLE campaign_variants \nADD COLUMN approvalStatus ENUM('pending', 'approved', 'rejected') DEFAULT 'pending' NOT NULL AFTER status,\nADD COLUMN deploymentStatus ENUM('not_deployed', 'deployed', 'paused') DEFAULT 'not_deployed' NOT NULL AFTER approvalStatus,\nADD COLUMN deployedAt TIMESTAMP NULL AFTER deploymentStatus,\nADD COLUMN pausedAt TIMESTAMP NULL AFTER deployedAt;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'approvalstatus' in 'campaign_variants'"
+  ]
+}

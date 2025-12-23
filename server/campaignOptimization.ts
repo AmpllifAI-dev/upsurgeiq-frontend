@@ -272,3 +272,333 @@ export async function getCampaignPerformanceSummary(campaignId: number) {
     },
   };
 }
+
+/**
+ * Autonomous optimization configuration
+ */
+const OPTIMIZATION_CONFIG = {
+  // Minimum data required before making optimization decisions
+  MIN_IMPRESSIONS: 500,
+  MIN_CLICKS: 20,
+  
+  // Performance thresholds
+  POOR_PERFORMANCE_THRESHOLD: 30, // Score below 30 triggers pause
+  AUTO_DEPLOY_THRESHOLD: 70, // Score above 70 triggers auto-deploy
+  
+  // Time-based rules
+  MIN_RUNTIME_HOURS: 24, // Wait at least 24 hours before pausing
+  
+  // Rate limiting
+  RATE_LIMIT_HOURS: 24, // Max 1 generation per 24 hours
+  WEEKLY_GENERATION_LIMIT: 3, // Max 3 generations per week
+};
+
+/**
+ * Analyze campaign variants and make autonomous optimization decisions
+ * This runs automatically for approved deployed variants
+ */
+export async function optimizeCampaignVariants(campaignId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  // Get all approved variants for this campaign
+  const variants = await db
+    .select()
+    .from(campaignVariants)
+    .where(
+      and(
+        eq(campaignVariants.campaignId, campaignId),
+        eq(campaignVariants.approvalStatus, "approved")
+      )
+    );
+
+  if (variants.length === 0) {
+    return { optimized: 0, actions: [] };
+  }
+
+  const actions: Array<{
+    variantId: number;
+    variantName: string;
+    action: "pause" | "deploy" | "none";
+    reason: string;
+    score: number;
+  }> = [];
+
+  for (const variant of variants) {
+    // Calculate performance score
+    const metrics = calculatePerformanceScore({
+      impressions: variant.impressions || 0,
+      clicks: variant.clicks || 0,
+      conversions: variant.conversions || 0,
+      cost: variant.cost || 0,
+    });
+
+    // Check if variant has enough data
+    const hasEnoughData =
+      (variant.impressions || 0) >= OPTIMIZATION_CONFIG.MIN_IMPRESSIONS &&
+      (variant.clicks || 0) >= OPTIMIZATION_CONFIG.MIN_CLICKS;
+
+    if (!hasEnoughData) {
+      actions.push({
+        variantId: variant.id,
+        variantName: variant.name,
+        action: "none",
+        reason: "Insufficient data for optimization",
+        score: metrics.score,
+      });
+      continue;
+    }
+
+    // Check runtime (don't pause too quickly)
+    const runtimeHours = variant.deployedAt
+      ? (Date.now() - new Date(variant.deployedAt).getTime()) / (1000 * 60 * 60)
+      : 0;
+
+    // Auto-pause poor performers
+    if (
+      variant.deploymentStatus === "deployed" &&
+      metrics.score < OPTIMIZATION_CONFIG.POOR_PERFORMANCE_THRESHOLD &&
+      runtimeHours >= OPTIMIZATION_CONFIG.MIN_RUNTIME_HOURS
+    ) {
+      // Import pauseVariant dynamically to avoid circular dependency
+      const { pauseVariant } = await import("./campaignApproval");
+      await pauseVariant(
+        variant.id,
+        userId,
+        `Auto-paused due to poor performance (score: ${metrics.score.toFixed(1)}/100)`
+      );
+
+      actions.push({
+        variantId: variant.id,
+        variantName: variant.name,
+        action: "pause",
+        reason: `Performance score ${metrics.score.toFixed(1)}/100 below threshold`,
+        score: metrics.score,
+      });
+
+      logger.info("Auto-paused underperforming variant", {
+        metadata: { campaignId, variantId: variant.id, score: metrics.score },
+      });
+
+      continue;
+    }
+
+    // Auto-deploy high performers
+    if (
+      variant.deploymentStatus === "not_deployed" &&
+      metrics.score >= OPTIMIZATION_CONFIG.AUTO_DEPLOY_THRESHOLD
+    ) {
+      const { deployVariant } = await import("./campaignApproval");
+      await deployVariant(variant.id, userId);
+
+      actions.push({
+        variantId: variant.id,
+        variantName: variant.name,
+        action: "deploy",
+        reason: `Auto-deployed due to high performance (score: ${metrics.score.toFixed(1)}/100)`,
+        score: metrics.score,
+      });
+
+      logger.info("Auto-deployed high-performing variant", {
+        metadata: { campaignId, variantId: variant.id, score: metrics.score },
+      });
+
+      continue;
+    }
+
+    actions.push({
+      variantId: variant.id,
+      variantName: variant.name,
+      action: "none",
+      reason: "Performance within acceptable range",
+      score: metrics.score,
+    });
+  }
+
+  const optimizedCount = actions.filter((a) => a.action !== "none").length;
+
+  return {
+    optimized: optimizedCount,
+    actions,
+  };
+}
+
+/**
+ * Detect underperforming variants that need attention
+ * Returns variants that should trigger alerts to the client
+ */
+export async function detectUnderperformers(campaignId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  // Get deployed variants
+  const variants = await db
+    .select()
+    .from(campaignVariants)
+    .where(
+      and(
+        eq(campaignVariants.campaignId, campaignId),
+        eq(campaignVariants.deploymentStatus, "deployed")
+      )
+    );
+
+  const underperformers = [];
+
+  for (const variant of variants) {
+    const metrics = calculatePerformanceScore({
+      impressions: variant.impressions || 0,
+      clicks: variant.clicks || 0,
+      conversions: variant.conversions || 0,
+      cost: variant.cost || 0,
+    });
+
+    // Check if has enough data and is underperforming
+    const hasEnoughData =
+      (variant.impressions || 0) >= OPTIMIZATION_CONFIG.MIN_IMPRESSIONS &&
+      (variant.clicks || 0) >= OPTIMIZATION_CONFIG.MIN_CLICKS;
+
+    if (hasEnoughData && metrics.score < OPTIMIZATION_CONFIG.POOR_PERFORMANCE_THRESHOLD) {
+      underperformers.push({
+        ...variant,
+        performanceScore: metrics.score,
+        recommendation: "Consider pausing this variant and approving new variations",
+      });
+    }
+  }
+
+  return underperformers;
+}
+
+/**
+ * Get optimization recommendations for a campaign
+ */
+export async function getOptimizationRecommendations(campaignId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const variants = await db
+    .select()
+    .from(campaignVariants)
+    .where(eq(campaignVariants.campaignId, campaignId));
+
+  const recommendations = [];
+
+  // Count variants by status
+  const pendingCount = variants.filter((v) => v.approvalStatus === "pending").length;
+  const deployedCount = variants.filter((v) => v.deploymentStatus === "deployed").length;
+  const pausedCount = variants.filter((v) => v.deploymentStatus === "paused").length;
+
+  // Recommendation: Approve pending variants
+  if (pendingCount > 0) {
+    recommendations.push({
+      type: "action_required",
+      priority: "high",
+      title: `${pendingCount} variant${pendingCount > 1 ? "s" : ""} awaiting approval`,
+      description: "Review and approve new ad variations to expand your testing pool.",
+      action: "review_pending",
+    });
+  }
+
+  // Recommendation: Deploy approved variants
+  const approvedNotDeployed = variants.filter(
+    (v) => v.approvalStatus === "approved" && v.deploymentStatus === "not_deployed"
+  ).length;
+
+  if (approvedNotDeployed > 0) {
+    recommendations.push({
+      type: "opportunity",
+      priority: "medium",
+      title: `${approvedNotDeployed} approved variant${approvedNotDeployed > 1 ? "s" : ""} ready to deploy`,
+      description: "Deploy these variants to start collecting performance data.",
+      action: "deploy_approved",
+    });
+  }
+
+  // Recommendation: Review paused variants
+  if (pausedCount > 0) {
+    recommendations.push({
+      type: "info",
+      priority: "low",
+      title: `${pausedCount} variant${pausedCount > 1 ? "s" : ""} currently paused`,
+      description: "Consider generating new variations to replace underperformers.",
+      action: "generate_new",
+    });
+  }
+
+  // Recommendation: Need more variants
+  if (deployedCount < 3 && pendingCount === 0) {
+    recommendations.push({
+      type: "suggestion",
+      priority: "medium",
+      title: "Limited active variants",
+      description: "Generate more ad variations to improve A/B testing effectiveness.",
+      action: "generate_variants",
+    });
+  }
+
+  return recommendations;
+}
+
+/**
+ * Check if campaign can generate new variants (rate limiting)
+ */
+export async function canGenerateVariants(campaignId: number): Promise<{
+  allowed: boolean;
+  reason?: string;
+  nextAllowedAt?: Date;
+}> {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const [campaign] = await db
+    .select()
+    .from(campaigns)
+    .where(eq(campaigns.id, campaignId))
+    .limit(1);
+
+  if (!campaign) {
+    return { allowed: false, reason: "Campaign not found" };
+  }
+
+  // Rate limit: Max 1 generation per 24 hours
+  if (campaign.lastVariantGeneratedAt) {
+    const hoursSinceLastGeneration =
+      (Date.now() - new Date(campaign.lastVariantGeneratedAt).getTime()) / (1000 * 60 * 60);
+
+    if (hoursSinceLastGeneration < OPTIMIZATION_CONFIG.RATE_LIMIT_HOURS) {
+      const nextAllowedAt = new Date(
+        new Date(campaign.lastVariantGeneratedAt).getTime() +
+          OPTIMIZATION_CONFIG.RATE_LIMIT_HOURS * 60 * 60 * 1000
+      );
+
+      return {
+        allowed: false,
+        reason: `Rate limit: Can generate variants once per ${OPTIMIZATION_CONFIG.RATE_LIMIT_HOURS} hours`,
+        nextAllowedAt,
+      };
+    }
+  }
+
+  // Weekly limit: Max 3 generations per week
+  const generationCount = campaign.variantGenerationCount || 0;
+
+  // Reset counter if it's been more than 7 days since last generation
+  if (campaign.lastVariantGeneratedAt) {
+    const daysSinceLastGeneration =
+      (Date.now() - new Date(campaign.lastVariantGeneratedAt).getTime()) / (1000 * 60 * 60 * 24);
+
+    if (daysSinceLastGeneration >= 7) {
+      // Counter will be reset when generation happens
+      return { allowed: true };
+    }
+  }
+
+  if (generationCount >= OPTIMIZATION_CONFIG.WEEKLY_GENERATION_LIMIT) {
+    return {
+      allowed: false,
+      reason: `Weekly limit reached: Maximum ${OPTIMIZATION_CONFIG.WEEKLY_GENERATION_LIMIT} variant generations per week`,
+    };
+  }
+
+  return { allowed: true };
+}

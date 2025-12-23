@@ -128,3 +128,78 @@ ALTER TABLE users ADD COLUMN supportRole ENUM('none', 'support_agent', 'tech_lea
 **Related:**
 - See "Database Migration Backlog" section above
 - Users table schema in `drizzle/schema.ts` line 20
+
+
+### Quick Fix: Campaign Lab Approval & Deployment Columns (December 23, 2025)
+
+**Issue:** The `campaign_variants` and `campaigns` tables were missing columns needed for the approval workflow and autonomous optimization features.
+
+**Quick Fix Applied:**
+```sql
+-- campaign_variants table
+ALTER TABLE campaign_variants 
+ADD COLUMN approvalStatus ENUM('pending', 'approved', 'rejected') DEFAULT 'pending' NOT NULL,
+ADD COLUMN deploymentStatus ENUM('not_deployed', 'deployed', 'paused') DEFAULT 'not_deployed' NOT NULL,
+ADD COLUMN deployedAt TIMESTAMP NULL,
+ADD COLUMN pausedAt TIMESTAMP NULL;
+
+-- campaigns table
+ALTER TABLE campaigns 
+ADD COLUMN lastVariantGeneratedAt TIMESTAMP NULL,
+ADD COLUMN variantGenerationCount INT DEFAULT 0;
+```
+
+**Why Quick Fix:**
+- Running `pnpm db:push` would require answering 70+ interactive migration prompts
+- These columns were blocking the approval system implementation
+- The columns were already defined in `drizzle/schema.ts` but not in the database
+
+**Proper Fix Needed:**
+- Run full database migration during scheduled maintenance window
+- Ensure all schema tables are properly migrated
+- Remove this technical debt entry after proper migration
+
+**Status:** Temporary fix in place, proper migration pending
+
+**Related:**
+- Campaign Lab approval system implementation
+- Autonomous optimization features
+- Schema defined in `drizzle/schema.ts` lines 260-280
+
+### Quick Fix: User Notifications Table (December 23, 2025)
+
+**Issue:** The `user_notifications` table was missing for the in-app notification center feature.
+
+**Quick Fix Applied:**
+```sql
+CREATE TABLE IF NOT EXISTS user_notifications (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  userId INT NOT NULL,
+  type ENUM('pending_approval', 'underperforming_ad', 'optimization_action', 'variant_deployed', 'variant_paused') NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  message TEXT NOT NULL,
+  entityType VARCHAR(50),
+  entityId INT,
+  isRead INT DEFAULT 0 NOT NULL,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  readAt TIMESTAMP NULL,
+  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+);
+```
+
+**Why Quick Fix:**
+- Running `pnpm db:push` would require answering 70+ interactive migration prompts
+- This table was blocking the notification system implementation
+- The table was already defined in `drizzle/schema.ts` but not in the database
+
+**Proper Fix Needed:**
+- Run full database migration during scheduled maintenance window
+- Ensure all schema tables are properly migrated
+- Remove this technical debt entry after proper migration
+
+**Status:** Temporary fix in place, proper migration pending
+
+**Related:**
+- Campaign Lab notification system
+- In-app alert center
+- Schema defined in `drizzle/schema.ts` lines 285-306

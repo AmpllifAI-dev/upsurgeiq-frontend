@@ -1679,6 +1679,17 @@ Generate a comprehensive campaign strategy that includes:
     generateVariants: protectedProcedure
       .input(z.object({ campaignId: z.number() }))
       .mutation(async ({ ctx, input }) => {
+        // Check rate limiting
+        const { canGenerateVariants } = await import("./campaignOptimization");
+        const rateCheck = await canGenerateVariants(input.campaignId);
+        
+        if (!rateCheck.allowed) {
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: rateCheck.reason || "Rate limit exceeded",
+          });
+        }
+
         const { generateCampaignVariants, saveVariantsToDatabase } = await import("./campaignVariants");
         
         // Get campaign details
@@ -1714,6 +1725,18 @@ Generate a comprehensive campaign strategy that includes:
 
         // Save to database
         await saveVariantsToDatabase(campaign.id, variants);
+
+        // Update rate limiting fields
+        const db = await getDb();
+        if (db) {
+          await db
+            .update(campaigns)
+            .set({
+              lastVariantGeneratedAt: new Date(),
+              variantGenerationCount: (campaign.variantGenerationCount || 0) + 1,
+            })
+            .where(eq(campaigns.id, campaign.id));
+        }
 
         // Log activity
         await logActivity({
@@ -1838,6 +1861,59 @@ Generate a comprehensive campaign strategy that includes:
         await updateVariantStatuses(input.campaignId);
 
         return { success: true, message: "Performance data simulated for all variants" };
+      }),
+
+    // Approval workflow procedures
+    approveVariant: protectedProcedure
+      .input(z.object({ variantId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const { approveVariant } = await import("./campaignApproval");
+        return await approveVariant(input.variantId, ctx.user.id);
+      }),
+
+    rejectVariant: protectedProcedure
+      .input(
+        z.object({
+          variantId: z.number(),
+          reason: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { rejectVariant } = await import("./campaignApproval");
+        return await rejectVariant(input.variantId, ctx.user.id, input.reason);
+      }),
+
+    deployVariant: protectedProcedure
+      .input(z.object({ variantId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const { deployVariant } = await import("./campaignApproval");
+        return await deployVariant(input.variantId, ctx.user.id);
+      }),
+
+    pauseVariant: protectedProcedure
+      .input(
+        z.object({
+          variantId: z.number(),
+          reason: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { pauseVariant } = await import("./campaignApproval");
+        return await pauseVariant(input.variantId, ctx.user.id, input.reason);
+      }),
+
+    resumeVariant: protectedProcedure
+      .input(z.object({ variantId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const { resumeVariant } = await import("./campaignApproval");
+        return await resumeVariant(input.variantId, ctx.user.id);
+      }),
+
+    getPendingVariants: protectedProcedure
+      .input(z.object({ campaignId: z.number() }))
+      .query(async ({ input }) => {
+        const { getPendingVariants } = await import("./campaignApproval");
+        return await getPendingVariants(input.campaignId);
       }),
 
     bulkDelete: protectedProcedure

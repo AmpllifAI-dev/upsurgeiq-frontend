@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Progress } from "@/components/ui/progress";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,11 +18,17 @@ import {
   Sparkles,
   TrendingUp,
   TrendingDown,
+  Trophy,
+  AlertCircle,
   Eye,
+  BarChart3,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Play,
+  Pause,
   MousePointerClick,
   Target,
-  DollarSign,
-  Trophy,
   Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -69,6 +74,71 @@ export function CampaignVariants({ campaignId }: CampaignVariantsProps) {
     onError: (error) => {
       toast.error("Simulation Failed", {
         description: error.message || "Failed to simulate performance data.",
+      });
+    },
+  });
+
+  // Approval mutations
+  const approveMutation = trpc.campaign.approveVariant.useMutation({
+    onSuccess: () => {
+      toast.success("Variant Approved", {
+        description: "The variant has been approved and is ready for deployment.",
+      });
+      utils.campaign.getVariants.invalidate({ campaignId });
+    },
+    onError: (error) => {
+      toast.error("Approval Failed", {
+        description: error.message,
+      });
+    },
+  });
+
+  const rejectMutation = trpc.campaign.rejectVariant.useMutation({
+    onSuccess: () => {
+      toast.success("Variant Rejected");
+      utils.campaign.getVariants.invalidate({ campaignId });
+    },
+    onError: (error) => {
+      toast.error("Rejection Failed", {
+        description: error.message,
+      });
+    },
+  });
+
+  const deployMutation = trpc.campaign.deployVariant.useMutation({
+    onSuccess: () => {
+      toast.success("Variant Deployed", {
+        description: "The variant is now live on ad platforms.",
+      });
+      utils.campaign.getVariants.invalidate({ campaignId });
+    },
+    onError: (error) => {
+      toast.error("Deployment Failed", {
+        description: error.message,
+      });
+    },
+  });
+
+  const pauseMutation = trpc.campaign.pauseVariant.useMutation({
+    onSuccess: () => {
+      toast.success("Variant Paused");
+      utils.campaign.getVariants.invalidate({ campaignId });
+    },
+    onError: (error) => {
+      toast.error("Pause Failed", {
+        description: error.message,
+      });
+    },
+  });
+
+  const resumeMutation = trpc.campaign.resumeVariant.useMutation({
+    onSuccess: () => {
+      toast.success("Variant Resumed");
+      utils.campaign.getVariants.invalidate({ campaignId });
+    },
+    onError: (error) => {
+      toast.error("Resume Failed", {
+        description: error.message,
       });
     },
   });
@@ -221,6 +291,39 @@ export function CampaignVariants({ campaignId }: CampaignVariantsProps) {
                     <CardDescription className="text-xs">
                       {variant.psychologicalAngle}
                     </CardDescription>
+                    {/* Approval & Deployment Status */}
+                    <div className="flex items-center gap-2 mt-2">
+                      {variant.approvalStatus === "pending" && (
+                        <Badge variant="outline" className="text-xs">
+                          <Clock className="w-3 h-3 mr-1" />
+                          Pending Approval
+                        </Badge>
+                      )}
+                      {variant.approvalStatus === "approved" && (
+                        <Badge variant="outline" className="text-xs border-green-500 text-green-600">
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Approved
+                        </Badge>
+                      )}
+                      {variant.approvalStatus === "rejected" && (
+                        <Badge variant="outline" className="text-xs border-red-500 text-red-600">
+                          <XCircle className="w-3 h-3 mr-1" />
+                          Rejected
+                        </Badge>
+                      )}
+                      {variant.deploymentStatus === "deployed" && (
+                        <Badge variant="outline" className="text-xs border-blue-500 text-blue-600">
+                          <Play className="w-3 h-3 mr-1" />
+                          Live
+                        </Badge>
+                      )}
+                      {variant.deploymentStatus === "paused" && (
+                        <Badge variant="outline" className="text-xs border-orange-500 text-orange-600">
+                          <Pause className="w-3 h-3 mr-1" />
+                          Paused
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                   {getStatusBadge(variant.status)}
                 </div>
@@ -293,6 +396,70 @@ export function CampaignVariants({ campaignId }: CampaignVariantsProps) {
                     Collecting data... Need {100 - (variant.impressions || 0)} more impressions
                   </div>
                 )}
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2 pt-3 border-t">
+                  {variant.approvalStatus === "pending" && (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => approveMutation.mutate({ variantId: variant.id })}
+                        disabled={approveMutation.isPending}
+                      >
+                        <CheckCircle className="w-4 h-4 mr-1" />
+                        Approve
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => rejectMutation.mutate({ variantId: variant.id })}
+                        disabled={rejectMutation.isPending}
+                      >
+                        <XCircle className="w-4 h-4 mr-1" />
+                        Reject
+                      </Button>
+                    </>
+                  )}
+                  {variant.approvalStatus === "approved" &&
+                    variant.deploymentStatus === "not_deployed" && (
+                      <Button
+                        size="sm"
+                        className="w-full"
+                        onClick={() => deployMutation.mutate({ variantId: variant.id })}
+                        disabled={deployMutation.isPending}
+                      >
+                        <Play className="w-4 h-4 mr-1" />
+                        Deploy to Platforms
+                      </Button>
+                    )}
+                  {variant.deploymentStatus === "deployed" && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => pauseMutation.mutate({ variantId: variant.id })}
+                      disabled={pauseMutation.isPending}
+                    >
+                      <Pause className="w-4 h-4 mr-1" />
+                      Pause
+                    </Button>
+                  )}
+                  {variant.deploymentStatus === "paused" && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => resumeMutation.mutate({ variantId: variant.id })}
+                      disabled={resumeMutation.isPending}
+                    >
+                      <Play className="w-4 h-4 mr-1" />
+                      Resume
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           );

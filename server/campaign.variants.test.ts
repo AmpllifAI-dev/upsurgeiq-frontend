@@ -21,19 +21,18 @@ describe("Campaign Variants - AI Generation & Performance Tracking", () => {
     if (!db) throw new Error("Database not available");
 
     // Create test user
-    const [user] = await db
+    const userResult = await db
       .insert(users)
       .values({
         openId: `test-variant-${Date.now()}`,
         name: "Test User",
         email: `test-variant-${Date.now()}@example.com`,
         role: "user",
-      })
-      .$returningId();
-    testUserId = user.id;
+      });
+    testUserId = Number(userResult.insertId);
 
     // Create test business
-    const [business] = await db
+    const businessResult = await db
       .insert(businesses)
       .values({
         userId: testUserId,
@@ -42,12 +41,11 @@ describe("Campaign Variants - AI Generation & Performance Tracking", () => {
         brandVoiceStyle: "concise",
         targetAudience: "Small business owners aged 25-45",
         dossier: "We sell eco-friendly office supplies",
-      })
-      .$returningId();
-    testBusinessId = business.id;
+      });
+    testBusinessId = Number(businessResult.insertId);
 
     // Create test campaign
-    const [campaign] = await db
+    const campaignResult = await db
       .insert(campaigns)
       .values({
         businessId: testBusinessId,
@@ -58,9 +56,8 @@ describe("Campaign Variants - AI Generation & Performance Tracking", () => {
         status: "planning",
         platforms: "Facebook, LinkedIn",
         targetAudience: "Small business owners",
-      })
-      .$returningId();
-    testCampaignId = campaign.id;
+      });
+    testCampaignId = Number(campaignResult.insertId);
   });
 
   afterAll(async () => {
@@ -233,21 +230,21 @@ describe("Campaign Variants - AI Generation & Performance Tracking", () => {
       if (!db) throw new Error("Database not available");
 
       // Create a campaign with no variants
-      const [emptyCampaign] = await db
+      const emptyCampaignResult = await db
         .insert(campaigns)
         .values({
           businessId: testBusinessId,
           userId: testUserId,
           name: "Empty Campaign",
           status: "draft",
-        })
-        .$returningId();
+        });
+      const emptyCampaignId = Number(emptyCampaignResult.insertId);
 
-      const winnerId = await identifyWinningVariant(emptyCampaign.id);
+      const winnerId = await identifyWinningVariant(emptyCampaignId);
       expect(winnerId).toBeNull();
 
       // Cleanup
-      await db.delete(campaigns).where(eq(campaigns.id, emptyCampaign.id));
+      await db.delete(campaigns).where(eq(campaigns.id, emptyCampaignId));
     });
 
     it("should return null when variants have insufficient data", async () => {
@@ -284,7 +281,7 @@ describe("Campaign Variants - AI Generation & Performance Tracking", () => {
       await db.delete(campaignVariants).where(eq(campaignVariants.campaignId, testCampaignId));
 
       // Create variants with performance data
-      const [variant1] = await db
+      const variant1Result = await db
         .insert(campaignVariants)
         .values({
           campaignId: testCampaignId,
@@ -298,8 +295,8 @@ describe("Campaign Variants - AI Generation & Performance Tracking", () => {
           cost: 500,
           ctr: "10.00",
           conversionRate: "30.00",
-        })
-        .$returningId();
+        });
+      const variant1Id = Number(variant1Result.insertId);
 
       await db.insert(campaignVariants).values({
         campaignId: testCampaignId,
@@ -316,7 +313,7 @@ describe("Campaign Variants - AI Generation & Performance Tracking", () => {
       });
 
       const winnerId = await identifyWinningVariant(testCampaignId);
-      expect(winnerId).toBe(variant1.id);
+      expect(winnerId).toBe(variant1Id);
     });
   });
 

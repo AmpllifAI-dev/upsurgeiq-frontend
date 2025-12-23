@@ -247,6 +247,8 @@ export const campaigns = mysqlTable("campaigns", {
   aiGeneratedStrategy: text("aiGeneratedStrategy"),
   keyMessages: text("keyMessages"),
   successMetrics: text("successMetrics"),
+  lastVariantGeneratedAt: timestamp("lastVariantGeneratedAt"),
+  variantGenerationCount: int("variantGenerationCount").default(0),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -263,6 +265,10 @@ export const campaignVariants = mysqlTable("campaign_variants", {
   adCopy: text("adCopy"),
   imageUrl: varchar("imageUrl", { length: 500 }),
   status: mysqlEnum("status", ["testing", "winning", "losing", "archived"]).default("testing").notNull(),
+  approvalStatus: mysqlEnum("approvalStatus", ["pending", "approved", "rejected"]).default("pending").notNull(),
+  deploymentStatus: mysqlEnum("deploymentStatus", ["not_deployed", "deployed", "paused"]).default("not_deployed").notNull(),
+  deployedAt: timestamp("deployedAt"),
+  pausedAt: timestamp("pausedAt"),
   impressions: int("impressions").default(0),
   clicks: int("clicks").default(0),
   conversions: int("conversions").default(0),
@@ -275,6 +281,29 @@ export const campaignVariants = mysqlTable("campaign_variants", {
 
 export type CampaignVariant = typeof campaignVariants.$inferSelect;
 export type InsertCampaignVariant = typeof campaignVariants.$inferInsert;
+
+// User Notifications (in-app alerts)
+export const userNotifications = mysqlTable("user_notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  type: mysqlEnum("type", [
+    "pending_approval",
+    "underperforming_ad",
+    "optimization_action",
+    "variant_deployed",
+    "variant_paused",
+  ]).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  entityType: varchar("entityType", { length: 50 }), // campaign, campaign_variant, etc.
+  entityId: int("entityId"),
+  isRead: int("isRead").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  readAt: timestamp("readAt"),
+});
+
+export type UserNotification = typeof userNotifications.$inferSelect;
+export type InsertUserNotification = typeof userNotifications.$inferInsert;
 
 // Partners (for White-Label Program)
 export const partners = mysqlTable("partners", {

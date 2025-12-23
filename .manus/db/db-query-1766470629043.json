@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE campaign_variants \nADD COLUMN approvalStatus ENUM('pending', 'approved', 'rejected') DEFAULT 'pending' NOT NULL,\nADD COLUMN deploymentStatus ENUM('not_deployed', 'deployed', 'paused') DEFAULT 'not_deployed' NOT NULL,\nADD COLUMN deployedAt TIMESTAMP NULL,\nADD COLUMN pausedAt TIMESTAMP NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute ALTER TABLE campaign_variants \nADD COLUMN approvalStatus ENUM('pending', 'approved', 'rejected') DEFAULT 'pending' NOT NULL,\nADD COLUMN deploymentStatus ENUM('not_deployed', 'deployed', 'paused') DEFAULT 'not_deployed' NOT NULL,\nADD COLUMN deployedAt TIMESTAMP NULL,\nADD COLUMN pausedAt TIMESTAMP NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1235
+}
