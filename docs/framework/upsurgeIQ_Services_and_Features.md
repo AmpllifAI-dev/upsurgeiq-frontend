@@ -1,7 +1,7 @@
 # upsurgeIQ - Services and Features
 
-**Document Version:** 1.0  
-**Last Updated:** December 18, 2025
+**Document Version:** 1.1  
+**Last Updated:** December 23, 2025
 
 This document outlines all services and features available through upsurgeIQ, organized by subscription tier and feature category. This document is referenced in and forms part of the Terms and Conditions and User Agreement.
 
@@ -63,6 +63,14 @@ Additionally, the **Intelligent Campaign Lab** is available as a standalone serv
 **AI Assistant**
 - Not included in Starter plan
 
+**Platform Features**
+- Usage tracking dashboard (monitor press release and media list usage)
+- Invoice and billing history
+- Email notifications for account updates
+- Global search with command palette (Ctrl+K)
+- Keyboard shortcuts for common actions
+- Accessibility features (ARIA labels, skip navigation)
+
 **Additional Features**
 - Basic brand voice and tone configuration
 - AI image generation settings
@@ -108,6 +116,15 @@ Additionally, the **Intelligent Campaign Lab** is available as a standalone serv
 - Phone call capability to draft content while on the go
 - Automatic transcription and content generation from voice input
 - Email delivery of drafted content for review and approval
+
+**Platform Features**
+- Usage tracking dashboard (monitor press release and media list usage)
+- Invoice and billing history
+- Email notifications for account updates and campaign alerts
+- Global search with command palette (Ctrl+K)
+- Keyboard shortcuts for common actions
+- Accessibility features (ARIA labels, skip navigation)
+- Export analytics data to CSV
 
 **Additional Features**
 - Advanced brand voice and tone configuration
@@ -160,17 +177,50 @@ Additionally, the **Intelligent Campaign Lab** is available as a standalone serv
 
 **Intelligent Campaign Lab (Included)**
 - AI-powered advertising campaign optimization
-- Multi-variant testing across different messaging angles
+- Multi-variant testing across different messaging angles (4-6 variations per round)
+- Variant approval system (approve/reject before deployment)
+- Autonomous optimization (auto-pause underperformers, auto-deploy winners)
 - Real-time performance monitoring and adjustment
-- Automatic redeployment of winning ad variations
+- Performance alert system with in-app notifications
+- Email notifications for pending approvals and performance alerts
+- Rate limiting for variant generation (24-hour and weekly limits)
 - Campaign performance analytics and reporting
+- Campaign PDF export with charts and analytics
 - Conversational AI assistant for campaign management
 - Ad spend managed directly by user on their own ad platform account
+
+**Platform Features**
+- Usage tracking dashboard (monitor all usage metrics)
+- Invoice and billing history
+- Email notifications for all account and campaign events
+- In-app notification center with real-time alerts
+- Global search with command palette (Ctrl+K)
+- Keyboard shortcuts for common actions
+- Accessibility features (ARIA labels, skip navigation)
+- Export analytics data to CSV
+- Export campaign reports to PDF
+- Bug reporting system with autonomous investigation
+- Error logging and monitoring dashboard (admin only)
+
+**White Label Partnership Features**
+- Co-branded portal with custom branding
+- Partner dashboard with member analytics
+- Commission tracking and reporting (20% recurring)
+- Marketing materials library
+- Dedicated partner account manager
+
+**WordPress Integration**
+- WordPress REST API connection
+- ACF Pro custom fields sync
+- Press release CMS integration
+- Content sync scheduling
+- Business profiles endpoint integration
 
 **Additional Features**
 - Premium brand voice and tone configuration
 - AI image generation with advanced style customization
 - Enhanced onboarding and dossier building
+- Client dossier auto-research system
 - LinkedIn profile integration for new hire content
 - Sports team series and schedule integration (for motorsport and professional sports clients)
 - Priority support
@@ -187,10 +237,16 @@ The Intelligent Campaign Lab is available as a standalone service for any subscr
 - AI-powered advertising campaign optimization
 - Multi-variant creative testing (4-6 different ad variations per testing round)
 - Testing across different psychological angles and value propositions
+- Variant approval system (approve/reject before deployment)
+- Autonomous optimization (auto-pause underperformers, auto-deploy winners)
 - Real-time performance monitoring and feedback collection
+- Performance alert system with in-app notifications
+- Email notifications for pending approvals and performance alerts
+- Rate limiting for variant generation (24-hour and weekly limits)
 - Automatic identification of winning variations
 - Continuous redeployment and testing of new variations
 - Campaign performance analytics and detailed reporting
+- Campaign PDF export with charts and analytics
 - Conversational AI assistant for campaign strategy and management
 - Support for campaigns on Facebook, Instagram, LinkedIn, and X
 
@@ -392,4 +448,15 @@ For questions about services and features, please contact:
 | **Campaign Lab** | ❌ | ❌ | ✔️ | ✔️ |
 | **Priority Support** | ❌ | ❌ | ✔️ | ❌ |
 | **Sports Team Integration** | ✔️ | ✔️ | ✔️ | ❌ |
+| **Usage Tracking Dashboard** | ✔️ | ✔️ | ✔️ | N/A |
+| **Invoice/Billing History** | ✔️ | ✔️ | ✔️ | N/A |
+| **Command Palette (Ctrl+K)** | ✔️ | ✔️ | ✔️ | N/A |
+| **Keyboard Shortcuts** | ✔️ | ✔️ | ✔️ | N/A |
+| **Email Notifications** | ✔️ | ✔️ | ✔️ | ✔️ |
+| **In-App Notifications** | ❌ | ❌ | ✔️ | ✔️ |
+| **CSV Export** | ❌ | ✔️ | ✔️ | ✔️ |
+| **PDF Export** | ❌ | ❌ | ✔️ | ✔️ |
+| **WordPress Integration** | ❌ | ❌ | ✔️ | N/A |
+| **White Label Portal** | ❌ | ❌ | ✔️ | N/A |
+| **Bug Reporting System** | ❌ | ❌ | ✔️ | N/A |
 
