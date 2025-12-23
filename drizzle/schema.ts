@@ -853,6 +853,7 @@ export const creditUsage = mysqlTable("credit_usage", {
     "image_generation",
     "voice_transcription",
     "content_analysis",
+    "admin_adjustment",
     "other"
   ]).notNull(),
   creditsUsed: decimal("creditsUsed", { precision: 10, scale: 4 }).notNull(), // Precise credit tracking

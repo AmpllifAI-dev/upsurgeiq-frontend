@@ -55,7 +55,7 @@ export default function PressReleaseNew() {
   const [showAIWarning, setShowAIWarning] = useState(false);
   const [distributionType, setDistributionType] = useState<"ai_assisted" | "manual">("ai_assisted");
 
-  const { data: business, isLoading: businessLoading } = trpc.business.get.useQuery(undefined, {
+  const { data: business, isLoading: businessLoading } = trpc.business?.get.useQuery(undefined, {
     enabled: !!user,
   });
 
@@ -152,8 +152,8 @@ export default function PressReleaseNew() {
     generateMutation.mutate({
       topic,
       keyPoints,
-      targetAudience: targetAudience || business.targetAudience || "",
-      tone: tone || business.brandVoiceTone || "formal",
+      targetAudience: targetAudience || business?.targetAudience || "",
+      tone: tone || business?.brandVoiceTone || "formal",
     });
   };
 
@@ -283,13 +283,13 @@ export default function PressReleaseNew() {
                 <Label htmlFor="targetAudience">Target Audience</Label>
                 <Input
                   id="targetAudience"
-                  placeholder={business.targetAudience || "e.g., Tech industry professionals"}
+                  placeholder={business?.targetAudience || "e.g., Tech industry professionals"}
                   value={targetAudience}
                   onChange={(e) => setTargetAudience(e.target.value)}
                   disabled={isGenerating}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Default: {business.targetAudience || "General audience"}
+                  Default: {business?.targetAudience || "General audience"}
                 </p>
               </div>
 
@@ -317,7 +317,7 @@ export default function PressReleaseNew() {
                 <Label htmlFor="tone">Tone</Label>
                 <Select value={tone} onValueChange={setTone} disabled={isGenerating}>
                   <SelectTrigger>
-                    <SelectValue placeholder={`Default: ${business.brandVoiceTone || "Formal"}`} />
+                    <SelectValue placeholder={`Default: ${business?.brandVoiceTone || "Formal"}`} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="formal">Formal & Professional</SelectItem>
@@ -328,7 +328,7 @@ export default function PressReleaseNew() {
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">
-                  Default: {business.brandVoiceTone || "Formal"}
+                  Default: {business?.brandVoiceTone || "Formal"}
                 </p>
               </div>
 

@@ -22,7 +22,7 @@ export default function ReportIssue() {
   const [expectedBehavior, setExpectedBehavior] = useState("");
   const [actualBehavior, setActualBehavior] = useState("");
 
-  const submitIssue = trpc.issues.submit.useMutation({
+  const submitIssue = trpc.issues.create.useMutation({
     onSuccess: () => {
       toast({
         title: "Issue reported successfully",
@@ -30,7 +30,7 @@ export default function ReportIssue() {
       });
       setLocation("/dashboard");
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         variant: "destructive",
         title: "Failed to submit issue",
@@ -52,14 +52,13 @@ export default function ReportIssue() {
     }
 
     submitIssue.mutate({
-      issueType,
+      type: issueType,
       title,
       description,
-      stepsToReproduce: stepsToReproduce || undefined,
+      reproSteps: stepsToReproduce || undefined,
       expectedBehavior: expectedBehavior || undefined,
       actualBehavior: actualBehavior || undefined,
       browserInfo: navigator.userAgent,
-      deviceInfo: `${navigator.platform} - ${window.screen.width}x${window.screen.height}`,
       pageUrl: window.location.href,
     });
   };

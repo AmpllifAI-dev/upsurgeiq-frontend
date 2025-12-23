@@ -16,7 +16,7 @@ interface UsageStat {
 
 export function UsageTrackingDashboard() {
   const { data: subscription } = trpc.subscription.getSubscription.useQuery();
-  const { data: pressReleases } = trpc.pressReleases.list.useQuery();
+  const { data: pressReleases } = trpc.pressRelease.list.useQuery();
   const { data: campaigns } = trpc.campaigns.list.useQuery();
   const { data: socialPosts } = trpc.socialMedia.list.useQuery();
 

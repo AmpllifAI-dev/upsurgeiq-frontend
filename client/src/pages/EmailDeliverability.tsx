@@ -9,7 +9,7 @@ import { useState } from "react";
 export default function EmailDeliverability() {
   const [timeRange, setTimeRange] = useState("30");
   
-  const { data: deliverabilityData, isLoading } = trpc.analytics.getDeliverability.useQuery({
+  const { data: deliverabilityData, isLoading } = trpc.leadBehaviour.getDeliverability.useQuery({
     days: parseInt(timeRange),
   });
 

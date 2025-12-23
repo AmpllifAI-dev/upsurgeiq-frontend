@@ -19,7 +19,7 @@ function getSessionId(): string {
  * Hook to track page views automatically
  */
 export function usePageTracking() {
-  const trackEvent = trpc.analytics.trackEvent.useMutation();
+  const trackEvent = trpc.leadBehaviour.trackEvent.useMutation();
   const hasTracked = useRef(false);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export function usePageTracking() {
  * Hook to track custom events
  */
 export function useEventTracking() {
-  const trackEvent = trpc.analytics.trackEvent.useMutation();
+  const trackEvent = trpc.leadBehaviour.trackEvent.useMutation();
 
   const track = (
     eventType: "resource_download" | "blog_read" | "case_study_view" | "cta_click" | "video_play" | "external_link_click",

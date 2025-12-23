@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE credit_usage MODIFY COLUMN featureType ENUM('press_release_generation', 'campaign_strategy_generation', 'ai_chat', 'image_generation', 'voice_transcription', 'content_analysis', 'admin_adjustment', 'other') NOT NULL",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Hyo2L8cuQnYKpK.root --database grCyd6mifTZvX8AxBen7Th --execute ALTER TABLE credit_usage MODIFY COLUMN featureType ENUM('press_release_generation', 'campaign_strategy_generation', 'ai_chat', 'image_generation', 'voice_transcription', 'content_analysis', 'admin_adjustment', 'other') NOT NULL",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 664
+}

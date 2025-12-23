@@ -21,8 +21,8 @@ import {
 import { trpc } from "@/lib/trpc";
 
 export function AnalyticsDashboard() {
-  const { data: summary, isLoading: summaryLoading } = trpc.analytics.getSummary.useQuery();
-  const { data: topPages, isLoading: pagesLoading } = trpc.analytics.getTopPages.useQuery({ limit: 10 });
+  const { data: summary, isLoading: summaryLoading } = trpc.leadBehaviour.getSummary.useQuery();
+  const { data: topPages, isLoading: pagesLoading } = trpc.leadBehaviour.getTopPages.useQuery({ limit: 10 });
 
   return (
     <DashboardLayout>

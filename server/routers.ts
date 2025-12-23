@@ -339,6 +339,7 @@ export const appRouter = router({
           aiImageStyle: z.string().optional(),
           aiImageMood: z.string().optional(),
           aiImageColorPalette: z.string().optional(),
+          preferredLanguage: z.string().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -428,6 +429,7 @@ export const appRouter = router({
           aiImageStyle: z.string().optional(),
           aiImageMood: z.string().optional(),
           aiImageColorPalette: z.string().optional(),
+          preferredLanguage: z.string().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -4071,6 +4073,132 @@ Generate a comprehensive campaign strategy that includes:
 
         const { PRODUCT_DEFINITIONS } = await import("./productDefinitions");
         return PRODUCT_DEFINITIONS;
+      }),
+
+    // Get all users with their credit usage
+    getAllUsersCredits: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+
+        const db = await getDb();
+        if (!db) return [];
+
+        const usersWithCredits = await db
+          .select({
+            userId: users.id,
+            name: users.name,
+            email: users.email,
+            totalCredits: sql<number>`COALESCE(SUM(CAST(${creditUsage.creditsUsed} AS DECIMAL(10,4))), 0)`,
+            totalTokens: sql<number>`COALESCE(SUM(${creditUsage.tokensUsed}), 0)`,
+            lastUsed: sql<Date>`MAX(${creditUsage.createdAt})`,
+          })
+          .from(users)
+          .leftJoin(creditUsage, eq(users.id, creditUsage.userId))
+          .groupBy(users.id, users.name, users.email)
+          .orderBy(sql`SUM(CAST(${creditUsage.creditsUsed} AS DECIMAL(10,4))) DESC`);
+
+        return usersWithCredits.map(u => ({
+          userId: u.userId,
+          name: u.name || "Unknown",
+          email: u.email || "",
+          totalCredits: Number(u.totalCredits),
+          totalTokens: Number(u.totalTokens),
+          lastUsed: u.lastUsed,
+        }));
+      }),
+
+    // Adjust user credits (admin manual adjustment)
+    adjustCredits: protectedProcedure
+      .input(z.object({
+        userId: z.number(),
+        credits: z.number(),
+        reason: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        }
+
+        // Record the credit adjustment
+        await db.insert(creditUsage).values({
+          userId: input.userId,
+          featureType: "admin_adjustment",
+          creditsUsed: input.credits.toString(),
+          tokensUsed: 0,
+          metadata: JSON.stringify({ reason: input.reason, adjustedBy: ctx.user.id }),
+          createdAt: new Date(),
+        });
+
+        return { success: true };
+      }),
+
+    // Export credit usage data
+    exportCreditUsage: protectedProcedure
+      .input(z.object({
+        timeRange: z.enum(["7d", "30d", "90d", "all"]),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        }
+
+        // Calculate date filter
+        let dateFilter: Date | null = null;
+        if (input.timeRange !== "all") {
+          const days = input.timeRange === "7d" ? 7 : input.timeRange === "30d" ? 30 : 90;
+          dateFilter = new Date();
+          dateFilter.setDate(dateFilter.getDate() - days);
+        }
+
+        const query = db
+          .select({
+            userId: creditUsage.userId,
+            userName: users.name,
+            userEmail: users.email,
+            featureType: creditUsage.featureType,
+            creditsUsed: creditUsage.creditsUsed,
+            tokensUsed: creditUsage.tokensUsed,
+            createdAt: creditUsage.createdAt,
+          })
+          .from(creditUsage)
+          .leftJoin(users, eq(creditUsage.userId, users.id))
+          .orderBy(desc(creditUsage.createdAt));
+
+        if (dateFilter) {
+          query.where(gte(creditUsage.createdAt, dateFilter));
+        }
+
+        const data = await query;
+
+        // Convert to CSV format
+        const csvRows = [
+          ["User ID", "Name", "Email", "Feature", "Credits", "Tokens", "Date"],
+          ...data.map(row => [
+            row.userId.toString(),
+            row.userName || "Unknown",
+            row.userEmail || "",
+            row.featureType,
+            row.creditsUsed,
+            (row.tokensUsed ?? 0).toString(),
+            row.createdAt.toISOString(),
+          ]),
+        ];
+
+        const csv = csvRows.map(row => row.map(cell => `"${cell}"`).join(",")).join("\n");
+
+        return { csv, filename: `credit-usage-${input.timeRange}-${new Date().toISOString().split('T')[0]}.csv` };
       }),
   }),
 

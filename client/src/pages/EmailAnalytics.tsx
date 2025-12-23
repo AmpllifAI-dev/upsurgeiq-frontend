@@ -34,13 +34,13 @@ export function EmailAnalytics() {
   const [selectedCampaign, setSelectedCampaign] = useState<string>("all");
 
   // Fetch analytics data
-  const { data: overviewStats, isLoading: statsLoading } = trpc.analytics.getOverview.useQuery({
+  const { data: overviewStats, isLoading: statsLoading } = trpc.leadBehaviour.getOverview.useQuery({
     days: parseInt(timeRange),
   });
 
   const { data: campaigns } = trpc.campaigns.list.useQuery();
   
-  const { data: campaignPerformance, isLoading: performanceLoading } = trpc.analytics.getCampaignPerformance.useQuery({
+  const { data: campaignPerformance, isLoading: performanceLoading } = trpc.leadBehaviour.getCampaignPerformance.useQuery({
     campaignId: selectedCampaign === "all" ? undefined : parseInt(selectedCampaign),
     days: parseInt(timeRange),
   });
