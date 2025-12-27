@@ -646,8 +646,63 @@ Database schema has 70+ tables defined, but only some exist in actual database. 
 - When context has changed significantly
 - Quarterly for active projects
 
-**Last Review:** December 22, 2025  
+**Last Review:** December 23, 2025  
 **Next Review:** Before platform launch
+
+---
+
+### Decision: Consolidate V2 Documentation into Single File
+
+**Date:** December 23, 2025  
+**Status:** Active
+
+**Context:**  
+Originally had two separate V2 documents (V2_FEATURES.md and ROADMAP_V2.md) which created confusion about where to document future features. Needed clear separation between current development (V1) and future roadmap (V2).
+
+**Alternatives Considered:**
+1. Keep both documents separate - Pro: Granular organization. Con: Confusion about which to update
+2. Merge into Services document - Pro: Single source. Con: Mixes current and future features
+3. Consolidate into single V2_FEATURES.md - Pro: Clear V1/V2 separation. Con: Larger file
+
+**Rationale:**  
+Chosen Option 3 because it provides clear distinction:
+- **upsurgeIQ_Services_and_Features.md** = Current V1 features being developed/deployed now
+- **V2_FEATURES.md** = Future features for post-launch development (roadmap)
+
+This prevents AI agents from mixing current and future work.
+
+**Impact:**  
+- Renamed ROADMAP_V2.md to ROADMAP_V2_OLD.md for reference
+- Created consolidated V2_FEATURES.md with both immediate post-launch features and long-term website builder vision
+- Updated AI_AGENT_START_HERE.md mandatory reading list
+- Added enforcement rules requiring V2 feature checks before proposing new features
+
+**IMPORTANT:** All future AI agents must read V2_FEATURES.md and check it before proposing any post-launch features.
+
+---
+
+### Decision: Complete Services Documentation Audit
+
+**Date:** December 23, 2025  
+**Status:** Active
+
+**Context:**  
+Discovered that 30+ implemented features were missing from upsurgeIQ_Services_and_Features.md, creating gap between actual product and documented product specification.
+
+**Rationale:**  
+Services and Features document is referenced in Terms and Conditions and User Agreement, so it must accurately reflect all available features by tier.
+
+**Impact:**  
+- Updated document version from 1.0 to 1.1
+- Added Campaign Lab enhancements (variant approval, autonomous optimization, notifications)
+- Added platform features (usage tracking, invoices, command palette, keyboard shortcuts)
+- Added export features (CSV analytics, PDF campaigns)
+- Added WordPress integration features
+- Added white label partnership features
+- Added bug reporting and error logging
+- Updated feature comparison table with 13 new rows
+
+**IMPORTANT:** When implementing new features, AI agents must update upsurgeIQ_Services_and_Features.md to keep it current.
 
 ---
 

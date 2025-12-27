@@ -2769,3 +2769,82 @@ Note: "Campaign" = Press Release + Social Media Posts (NOT Campaign Lab)
 - [x] Add accessibility and UX features
 - [x] Update feature comparison table with all new features
 - [x] Update document version to 1.1 and date to December 23, 2025
+
+
+## Framework Documentation Update (December 23, 2025)
+- [x] Update AI_AGENT_START_HERE.md with current priorities (pre-launch testing)
+- [x] Update AI_AGENT_START_HERE.md with recently completed features
+- [x] Update AI_AGENT_START_HERE.md timestamp to December 23, 2025 07:45 GMT
+- [x] Update PROJECT_CONTEXT.md status to "Pre-Launch Testing"
+- [x] Add PROJECT_CONTEXT.md last updated timestamp
+- [x] Add V2 documentation consolidation decision to DECISIONS_LOG.md
+- [x] Add services documentation audit decision to DECISIONS_LOG.md
+- [x] Update DECISIONS_LOG.md last review date to December 23, 2025
+
+
+## Pre-Launch Tasks (December 23, 2025)
+
+### Campaign Lab Testing
+- [ ] Create test campaign with real data
+- [ ] Generate 4-6 ad variants using AI
+- [ ] Test variant approval workflow (approve/reject)
+- [ ] Verify in-app notifications appear for pending approvals
+- [ ] Verify email notifications are sent for pending approvals
+- [ ] Test autonomous optimization (auto-pause underperformers)
+- [ ] Verify performance alert notifications work
+- [ ] Test campaign PDF export with charts
+
+### Ad Platform OAuth Configuration - ADMINISTRATOR TASK
+- [ ] Set up Facebook Developer App - ADMINISTRATOR TASK
+- [ ] Configure Facebook OAuth credentials - ADMINISTRATOR TASK
+- [ ] Set up LinkedIn Developer App - ADMINISTRATOR TASK
+- [ ] Configure LinkedIn OAuth credentials - ADMINISTRATOR TASK
+- [ ] Follow SOCIAL_MEDIA_ADS_API_SETUP.md guide - ADMINISTRATOR TASK
+- [ ] Test OAuth connection flows - ADMINISTRATOR TASK
+- [ ] Verify ad deployment capabilities - ADMINISTRATOR TASK
+
+### Final Quality Assurance
+- [ ] Run full regression test of all major features
+- [ ] Test press release creation and distribution
+- [ ] Test social media posting to all platforms
+- [ ] Test media list management and CSV upload
+- [ ] Test AI assistant (text and voice call-in)
+- [ ] Test WordPress integration sync
+- [ ] Test white label partner portal
+- [ ] Test bug reporting system
+- [ ] Verify all email notifications are working
+- [ ] Test usage tracking dashboard accuracy
+- [ ] Test invoice and billing history
+
+### Technical Cleanup
+- [ ] Review and fix any remaining TypeScript errors
+- [ ] Performance testing (load times, database queries)
+- [ ] Security audit (authentication, authorization, data protection)
+- [ ] Review error logging and monitoring
+- [ ] Test database connection resilience (handle timeouts)
+
+### Launch Preparation - ADMINISTRATOR TASK
+- [ ] Create comprehensive pre-launch checklist - ADMINISTRATOR TASK
+- [ ] Review Terms and Conditions alignment with Services doc - ADMINISTRATOR TASK
+- [ ] Verify Stripe products and pricing are correct - ADMINISTRATOR TASK
+- [ ] Test subscription upgrade/downgrade flows - ADMINISTRATOR TASK
+- [ ] Prepare launch announcement materials - ADMINISTRATOR TASK
+- [ ] Set up customer support email and processes - ADMINISTRATOR TASK
+- [ ] Create user onboarding documentation - ADMINISTRATOR TASK
+
+
+## Framework Documentation & Chat History (December 23, 2025 Morning)
+- [x] Consolidate V2 documentation (V2_FEATURES.md + ROADMAP_V2_OLD.md)
+- [x] Add purpose summaries to V2_FEATURES.md and upsurgeIQ_Services_and_Features.md
+- [x] Complete services documentation audit (30+ missing features added)
+- [x] Update upsurgeIQ_Services_and_Features.md to version 1.1
+- [x] Add 13 new rows to feature comparison table
+- [x] Update AI_AGENT_START_HERE.md current priorities
+- [x] Update PROJECT_CONTEXT.md status to "Pre-Launch Testing"
+- [x] Add V2 consolidation decision to DECISIONS_LOG.md
+- [x] Add services audit decision to DECISIONS_LOG.md
+- [x] Create Manus-hosted services breakdown document
+- [x] Create white label features comprehensive document
+- [x] Create actual services breakdown (Vercel, Cloudflare, WP Engine, etc.)
+- [x] Add pre-launch tasks to todo.md with ADMINISTRATOR TASK markers
+- [x] Capture conversation history: CONVERSATION_HISTORY_DEC23.md (1:30 AM - 8:00 AM GMT)
