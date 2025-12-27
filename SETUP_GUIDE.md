@@ -82,7 +82,7 @@ Progress: resolved 847, reused 823, downloaded 24, added 847, done
 ```
 
 **If you see errors:**
-- Check Node.js version: `node --version` (should be 22.13.0)
+- Check Node.js version: `node --version` (should be 20.x or higher)
 - Clear pnpm cache: `pnpm store prune`
 - Try again: `pnpm install`
 
