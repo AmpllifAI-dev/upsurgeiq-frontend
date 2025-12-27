@@ -88,16 +88,41 @@ Progress: resolved 847, reused 823, downloaded 24, added 847, done
 
 ### Step 3: Environment Variables
 
-**On Manus Platform:**
-Environment variables are automatically injected. You don't need to create a `.env` file.
+⚠️ **CRITICAL:** The application requires 25+ environment variables to run.
 
-**For Local Development (if not using Manus):**
+**Option 1: Use Manus Platform (Recommended)**
 
-Create `.env` file in project root:
+All environment variables are pre-configured in the Manus platform. Just run:
 
-```env
-# Database
-DATABASE_URL="mysql://user:password@host:port/database"
+```bash
+pnpm dev
+```
+
+The server will automatically pick up all variables. No `.env` file needed.
+
+**Option 2: Local Development (Outside Manus)**
+
+You'll need to obtain actual secret values from Christopher. The application cannot run without them.
+
+**Required variables include:**
+- Manus OAuth credentials (VITE_APP_ID, OAUTH_SERVER_URL, etc.)
+- Database connection (DATABASE_URL)
+- Stripe payment keys (STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET)
+- SendGrid email key (SENDGRID_API_KEY)
+- JWT secret (JWT_SECRET)
+- And 20+ more...
+
+**See ENVIRONMENT_VARIABLES.md for complete list and setup instructions.**
+
+**To get access:**
+1. Request Manus platform access from Christopher (easiest)
+2. OR request encrypted file with actual values
+3. OR request secure password manager share
+
+**Never:**
+- Commit `.env` file to Git
+- Share secrets in chat/email
+- Use production keys in development
 
 # Authentication
 JWT_SECRET="your-jwt-secret"
